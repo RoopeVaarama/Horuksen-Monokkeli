@@ -1,7 +1,3 @@
-# Horuksen-Monokkeli-
-Horuksen Monokkeli 
-
-
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
 </p>
@@ -40,10 +36,6 @@ $ npm install
 
 ```bash
 # development
-
-# Start front and backend at the same time
-$ nom run dev
-
 $ npm run start
 
 # watch mode
