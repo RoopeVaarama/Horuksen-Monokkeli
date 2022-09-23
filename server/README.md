@@ -13,6 +13,8 @@ $ npm install
 Install MongoDB on your computer, [standalone](https://www.mongodb.com/try/download/community) 
 or [dockerized](https://www.bmc.com/blogs/mongodb-docker-container/).
 
+Update .env file if necessary (probably isn't).
+
 ## Running the app
 
 ```bash
