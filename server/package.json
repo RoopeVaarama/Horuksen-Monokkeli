@@ -31,6 +31,7 @@
     "concurrently": "^7.4.0",
     "dotenv": "^16.0.2",
     "mongoose": "^6.6.1",
+    "pdf.js-extract": "^0.2.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0"
