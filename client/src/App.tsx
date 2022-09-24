@@ -1,25 +1,26 @@
 import React from 'react';
-import logo from './logo.svg';
-import './assets/App.css';
+import { ThemeProvider } from '@emotion/react';
+import theme from './assets/theme';
+import { AppBar, Box, Toolbar, Typography } from '@mui/material';
+
+const HEADER_HEIGHT = '60px'
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ThemeProvider theme={theme}>
+      <Box position='relative' height='100vh' width='100%' sx={{ backgroundColor: theme.palette.background.default }}>
+        <AppBar position='fixed'>
+          <Toolbar variant='dense' sx={{ minHeight: HEADER_HEIGHT }}>
+            <Typography variant='h6'>
+              LOGO
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        <Box pt={HEADER_HEIGHT} boxSizing='border-box' width='100%' height='100%' sx={{ backgroundColor: theme.palette.background.default }}>
+          CONTENT
+        </Box>
+      </Box>
+    </ThemeProvider>
   );
 }
 
