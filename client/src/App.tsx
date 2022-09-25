@@ -1,6 +1,11 @@
+import { lazy, Suspense } from 'react'
 import { ThemeProvider } from '@emotion/react'
 import theme from './assets/theme'
-import { AppBar, Box, Toolbar, Typography } from '@mui/material'
+import { AppBar, Box, CircularProgress, Toolbar, Typography } from '@mui/material'
+import { Route, Routes } from 'react-router-dom'
+
+const AsyncSearchContainer = lazy(() => import('./components/SearchContainer'))
+const AsyncPageNotFound = lazy(() => import('./components/PageNotFound'))
 
 const HEADER_HEIGHT = '60px'
 
@@ -25,7 +30,18 @@ function App() {
           height='100%'
           sx={{ backgroundColor: theme.palette.background.default }}
         >
-          CONTENT
+          <Suspense
+            fallback={
+              <Box pt={2} width='100%' display='flex' justifyContent='center'>
+                <CircularProgress />
+              </Box>
+            }
+          >
+            <Routes>
+              <Route path='/' element={<AsyncSearchContainer />} />
+              <Route path='*' element={<AsyncPageNotFound />} />
+            </Routes>
+          </Suspense>
         </Box>
       </Box>
     </ThemeProvider>
