@@ -1,8 +1,11 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useContext } from 'react'
 import { ThemeProvider } from '@emotion/react'
 import theme from './assets/theme'
-import { AppBar, Box, CircularProgress, Toolbar, Typography } from '@mui/material'
+import { AppBar, Box, CircularProgress, Grid, MenuItem, Toolbar, Typography } from '@mui/material'
+import Select, { SelectChangeEvent } from '@mui/material/Select'
 import { Route, Routes } from 'react-router-dom'
+import { IntlContext } from './components/LanguageContainer/LanguageContainer'
+import { FormattedMessage } from 'react-intl'
 
 const AsyncSearchContainer = lazy(() => import('./components/SearchContainer'))
 const AsyncPageNotFound = lazy(() => import('./components/PageNotFound'))
@@ -10,6 +13,8 @@ const AsyncPageNotFound = lazy(() => import('./components/PageNotFound'))
 const HEADER_HEIGHT = '60px'
 
 function App() {
+  const intlContext = useContext(IntlContext)
+
   return (
     <ThemeProvider theme={theme}>
       <Box
@@ -20,7 +25,29 @@ function App() {
       >
         <AppBar position='fixed'>
           <Toolbar variant='dense' sx={{ minHeight: HEADER_HEIGHT }}>
-            <Typography variant='h6'>LOGO</Typography>
+            <Grid container justifyContent='space-between' alignItems='center'>
+              <Grid item>
+                <Typography variant='h6'>
+                  <FormattedMessage id='appTitle' defaultMessage='Horuksen monokkeli' />
+                </Typography>
+              </Grid>
+              <Grid item>
+                {intlContext && (
+                  <Select
+                    value={intlContext.locale}
+                    onChange={(e: SelectChangeEvent<string>) =>
+                      intlContext.changeLanguage(e.target.value)
+                    }
+                  >
+                    {Object.keys(intlContext.locales).map((option) => (
+                      <MenuItem key={option} value={option}>
+                        {intlContext.locales[option]}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                )}
+              </Grid>
+            </Grid>
           </Toolbar>
         </AppBar>
         <Box

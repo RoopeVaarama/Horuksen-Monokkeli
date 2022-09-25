@@ -4,12 +4,15 @@ import { BrowserRouter } from 'react-router-dom'
 import './assets/index.css'
 import App from './App'
 import reportWebVitals from './reportWebVitals'
+import LanguageContainer from './components/LanguageContainer'
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 root.render(
   <BrowserRouter>
     <React.StrictMode>
-      <App />
+      <LanguageContainer>
+        <App />
+      </LanguageContainer>
     </React.StrictMode>
   </BrowserRouter>
 )
