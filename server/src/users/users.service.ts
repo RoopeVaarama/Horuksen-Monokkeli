@@ -17,10 +17,11 @@ export class UsersService {
   }
 
   /**
-   * 
+   * Updates existing user. Updates only the properties specified in the body,
+   * so you can just omit the things you don't want to update.
    * @param id ID of user to update
    * @param user User object
-   * @returns 
+   * @returns Updated user, excluding password
    */
   async updateUser(id: String, user: User): Promise<User> {
     const updatedUser = await this.userModel.findOneAndUpdate({_id: id}, {...user}).exec();
@@ -28,11 +29,21 @@ export class UsersService {
     return await this.userModel.findById(updatedUser._id).select({password: 0}).exec();
   }
 
+
+/**
+ * Deletes user with given id
+ * @param id ID of user to delete
+ * @returns Boolean, whether the delete was successful or not
+ */
   async deleteUser(id: String): Promise<boolean> {
     const deleteResponse = await this.userModel.deleteOne({_id: id}).exec();
     return deleteResponse.acknowledged; 
   }
 
+  /**
+   * 
+   * @returns A list of all users.
+   */
   async getUsers(): Promise<User[]> {
     const users = await this.userModel.find().select({password: 0}).exec();
 
