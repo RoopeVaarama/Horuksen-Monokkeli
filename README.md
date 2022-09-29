@@ -46,7 +46,7 @@ $ npm install
 # development
 
 # Start front and backend at the same time
-$ nom run dev
+$ npm run dev
 
 $ npm run start
 
