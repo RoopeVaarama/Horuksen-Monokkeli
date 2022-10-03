@@ -1,5 +1,7 @@
 FROM node:16.17.1 as base
 
+RUN npm install -g nest
+
 ENV NODE_ENV=production
 
 WORKDIR /server
