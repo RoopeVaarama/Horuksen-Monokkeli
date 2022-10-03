@@ -13,6 +13,7 @@ export class SearchController {
     private readonly parseService: ParseService
   ) { }
 
+
   @Get('/parse/:file')
   async parse(@Param('file') file: string): Promise<PDFExtractResult> {
     return await this.parseService.parsePdf(`test_pdfs/${file}`);
