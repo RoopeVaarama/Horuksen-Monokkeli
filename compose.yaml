@@ -1,0 +1,31 @@
+services:
+  # Frontend service
+  frontend:
+    image: horuksen-monokkeli/frontend
+    build: 
+      context: ./client/
+    ports:
+      - "3000:80"
+
+  # Backend service
+  backend:
+    image: horuksen-monokkeli/backend
+    build: 
+      context: ./server/
+    ports:
+      - "3001:3001"
+    networks:
+      - "back-tier"
+    environment:
+      - MONGODB_URI=mongodb://mongohost/horus
+
+  # Mongodb service
+  mongodb:
+    image: mongo:latest
+    networks:
+      back-tier:
+        aliases:
+          - "mongohost"
+
+networks:
+  back-tier: {}
