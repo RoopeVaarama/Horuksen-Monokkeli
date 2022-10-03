@@ -5,13 +5,12 @@ import { Search } from './schemas/search.schema';
 
 @Injectable()
 export class SearchService {
-
 	// only finds exact matches
-    async search(contents: PDFExtractResult, search: Search): Promise<Result[]> {
+	async search(contents: PDFExtractResult, search: Search): Promise<Result[]> {
 
 		const pageArray = contents.pages;
 		let pageIndex: number;
-		let results: Result[] = [];
+		const results: Result[] = [];
 
 		for (pageIndex = 0; pageIndex < pageArray.length; ++pageIndex) {
 
@@ -22,17 +21,17 @@ export class SearchService {
 			for (entryIndex = 0; entryIndex < contentArray.length; ++entryIndex) {
 				let entry = contentArray[entryIndex];
 				if (entry.str == search.key) {
-					let result = new Result();
+					const result = new Result();
 					result.key = search.key;
 					result.value = this.rightValue(page, entry.x, entry.y);
 					results.push(result);
-                }
+				}
 			}
-		}     
-        return results;
+		}
+		return results;
 	}
 
-	private rightValue(page:PDFExtractPage, x: number, y: number) {
+	private rightValue(page: PDFExtractPage, x: number, y: number) {
 		const contentArray = page.content;
 		let entryIndex: number;
 
@@ -43,5 +42,5 @@ export class SearchService {
 			}
 		}
 		return 'no value found';
-    }
+	}
 }
