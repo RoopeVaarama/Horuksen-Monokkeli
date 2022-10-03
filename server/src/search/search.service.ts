@@ -9,20 +9,20 @@ export class SearchService {
 	// only finds exact matches
     async search(contents: PDFExtractResult, search: Search): Promise<Result[]> {
 
-		var pageArray = contents.pages;
-		var pageIndex: number;
-		var results: Result[] = [];
+		const pageArray = contents.pages;
+		let pageIndex: number;
+		let results: Result[] = [];
 
 		for (pageIndex = 0; pageIndex < pageArray.length; ++pageIndex) {
 
-			var page = pageArray[pageIndex];
-			var contentArray = page.content;
-			var entryIndex: number;
+			const page = pageArray[pageIndex];
+			const contentArray = page.content;
+			let entryIndex: number;
 
 			for (entryIndex = 0; entryIndex < contentArray.length; ++entryIndex) {
 				let entry = contentArray[entryIndex];
 				if (entry.str == search.key) {
-					var result = new Result();
+					let result = new Result();
 					result.key = search.key;
 					result.value = this.rightValue(page, entry.x, entry.y);
 					results.push(result);
@@ -33,8 +33,8 @@ export class SearchService {
 	}
 
 	private rightValue(page:PDFExtractPage, x: number, y: number) {
-		var contentArray = page.content;
-		var entryIndex: number;
+		const contentArray = page.content;
+		let entryIndex: number;
 
 		for (entryIndex = 0; entryIndex < contentArray.length; ++entryIndex) {
 			let entry = contentArray[entryIndex];

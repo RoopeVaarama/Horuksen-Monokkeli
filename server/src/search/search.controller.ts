@@ -17,7 +17,7 @@ export class SearchController {
     @Post(':file')
     @ApiCreatedResponse({ status: 200, description: 'Search completed', type: Search })
     async findValues(@Body() search: Search, @Param('file') file: string): Promise<Result[]> {
-        var contents = await new ParseService().parsePdf(`test_pdfs/${file}`);
+        const contents = await new ParseService().parsePdf(`test_pdfs/${file}`);
         return await new SearchService().search(contents, search);
     }
 
