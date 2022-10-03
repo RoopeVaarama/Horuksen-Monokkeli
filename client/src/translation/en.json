@@ -1,5 +1,8 @@
 {
   "placeholder": "Placeholder",
   "appTitle": "Horuksen monokkeli",
-  "pageNotFound": "Page not found"
+  "files": "Files",
+  "newSearch": "New search",
+  "pageNotFound": "Page not found",
+  "profile": "Profile"
 }

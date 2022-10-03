@@ -1,6 +1,6 @@
 import { FormattedMessage } from 'react-intl'
 
-const PageNotFound = () => {
+const PageNotFoundContainer = () => {
   return (
     <div>
       <FormattedMessage id='pageNotFound' defaultMessage='Sivua ei ole olemassa' />
@@ -8,4 +8,4 @@ const PageNotFound = () => {
   )
 }
 
-export default PageNotFound
+export default PageNotFoundContainer
