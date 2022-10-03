@@ -20,7 +20,7 @@ const LOCALES: Locales = {
 
 export const IntlContext = createContext<IntlCtx | undefined>(undefined)
 
-const LanguageContainer = ({ children }: { children: JSX.Element }) => {
+const TranslationProvider = ({ children }: { children: JSX.Element }) => {
   const [locale, setLocale] = useState(DEFAULT_LOCALE)
 
   const changeLanguage = (newLocale: string) => {
@@ -52,4 +52,4 @@ const LanguageContainer = ({ children }: { children: JSX.Element }) => {
   )
 }
 
-export default LanguageContainer
+export default TranslationProvider
