@@ -5,36 +5,35 @@ import { Search } from './schemas/search.schema';
 
 @Injectable()
 export class SearchService {
-
 	// only finds exact matches
-    async search(contents: PDFExtractResult, search: Search): Promise<Result[]> {
+	async search(contents: PDFExtractResult, search: Search): Promise<Result[]> {
 
-		var pageArray = contents.pages;
-		var pageIndex: number;
-		var results: Result[] = [];
+		const pageArray = contents.pages;
+		let pageIndex: number;
+		const results: Result[] = [];
 
 		for (pageIndex = 0; pageIndex < pageArray.length; ++pageIndex) {
 
-			var page = pageArray[pageIndex];
-			var contentArray = page.content;
-			var entryIndex: number;
+			const page = pageArray[pageIndex];
+			const contentArray = page.content;
+			let entryIndex: number;
 
 			for (entryIndex = 0; entryIndex < contentArray.length; ++entryIndex) {
 				let entry = contentArray[entryIndex];
 				if (entry.str == search.key) {
-					var result = new Result();
+					const result = new Result();
 					result.key = search.key;
 					result.value = this.rightValue(page, entry.x, entry.y);
 					results.push(result);
-                }
+				}
 			}
-		}     
-        return results;
+		}
+		return results;
 	}
 
-	private rightValue(page:PDFExtractPage, x: number, y: number) {
-		var contentArray = page.content;
-		var entryIndex: number;
+	private rightValue(page: PDFExtractPage, x: number, y: number) {
+		const contentArray = page.content;
+		let entryIndex: number;
 
 		for (entryIndex = 0; entryIndex < contentArray.length; ++entryIndex) {
 			let entry = contentArray[entryIndex];
@@ -43,5 +42,5 @@ export class SearchService {
 			}
 		}
 		return 'no value found';
-    }
+	}
 }

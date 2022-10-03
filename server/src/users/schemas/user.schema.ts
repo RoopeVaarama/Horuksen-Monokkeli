@@ -13,7 +13,7 @@ export class User {
 
   @Prop()
   @ApiProperty()
-  password: String;
+  password: string;
 
   @Prop()
   @ApiProperty()

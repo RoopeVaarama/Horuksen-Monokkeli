@@ -3,7 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { User, UserSchema } from './schemas/user.schema';
+import { User, UserSchema } from './users/schemas/user.schema';
 import { SearchModule } from './search/search.module';
 import { UsersModule } from './users/users.module';
 
@@ -35,4 +35,4 @@ import { UsersModule } from './users/users.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
