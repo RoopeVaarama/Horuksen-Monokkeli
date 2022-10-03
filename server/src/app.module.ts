@@ -4,6 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { User, UserSchema } from './schemas/user.schema';
+import { SearchModule } from './search/search.module';
 
 @Module({
   imports: [
@@ -25,7 +26,8 @@ import { User, UserSchema } from './schemas/user.schema';
      * Example below on how to define a model to scope.
      * @todo remove below .forFeature call
      */
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }])
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    SearchModule
   ],
   controllers: [AppController],
   providers: [AppService],
