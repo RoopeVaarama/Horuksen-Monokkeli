@@ -1,6 +1,7 @@
 FROM node:16.17.1 as base
 
 ENV NODE_ENV=production
+ENV CI=true
 
 WORKDIR /client
 
@@ -11,7 +12,6 @@ RUN npm install
 COPY . .
 
 FROM base as test
-ENV CI=true
 RUN npm test
 
 FROM base as build
