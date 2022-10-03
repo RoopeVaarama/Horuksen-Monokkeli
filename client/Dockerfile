@@ -11,6 +11,7 @@ RUN npm install
 COPY . .
 
 FROM base as test
+ENV CI=true
 RUN npm test
 
 FROM base as build
