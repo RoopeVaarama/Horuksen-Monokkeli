@@ -1,6 +1,6 @@
 FROM node:16.17.1 as base
 
-RUN npm install -g nest
+RUN npm install -g @nestjs/cli
 
 ENV NODE_ENV=production
 
