@@ -5,6 +5,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { User, UserSchema } from './schemas/user.schema';
 import { SearchModule } from './search/search.module';
+import { UsersModule } from './users/users.module';
+
 
 @Module({
   imports: [
@@ -27,7 +29,8 @@ import { SearchModule } from './search/search.module';
      * @todo remove below .forFeature call
      */
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
-    SearchModule
+    SearchModule,
+    UsersModule
   ],
   controllers: [AppController],
   providers: [AppService],
