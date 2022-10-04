@@ -7,7 +7,6 @@ import { Search } from './schemas/search.schema';
 export class SearchService {
 	// only finds exact matches
 	async search(contents: PDFExtractResult, search: Search): Promise<Result[]> {
-
 		const pageArray = contents.pages;
 		let pageIndex: number;
 		const results: Result[] = [];
