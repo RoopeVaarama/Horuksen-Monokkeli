@@ -24,11 +24,6 @@ import { UsersModule } from './users/users.module';
       },
       inject: [ConfigService],
     }),
-    /**
-     * Example below on how to define a model to scope.
-     * @todo remove below .forFeature call
-     */
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     SearchModule,
     UsersModule
   ],
