@@ -21,7 +21,7 @@ services:
 
   # Mongodb service
   mongodb:
-    image: mongo:latest
+    image: mongo:4.4
     networks:
       back-tier:
         aliases:
