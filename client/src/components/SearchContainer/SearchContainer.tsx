@@ -1,7 +1,10 @@
-import { Button, Stack, Step, StepButton, Stepper, styled, Typography } from '@mui/material'
+import { Box, Stack, Step, StepButton, Stepper, styled } from '@mui/material'
 import StepConnector, { stepConnectorClasses } from '@mui/material/StepConnector'
 import { useState } from 'react'
 import { FormattedMessage } from 'react-intl'
+import FilesPage from './FilesPage'
+import ResultsPage from './ResultsPage'
+import TemplatesPage from './TemplatesPage'
 
 const STEPS = [
   { intlId: 'selectKeywords', defaultMessage: 'Valitse avainsanat' },
@@ -19,12 +22,16 @@ const StyledStepConnector = styled(StepConnector)(({ theme }) => ({
 }))
 
 const StyledStep = styled(Step)(({ theme, completed, active, disabled }) => ({
+  '.MuiButtonBase-root': {
+    paddingTop: `${theme.spacing(1)}!important`,
+    paddingBottom: `${theme.spacing(1)}!important`
+  },
   svg: {
     color: `${
       disabled
         ? theme.palette.grey[400]
         : active
-        ? theme.palette.primary.main
+        ? theme.palette.secondary.main
         : completed
         ? theme.palette.success.main
         : theme.palette.text.primary
@@ -35,7 +42,7 @@ const StyledStep = styled(Step)(({ theme, completed, active, disabled }) => ({
       disabled
         ? theme.palette.text.disabled
         : active
-        ? theme.palette.primary.main
+        ? theme.palette.secondary.dark
         : theme.palette.text.primary
     }!important`
   }
@@ -97,22 +104,21 @@ const SearchContainer = () => {
             </StyledStep>
           ))}
       </Stepper>
-      <Stack display='flex' alignItems='center' pt={3} spacing={1}>
-        <Typography>Sivu: {activeStep + 1}</Typography>
-        <FormattedMessage
-          id={STEPS[activeStep].intlId}
-          defaultMessage={STEPS[activeStep].defaultMessage}
-        />
-        {activeStep !== STEPS.length - 1 && (
-          <Button
-            onClick={() => handleCompletion(!completed[activeStep])}
-            sx={{ width: 'max-content' }}
-            variant='contained'
-          >
-            {completed[activeStep] ? 'Merkitse keskeneräiseksi' : 'Merkitse valmiiksi'}
-          </Button>
+      <Box width='100%' display='flex' justifyContent='center'>
+        {activeStep === 0 && (
+          <TemplatesPage
+            isComplete={completed[activeStep]}
+            onComplete={() => handleCompletion(!completed[activeStep])}
+          />
         )}
-      </Stack>
+        {activeStep === 1 && (
+          <FilesPage
+            isComplete={completed[activeStep]}
+            onComplete={() => handleCompletion(!completed[activeStep])}
+          />
+        )}
+        {activeStep === 2 && <ResultsPage />}
+      </Box>
     </Stack>
   )
 }

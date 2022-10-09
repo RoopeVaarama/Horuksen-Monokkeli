@@ -1,22 +1,27 @@
 import { useContext } from 'react'
 import { IntlContext } from '../../../TranslationProvider/TranslationProvider'
-import { MenuItem, Select, SelectChangeEvent } from '@mui/material'
+import { ToggleButton, ToggleButtonGroup } from '@mui/material'
 
 const LanguageSelector = () => {
   const intlContext = useContext(IntlContext)
   return (
     <>
       {intlContext && (
-        <Select
+        <ToggleButtonGroup
+          sx={{ '.MuiButtonBase-root': { borderRadius: '0px' } }}
+          color='primary'
           value={intlContext.locale}
-          onChange={(e: SelectChangeEvent<string>) => intlContext.changeLanguage(e.target.value)}
+          exclusive
+          onChange={(e: React.MouseEvent<HTMLElement>, value: string) =>
+            intlContext.changeLanguage(value)
+          }
         >
           {Object.keys(intlContext.locales).map((option) => (
-            <MenuItem key={option} value={option}>
+            <ToggleButton key={option} value={option}>
               {intlContext.locales[option]}
-            </MenuItem>
+            </ToggleButton>
           ))}
-        </Select>
+        </ToggleButtonGroup>
       )}
     </>
   )
