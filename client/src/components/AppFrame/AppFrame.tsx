@@ -18,19 +18,20 @@ const Wrapper = styled('div')(({ theme }) => ({
   position: 'relative',
   minHeight: '100vh',
   top: 0,
-  [theme.breakpoints.down('sm')]: {
+  [theme.breakpoints.down('md')]: {
     width: '100%'
   },
-  [theme.breakpoints.up('sm')]: {
-    width: theme.breakpoints.values.sm
+  [theme.breakpoints.up('md')]: {
+    width: theme.breakpoints.values.md
   }
 }))
 
 const Content = styled('div')(({ theme }) => ({
-  paddingTop: TOOLBAR_HEIGHT,
-  boxSizing: 'border-box',
+  marginTop: TOOLBAR_HEIGHT,
+  height: `calc(100% - ${TOOLBAR_HEIGHT})`,
   width: '100%',
-  height: '100%',
+  boxSizing: 'border-box',
+  padding: theme.spacing(2, 3),
   backgroundColor: theme.palette.background.default
 }))
 
