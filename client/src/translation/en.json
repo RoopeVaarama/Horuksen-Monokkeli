@@ -1,8 +1,11 @@
 {
   "placeholder": "Placeholder",
   "appTitle": "Horuksen monokkeli",
+  "examineResults": "Examine results",
   "files": "Files",
   "newSearch": "New search",
   "pageNotFound": "Page not found",
-  "profile": "Profile"
+  "profile": "Profile",
+  "selectFiles": "Select files",
+  "selectKeywords": "Select keywords"
 }
