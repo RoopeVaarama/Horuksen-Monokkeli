@@ -1,0 +1,24 @@
+# Jenkins trigger
+
+name: CICD
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "master" branch
+  push:
+    branches: [ "master", "dockerization" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # Send request to Jenkins in use to trigger build and deploy
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: HTTP Request Action
+        uses: fjogeleit/http-request-action@v1.11.1
+        with:
+          url: https://monokkeli.joonas.codes/build_now/?token=${{ secrets.BuildToken }}
+          method: 'GET'
