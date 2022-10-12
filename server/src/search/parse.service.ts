@@ -4,6 +4,12 @@ import { PDFExtract, PDFExtractOptions, PDFExtractResult } from 'pdf.js-extract'
 @Injectable()
 export class ParseService {
 
+    async parsePdfNoValidation(file: string): Promise<PDFExtractResult> {
+        const pdfExtract = new PDFExtract();
+        const options: PDFExtractOptions = {};
+        return await pdfExtract.extract(file, options);
+    }
+
     async parsePdf(file: string): Promise<PDFExtractResult> {
         return await this.checkFileValidity(file);
     }

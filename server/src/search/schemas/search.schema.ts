@@ -4,6 +4,7 @@ import { Document } from 'mongoose';
 
 export type SearchDocument = Search & Document;
 
+
 @Schema()
 export class Search {
 
@@ -13,7 +14,7 @@ export class Search {
 
   @Prop()
   @ApiProperty()
-  valueIsText: boolean;
+  findValues: boolean;
 
   @Prop()
   @ApiProperty()
