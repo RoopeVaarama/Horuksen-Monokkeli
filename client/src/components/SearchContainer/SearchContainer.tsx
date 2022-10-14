@@ -1,4 +1,4 @@
-import { Box, Stack, Step, StepButton, Stepper, styled } from '@mui/material'
+import { Stack, Step, StepButton, Stepper, styled } from '@mui/material'
 import StepConnector, { stepConnectorClasses } from '@mui/material/StepConnector'
 import { useState } from 'react'
 import { FormattedMessage } from 'react-intl'
@@ -34,7 +34,7 @@ const StyledStep = styled(Step)(({ theme, completed, active, disabled }) => ({
         ? theme.palette.secondary.main
         : completed
         ? theme.palette.success.main
-        : theme.palette.text.primary
+        : theme.palette.primary.main
     }!important`
   },
   '.MuiStepLabel-label': {
@@ -45,6 +45,16 @@ const StyledStep = styled(Step)(({ theme, completed, active, disabled }) => ({
         ? theme.palette.secondary.dark
         : theme.palette.text.primary
     }!important`
+  },
+  [theme.breakpoints.down('sm')]: {
+    '.MuiStepLabel-root': {
+      display: 'flex',
+      flexDirection: 'column',
+      '.MuiStepLabel-iconContainer': {
+        paddingBottom: theme.spacing(1),
+        paddingRight: 0
+      }
+    }
   }
 }))
 
@@ -104,21 +114,19 @@ const SearchContainer = () => {
             </StyledStep>
           ))}
       </Stepper>
-      <Box width='100%' display='flex' justifyContent='center'>
-        {activeStep === 0 && (
-          <TemplatesPage
-            isComplete={completed[activeStep]}
-            onComplete={() => handleCompletion(!completed[activeStep])}
-          />
-        )}
-        {activeStep === 1 && (
-          <FilesPage
-            isComplete={completed[activeStep]}
-            onComplete={() => handleCompletion(!completed[activeStep])}
-          />
-        )}
-        {activeStep === 2 && <ResultsPage />}
-      </Box>
+      {activeStep === 0 && (
+        <TemplatesPage
+          isComplete={completed[activeStep]}
+          onComplete={() => handleCompletion(!completed[activeStep])}
+        />
+      )}
+      {activeStep === 1 && (
+        <FilesPage
+          isComplete={completed[activeStep]}
+          onComplete={() => handleCompletion(!completed[activeStep])}
+        />
+      )}
+      {activeStep === 2 && <ResultsPage />}
     </Stack>
   )
 }

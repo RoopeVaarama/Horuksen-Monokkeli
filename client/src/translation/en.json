@@ -3,9 +3,14 @@
   "appTitle": "Horuksen monokkeli",
   "examineResults": "Examine results",
   "files": "Files",
+  "fontSizeDependent": "Font size dependent",
+  "keyWord": "Keyword",
   "newSearch": "New search",
+  "onlyTheKeyword": "Only the keyword",
+  "pagePosition": "Location on the page",
   "pageNotFound": "Page not found",
   "profile": "Profile",
+  "relativePosition": "Relative position",
   "selectFiles": "Select files",
   "selectKeywords": "Select keywords"
 }

@@ -11,7 +11,7 @@ const Root = styled('div')(({ theme }) => ({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'stretch',
-  backgroundColor: theme.palette.background.paper
+  backgroundColor: theme.palette.background.default
 }))
 
 const Wrapper = styled('div')(({ theme }) => ({
@@ -30,9 +30,10 @@ const Content = styled('div')(({ theme }) => ({
   marginTop: TOOLBAR_HEIGHT,
   height: `calc(100% - ${TOOLBAR_HEIGHT})`,
   width: '100%',
+  minWidth: '320px',
   boxSizing: 'border-box',
-  padding: theme.spacing(2, 3),
-  backgroundColor: theme.palette.background.default
+  backgroundColor: theme.palette.background.default,
+  padding: theme.spacing(2, 3)
 }))
 
 const AppFrame = ({ children }: { children: JSX.Element }) => {
