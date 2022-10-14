@@ -1,9 +1,7 @@
-import { styled, Typography, Button } from '@mui/material'
-import { TextField } from '@mui/material'
-import { Box } from '@mui/system'
+import { useState, ChangeEvent, FormEvent } from 'react'
+import { styled, Typography, Button, Box, TextField, Link } from '@mui/material'
 import { FormattedMessage } from 'react-intl'
 import SimpleToolbar from './SimpleToolbar'
-import { useState, ChangeEvent, FormEvent } from 'react'
 
 const TOOLBAR_HEIGHT = '60px'
 
@@ -14,9 +12,8 @@ const FormContainer = styled(Box)(({ theme }) => ({
   left: '50%',
   transform: 'translate(-50%, -50%)',
   padding: '25px',
-  borderRadius: '5px',
-  border: 'solid',
-  alignItems: 'center'
+  borderRadius: '10px',
+  border: 'solid'
 }))
 
 const SignInForm = styled('form')(({ theme }) => ({
@@ -26,7 +23,7 @@ const SignInForm = styled('form')(({ theme }) => ({
   padding: theme.spacing(2, 3)
 }))
 
-const FormInput = styled(TextField)(({ theme }) => ({
+const FormInput = styled(TextField)(() => ({
   marginTop: '10px',
   marginBottom: '10px',
   fontSize: '16px',
@@ -36,7 +33,14 @@ const FormInput = styled(TextField)(({ theme }) => ({
 const SignInButton = styled(Button)(({ theme }) => ({
   margin: '10px',
   variant: 'contained',
-  color: theme.palette.primary.main
+  color: theme.palette.primary.dark
+}))
+
+const RegisterLink = styled(Link)(({ theme }) => ({
+  fontSize: '12px',
+  display: 'flex',
+  justifyContent: 'center',
+  fontColor: theme.palette.primary
 }))
 
 const SignInContainer = () => {
@@ -45,24 +49,18 @@ const SignInContainer = () => {
     password: ''
   })
 
-  const setEmail = (event: ChangeEvent<HTMLInputElement>): void => {
-    setCredentials((currentCred) => ({
-      ...currentCred,
-      email: event.target.value
-    }))
-  }
-
-  const setPassword = (event: ChangeEvent<HTMLInputElement>): void => {
-    setCredentials((currentCred) => ({
-      ...currentCred,
-      password: event.target.value
+  const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
+    const { name, value } = event.target
+    setCredentials((currentData) => ({
+      ...currentData,
+      [name]: value
     }))
   }
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault()
-    console.log('Submitted')
-    // Varsinainen kirjautumisäksöni
+    console.log('Submitted: ' + credentials.email + ': ' + credentials.password)
+    // TO DO Varsinainen kirjautumisäksöni
   }
 
   return (
@@ -73,10 +71,23 @@ const SignInContainer = () => {
           <FormattedMessage id='signIn' defaultMessage='Kirjautuminen' />
         </Typography>
         <SignInForm onSubmit={handleSubmit}>
-          <FormInput label='Sähköposti' required onChange={setEmail} />
-          <FormInput label='Salasana' required onChange={setPassword} />
+          <FormInput
+            label='Sähköposti'
+            type='email'
+            name='email'
+            onChange={handleChange}
+            required
+          />
+          <FormInput
+            label='Salasana'
+            type='password'
+            name='password'
+            required
+            onChange={handleChange}
+          />
           <SignInButton type='submit'>Kirjaudu sisään</SignInButton>
         </SignInForm>
+        <RegisterLink href='register'>Rekisteröidy</RegisterLink>
       </FormContainer>
     </div>
   )
