@@ -1,7 +1,8 @@
-import { useState, ChangeEvent, FormEvent } from 'react'
+import { useState, ChangeEvent, FormEvent, useEffect } from 'react'
 import { styled, Typography, Button, Box, TextField, Link } from '@mui/material'
 import { FormattedMessage } from 'react-intl'
 import SimpleToolbar from '../SignInContainer/SimpleToolbar'
+import ErrorMessage from '../ErrorMessage'
 
 const TOOLBAR_HEIGHT = '60px'
 
@@ -11,6 +12,7 @@ const FormContainer = styled(Box)(({ theme }) => ({
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
+  marginTop: '25px',
   padding: '25px',
   borderRadius: '10px',
   border: 'solid',
@@ -60,10 +62,43 @@ const RegisterContainer = () => {
     }))
   }
 
+  const [error, setError] = useState({
+    errorPresent: false,
+    msg: ''
+  })
+
+  const raiseError = (errorMsg: string): void => {
+    setError({
+      errorPresent: true,
+      msg: errorMsg
+    })
+  }
+
+  const clearError = (): void => {
+    setError({
+      errorPresent: false,
+      msg: ''
+    })
+  }
+
+  // Validate when passwords are changed
+  useEffect(() => {
+    validatePassword()
+  }, [registerData.password, registerData.repeatPassword])
+
+  const validatePassword = (): void => {
+    const { password, repeatPassword } = registerData
+    password === repeatPassword && password.length > 7
+      ? clearError()
+      : password === repeatPassword
+      ? raiseError('Salasanan minimipituus 8 merkkiä')
+      : raiseError('Salasanat eivät täsmää')
+  }
+
   const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault()
-    console.log('Submitted')
     // TO DO Varsinainen rekisteröitymisäksöni
+    error.errorPresent ? console.log('Failure') : console.log('Rekisteröityminen OK')
   }
 
   return (
@@ -96,6 +131,7 @@ const RegisterContainer = () => {
             onChange={handleChange}
             required
           />
+          {error.errorPresent && <ErrorMessage errorMessage={error.msg} />}
           <SignInButton type='submit'>Rekisteröidy</SignInButton>
         </RegisterForm>
         <SignInLink href='signin'>Kirjaudu sisään</SignInLink>
