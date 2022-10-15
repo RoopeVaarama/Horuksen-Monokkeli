@@ -18,17 +18,27 @@ import {
   FormControl,
   InputLabel,
   FormControlLabel,
-  Checkbox
+  Checkbox,
+  SelectChangeEvent
 } from '@mui/material'
 import { FormattedMessage } from 'react-intl'
+import { Template } from '../../../../types/Template'
+import { useTemplateStore } from '../../../../store/templateStore'
+import { relativePositions, locationsOnPage } from '../../../../constants'
+import { RelativePosition } from '../../../../types/RelativePosition'
+import { LocationOnPage } from '../../../../types/LocationOnPage'
 
-const ITEMS_RELATIVE_POSITION = ['test1', 'test2', 'test3']
-const ITEMS_PAGE_POSITION = ['test1', 'test2', 'test3']
-
-const TemplateSelector = ({ marker }: { marker: number }) => {
+const TemplateSelector = ({ marker, template }: { marker: number; template: Template }) => {
   const [open, setOpen] = useState(false)
-  const [relativePosition, setRelativePosition] = useState(ITEMS_RELATIVE_POSITION[0])
-  const [pagePosition, setPagePosition] = useState(ITEMS_PAGE_POSITION[0])
+  const [textFieldError, setTextFieldError] = useState(false)
+  const {
+    deleteTemplate,
+    updateKeyword,
+    updateRelativePosition,
+    updateLocationOnPage,
+    updateBoolOnlyKeyword,
+    updateBoolFontSizeDependent
+  } = useTemplateStore()
 
   const theme = useTheme()
   return (
@@ -61,8 +71,11 @@ const TemplateSelector = ({ marker }: { marker: number }) => {
                   labelId='relativePositionLabel'
                   color='secondary'
                   size='small'
-                  value={relativePosition}
-                  onChange={(e) => setRelativePosition(e.target.value)}
+                  value={template.relativePosition}
+                  onChange={(e: SelectChangeEvent<RelativePosition['value']>) => {
+                    if (typeof e.target.value !== 'string')
+                      updateRelativePosition(template.id, e.target.value)
+                  }}
                   IconComponent={ExpandMore}
                   label={
                     <FormattedMessage
@@ -71,9 +84,9 @@ const TemplateSelector = ({ marker }: { marker: number }) => {
                     />
                   }
                 >
-                  {ITEMS_RELATIVE_POSITION.map((item) => (
-                    <MenuItem key={item} value={item}>
-                      {item}
+                  {relativePositions.map((relPos) => (
+                    <MenuItem key={relPos.intlId} value={relPos.value}>
+                      <FormattedMessage id={relPos.intlId} defaultMessage={relPos.defaultMessage} />
                     </MenuItem>
                   ))}
                 </Select>
@@ -88,14 +101,17 @@ const TemplateSelector = ({ marker }: { marker: number }) => {
                   labelId='pagePositionLabel'
                   color='secondary'
                   size='small'
-                  value={pagePosition}
-                  onChange={(e) => setPagePosition(e.target.value)}
+                  value={template.locationOnPage}
+                  onChange={(e: SelectChangeEvent<LocationOnPage['value']>) => {
+                    if (typeof e.target.value !== 'string')
+                      updateLocationOnPage(template.id, e.target.value)
+                  }}
                   IconComponent={ExpandMore}
                   label={<FormattedMessage id='pagePosition' defaultMessage='Sijainti sivulla' />}
                 >
-                  {ITEMS_PAGE_POSITION.map((item) => (
-                    <MenuItem key={item} value={item}>
-                      {item}
+                  {locationsOnPage.map((item) => (
+                    <MenuItem key={item.intlId} value={item.value}>
+                      <FormattedMessage id={item.intlId} defaultMessage={item.defaultMessage} />
                     </MenuItem>
                   ))}
                 </Select>
@@ -110,7 +126,13 @@ const TemplateSelector = ({ marker }: { marker: number }) => {
                 '.MuiButtonBase-root': { p: '4px', mr: '4px' },
                 mr: [3, 0]
               }}
-              control={<Checkbox color='secondary' />}
+              checked={template.onlyKeyword}
+              control={
+                <Checkbox
+                  color='secondary'
+                  onChange={(e) => updateBoolOnlyKeyword(template.id, e.target.checked)}
+                />
+              }
               label={<FormattedMessage id='onlyTheKeyword' defaultMessage='Vain avainsana' />}
             />
             <FormControlLabel
@@ -119,7 +141,13 @@ const TemplateSelector = ({ marker }: { marker: number }) => {
                 '.MuiTypography-root': { fontSize: '14px' },
                 '.MuiButtonBase-root': { p: '4px', mr: '4px' }
               }}
-              control={<Checkbox color='secondary' />}
+              checked={template.fontSizeDependent}
+              control={
+                <Checkbox
+                  color='secondary'
+                  onChange={(e) => updateBoolFontSizeDependent(template.id, e.target.checked)}
+                />
+              }
               label={
                 <FormattedMessage id='fontSizeDependent' defaultMessage='Merkkikokoriippuvainen' />
               }
@@ -141,10 +169,22 @@ const TemplateSelector = ({ marker }: { marker: number }) => {
         <TextField
           color='secondary'
           size='small'
+          defaultValue={template.keyword}
+          autoFocus={!template.keyword}
+          error={textFieldError}
+          onBlur={(e) => {
+            if (e.target.value) {
+              setTextFieldError(false)
+            } else {
+              setTextFieldError(true)
+            }
+            updateKeyword(template.id, e.target.value)
+          }}
           label={<FormattedMessage id='keyWord' defaultMessage='Avainsana' />}
         />
       </Stack>
       <IconButton
+        onClick={() => deleteTemplate(template.id)}
         sx={{
           position: 'absolute',
           top: '8px',

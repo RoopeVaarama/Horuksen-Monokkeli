@@ -1,7 +1,11 @@
+import { LocationOnPage } from './LocationOnPage'
+import { RelativePosition } from './RelativePosition'
+
 export interface Template {
+  id: number
   keyword: string
-  relativeLocation: string
-  locationOnPage: string
+  relativePosition: RelativePosition['value']
+  locationOnPage: LocationOnPage['value']
   onlyKeyword: boolean
-  fontSizeReliant: boolean
+  fontSizeDependent: boolean
 }

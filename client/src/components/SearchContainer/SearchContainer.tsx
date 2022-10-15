@@ -1,7 +1,9 @@
 import { Stack, Step, StepButton, Stepper, styled } from '@mui/material'
 import StepConnector, { stepConnectorClasses } from '@mui/material/StepConnector'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FormattedMessage } from 'react-intl'
+import { useTemplateStore } from '../../store/templateStore'
+import { Template } from '../../types/Template'
 import FilesPage from './FilesPage'
 import ResultsPage from './ResultsPage'
 import TemplatesPage from './TemplatesPage'
@@ -63,6 +65,7 @@ const SearchContainer = () => {
   const [completed, setCompleted] = useState<readonly boolean[]>(
     new Array<boolean>(STEPS.length).fill(false)
   )
+  const { templates } = useTemplateStore()
 
   const handleStep = (step: number) => () => {
     setActiveStep(step)
@@ -71,13 +74,6 @@ const SearchContainer = () => {
   const handleCompletion = (state: boolean) => {
     const newCompleted = [...completed]
     newCompleted[activeStep] = state
-    if (state && activeStep + 1 !== STEPS.length) {
-      // if step has just been marked as completed, move the user to the next step
-      const newActiveStep = isDisabled(activeStep + 1)
-        ? newCompleted.findIndex((c) => !c)
-        : activeStep + 1
-      setActiveStep(newActiveStep)
-    }
     if (stepsBeforeFinalAreCompleted(newCompleted)) {
       // mark final step as completed if every other step is completed as well
       newCompleted[STEPS.length - 1] = true
@@ -97,6 +93,12 @@ const SearchContainer = () => {
     return step === STEPS.length - 1 && !stepsBeforeFinalAreCompleted(completed)
   }
 
+  useEffect(() => {
+    handleCompletion(
+      templates.length > 0 && templates.every((value: Template) => value.keyword !== '')
+    )
+  }, [templates])
+
   return (
     <Stack spacing={2}>
       <Stepper nonLinear connector={<StyledStepConnector />} sx={{ py: 2 }}>
@@ -114,12 +116,7 @@ const SearchContainer = () => {
             </StyledStep>
           ))}
       </Stepper>
-      {activeStep === 0 && (
-        <TemplatesPage
-          isComplete={completed[activeStep]}
-          onComplete={() => handleCompletion(!completed[activeStep])}
-        />
-      )}
+      {activeStep === 0 && <TemplatesPage />}
       {activeStep === 1 && (
         <FilesPage
           isComplete={completed[activeStep]}
