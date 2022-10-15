@@ -88,11 +88,14 @@ const RegisterContainer = () => {
 
   const validatePassword = (): void => {
     const { password, repeatPassword } = registerData
-    password === repeatPassword && password.length > 7
-      ? clearError()
-      : password === repeatPassword
-      ? raiseError('Salasanan minimipituus 8 merkkiä')
-      : raiseError('Salasanat eivät täsmää')
+    {
+      if (password.length > 0 || repeatPassword.length > 0)
+        password === repeatPassword && password.length > 7
+          ? clearError()
+          : password === repeatPassword
+          ? raiseError('Salasanan minimipituus 8 merkkiä')
+          : raiseError('Salasanat eivät täsmää')
+    }
   }
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
@@ -109,11 +112,19 @@ const RegisterContainer = () => {
           <FormattedMessage id='register' defaultMessage='Rekisteröidy' />
         </Typography>
         <RegisterForm onSubmit={handleSubmit}>
-          <FormInput label='Nimi' type='text' name='name' onChange={handleChange} required />
+          <FormInput
+            label='Nimi'
+            type='text'
+            name='name'
+            value={registerData.name}
+            onChange={handleChange}
+            required
+          />
           <FormInput
             label='Sähköposti'
             type='email'
             name='email'
+            value={registerData.email}
             onChange={handleChange}
             required
           />
@@ -121,6 +132,7 @@ const RegisterContainer = () => {
             label='Salasana'
             type='password'
             name='password'
+            value={registerData.password}
             onChange={handleChange}
             required
           />
@@ -128,6 +140,7 @@ const RegisterContainer = () => {
             label='Salasana uudelleen'
             type='password'
             name='repeatPassword'
+            value={registerData.repeatPassword}
             onChange={handleChange}
             required
           />
