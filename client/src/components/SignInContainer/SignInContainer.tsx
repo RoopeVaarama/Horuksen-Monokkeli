@@ -1,9 +1,7 @@
 import { useState, ChangeEvent, FormEvent } from 'react'
-import { styled, Typography, Button, Box, TextField, Link } from '@mui/material'
+import { styled, Typography, Button, Box, TextField } from '@mui/material'
 import { FormattedMessage } from 'react-intl'
-import SimpleToolbar from './SimpleToolbar'
-
-const TOOLBAR_HEIGHT = '60px'
+import { Link } from 'react-router-dom'
 
 const FormContainer = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
@@ -65,29 +63,32 @@ const SignInContainer = () => {
 
   return (
     <div>
-      <SimpleToolbar height={TOOLBAR_HEIGHT} />
       <FormContainer>
         <Typography variant='h6'>
           <FormattedMessage id='signIn' defaultMessage='Kirjautuminen' />
         </Typography>
         <SignInForm onSubmit={handleSubmit}>
           <FormInput
-            label='Sähköposti'
+            label={<FormattedMessage id='email' defaultMessage='Sähköposti' />}
             type='email'
             name='email'
             onChange={handleChange}
             required
           />
           <FormInput
-            label='Salasana'
+            label={<FormattedMessage id='password' defaultMessage='Salasana' />}
             type='password'
             name='password'
             required
             onChange={handleChange}
           />
-          <SignInButton type='submit'>Kirjaudu sisään</SignInButton>
+          <SignInButton type='submit'>
+            <FormattedMessage id='signIn' defaultMessage='Kirjaudu sisään' />
+          </SignInButton>
         </SignInForm>
-        <RegisterLink href='register'>Rekisteröidy</RegisterLink>
+        <RegisterLink to='../register'>
+          <FormattedMessage id='register' defaultMessage='Register' />
+        </RegisterLink>
       </FormContainer>
     </div>
   )

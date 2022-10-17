@@ -1,10 +1,17 @@
 import { useState, ChangeEvent, FormEvent, useEffect } from 'react'
-import { styled, Typography, Button, Box, TextField, Link } from '@mui/material'
+import { Link } from 'react-router-dom'
+import { styled, Typography, Button, Box, TextField } from '@mui/material'
 import { FormattedMessage } from 'react-intl'
-import SimpleToolbar from '../SignInContainer/SimpleToolbar'
 import ErrorMessage from '../ErrorMessage'
 
-const TOOLBAR_HEIGHT = '60px'
+const errorShortPassword = {
+  msg: 'Salasanan minimipituus 8 merkkiä',
+  translation: 'shortPassword'
+}
+const errorMismatchPasswords = {
+  msg: 'Salasanat eivät täsmää',
+  translation: 'mismatchPassword'
+}
 
 const FormContainer = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
@@ -62,22 +69,28 @@ const RegisterContainer = () => {
     }))
   }
 
+  const [formSent, setFormSent] = useState(false)
+
+  const showPossibleErrors = () => {
+    setFormSent(true)
+  }
+
   const [error, setError] = useState({
     errorPresent: false,
-    msg: ''
+    errorObject: { msg: '', translation: '' }
   })
 
-  const raiseError = (errorMsg: string): void => {
+  const raiseError = (errorObj: { msg: string; translation: string }): void => {
     setError({
       errorPresent: true,
-      msg: errorMsg
+      errorObject: errorObj
     })
   }
 
   const clearError = (): void => {
     setError({
       errorPresent: false,
-      msg: ''
+      errorObject: { msg: '', translation: '' }
     })
   }
 
@@ -93,27 +106,27 @@ const RegisterContainer = () => {
         password === repeatPassword && password.length > 7
           ? clearError()
           : password === repeatPassword
-          ? raiseError('Salasanan minimipituus 8 merkkiä')
-          : raiseError('Salasanat eivät täsmää')
+          ? raiseError(errorShortPassword)
+          : raiseError(errorMismatchPasswords)
     }
   }
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault()
+    showPossibleErrors()
     // TO DO Varsinainen rekisteröitymisäksöni
     error.errorPresent ? console.log('Failure') : console.log('Rekisteröityminen OK')
   }
 
   return (
     <div>
-      <SimpleToolbar height={TOOLBAR_HEIGHT} />
       <FormContainer>
         <Typography variant='h6'>
           <FormattedMessage id='register' defaultMessage='Rekisteröidy' />
         </Typography>
         <RegisterForm onSubmit={handleSubmit}>
           <FormInput
-            label='Nimi'
+            label={<FormattedMessage id='name' defaultMessage='Nimi' />}
             type='text'
             name='name'
             value={registerData.name}
@@ -121,7 +134,7 @@ const RegisterContainer = () => {
             required
           />
           <FormInput
-            label='Sähköposti'
+            label={<FormattedMessage id='email' defaultMessage='Sähköposti' />}
             type='email'
             name='email'
             value={registerData.email}
@@ -129,25 +142,31 @@ const RegisterContainer = () => {
             required
           />
           <FormInput
-            label='Salasana'
+            label={<FormattedMessage id='password' defaultMessage='Password' />}
             type='password'
             name='password'
             value={registerData.password}
             onChange={handleChange}
+            error={formSent && error.errorPresent}
             required
           />
           <FormInput
-            label='Salasana uudelleen'
+            label={<FormattedMessage id='repeatPassword' defaultMessage='Salasana uudelleen' />}
             type='password'
             name='repeatPassword'
             value={registerData.repeatPassword}
             onChange={handleChange}
+            error={formSent && error.errorPresent}
             required
           />
-          {error.errorPresent && <ErrorMessage errorMessage={error.msg} />}
-          <SignInButton type='submit'>Rekisteröidy</SignInButton>
+          {formSent && error.errorPresent && <ErrorMessage errorObject={error.errorObject} />}
+          <SignInButton type='submit'>
+            {<FormattedMessage id='register' defaultMessage='Rekisteröidy' />}
+          </SignInButton>
         </RegisterForm>
-        <SignInLink href='signin'>Kirjaudu sisään</SignInLink>
+        <SignInLink to='../signin'>
+          {<FormattedMessage id='signIn' defaultMessage='Sisäänkirjautuminen' />}
+        </SignInLink>
       </FormContainer>
     </div>
   )
