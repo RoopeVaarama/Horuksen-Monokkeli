@@ -72,6 +72,7 @@ const SignInContainer = () => {
             label={<FormattedMessage id='email' defaultMessage='Sähköposti' />}
             type='email'
             name='email'
+            value={credentials.email}
             onChange={handleChange}
             required
           />
@@ -79,15 +80,16 @@ const SignInContainer = () => {
             label={<FormattedMessage id='password' defaultMessage='Salasana' />}
             type='password'
             name='password'
-            required
+            value={credentials.password}
             onChange={handleChange}
+            required
           />
           <SignInButton type='submit'>
             <FormattedMessage id='signIn' defaultMessage='Kirjaudu sisään' />
           </SignInButton>
         </SignInForm>
         <RegisterLink to='../register'>
-          <FormattedMessage id='register' defaultMessage='Register' />
+          <FormattedMessage id='register' defaultMessage='Rekisteröidy' />
         </RegisterLink>
       </FormContainer>
     </div>
