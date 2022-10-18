@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PDFExtract, PDFExtractOptions, PDFExtractResult } from 'pdf.js-extract';
+import { HttpException } from '@nestjs/common';
 
 @Injectable()
 export class ParseService {
@@ -13,17 +14,21 @@ export class ParseService {
         }
         catch (err) {
             if (err.name == "InvalidPDFException") {
-                console.log("File not in PDF format.");
+                throw new HttpException("File found, but it's not in PDF format. " + 
+                "Make sure file ending is .pdf", 400);
             }
             else {
-                console.log("Something went wrong when extracting PDF.")
+                throw new HttpException("File not found. " + 
+                "Make sure the file name is correct and file exists.", 404);
             }
             return null;
         }
 
         if (this.doesDocumentHaveText(extractedPDF) == false) {
-            //TODO: probably has to be replaced with call to frontend
-            console.log("This document seems to have no text. Are you sure you want to use this file?")
+            //TODO: this text not disaplayed in return message.
+            //Return code still works fine.
+            throw new HttpException("No content in PDF. " + 
+            "PDF found and exctracted, but no text in it could be found.", 204);
         }
 
 
