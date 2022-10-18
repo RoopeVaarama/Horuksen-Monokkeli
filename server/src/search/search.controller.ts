@@ -21,7 +21,7 @@ export class SearchController {
 
   @Post(':file')
   @ApiCreatedResponse({ status: 201, description: "Search completed.", type: Search })
-  @ApiNoContentResponse({ status: 204, description: "No content in PDF. PDF found and exctracted, but no text in it could be found."})
+  @ApiNoContentResponse({ status: 204, description: "No content in PDF. PDF found and extracted, but no text in it could be found."})
   @ApiBadRequestResponse({status: 400, description: "File found, but it's not in PDF format. Make sure file ending is .pdf"})
   @ApiNotFoundResponse({status: 404, description: "File not found. Make sure the file name is correct and file exists."})
   async search(@Body() search: Search, @Param('file') file: string): Promise<Result[]> {

@@ -28,7 +28,7 @@ export class ParseService {
             //TODO: this text not disaplayed in return message.
             //Return code still works fine.
             throw new HttpException("No content in PDF. " + 
-            "PDF found and exctracted, but no text in it could be found.", 204);
+            "PDF found and extracted, but no text in it could be found.", 204);
         }
 
 
