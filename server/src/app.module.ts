@@ -5,6 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { User, UserSchema } from './users/schemas/user.schema';
 import { SearchModule } from './search/search.module';
+import { FileModule } from './file.module';
 import { UsersModule } from './users/users.module';
 
 
@@ -25,7 +26,8 @@ import { UsersModule } from './users/users.module';
       inject: [ConfigService],
     }),
     SearchModule,
-    UsersModule
+    UsersModule,
+    FileModule
   ],
   controllers: [AppController],
   providers: [AppService],
