@@ -1,7 +1,7 @@
 import { Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { ValueSearch, ValueSearchDocument } from './schemas/valueSearch.schema';
+import { ValueSearch, ValueSearchDocument } from './schemas/value-search.schema';
 
 @Injectable()
 export class TemplateService {

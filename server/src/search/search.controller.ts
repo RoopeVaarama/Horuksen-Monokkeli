@@ -5,7 +5,7 @@ import { SearchService } from './search.service';
 import { PDFExtractResult } from 'pdf.js-extract';
 import { Terms } from './schemas/terms.schema';
 import { Result } from './schemas/result.schema';
-import { ValueSearch } from './schemas/valueSearch.schema';
+import { ValueSearch } from './schemas/value-search.schema';
 import { TemplateService } from './template.service';
 
 @Controller('search')
