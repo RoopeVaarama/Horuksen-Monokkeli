@@ -1,29 +1,60 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, ValidationPipe, UsePipes } from '@nestjs/common';
 import { ApiCreatedResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ParseService } from './parse.service';
 import { SearchService } from './search.service';
 import { PDFExtractResult } from 'pdf.js-extract';
-import { Search } from './schemas/search.schema';
+import { Terms } from './schemas/terms.schema';
 import { Result } from './schemas/result.schema';
+import { ValueSearch } from './schemas/valueSearch.schema';
+import { TemplateService } from './template.service';
 
 @Controller('search')
 export class SearchController {
-  constructor(
-    private readonly service: SearchService,
-    private readonly parseService: ParseService
-  ) { }
+    constructor(
+        private readonly service: SearchService,
+        private readonly parseService: ParseService,
+        private readonly templateService: TemplateService
+    ) { }
 
+    // extract the contents of a pdf
+    @Get('/parse/:file')
+    async parse(@Param('file') file: string): Promise<PDFExtractResult> {
+        return await this.parseService.parsePdf(`test_pdfs/${file}`);
+    }
 
-  @Get('/parse/:file')
-  async parse(@Param('file') file: string): Promise<PDFExtractResult> {
-    return await this.parseService.parsePdf(`test_pdfs/${file}`);
-  }
+    // old test endpoint, to be removed
+    @Post('/test/:file')
+    @ApiCreatedResponse({ status: 200, description: 'Search completed', type: ValueSearch })
+    @UsePipes(ValidationPipe)
+    async testSearch(@Body() search: ValueSearch, @Param('file') file: string): Promise<Result[]> {
+        const contents = await this.parseService.parsePdf(`test_pdfs/${file}`);
+        if (contents == null) return null;
+        return await this.service.search(contents, search.terms);
+    }
 
-  @Post(':file')
-  @ApiCreatedResponse({ status: 200, description: 'Search completed', type: Search })
-  async search(@Body() search: Search, @Param('file') file: string): Promise<Result[]> {
-    const contents = await this.parseService.parsePdf(`test_pdfs/${file}`);
-    if(contents == null) return null;
-    return await this.service.search(contents, search);
-  }
+    // performs a search (currently just on Invoice.pdf) with the specified template id
+    @Get('/valuesearch/:tid')
+    @ApiCreatedResponse({ status: 200, description: 'Search completed', type: ValueSearch })
+    async valueSearch(@Param('tid') tid: string): Promise<Result[]> {
+        const contents = await this.parseService.parsePdf(`test_pdfs/invoice.pdf`);
+        if (contents == null) return null;
+        const search = await this.templateService.getTemplate(tid);
+        return await this.service.search(contents, search.terms);
+    }
+
+    // create a new search template
+    @Post('/create')
+    @ApiCreatedResponse({ status: 200, description: 'Template created', type: ValueSearch })
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async newTemplate(@Body() search: ValueSearch): Promise<ValueSearch> {
+        return await this.templateService.createTemplate(search);
+    }
+
+    // returns all templates of a user
+    @Get('/templates/:uid')
+    @ApiCreatedResponse({ status: 200, description: 'Templates of user fetched', type: [ValueSearch] })
+    async getTemplates(@Param('uid') uid: string): Promise<ValueSearch[]> {
+        return await this.templateService.getTemplates(uid);
+    }
+
 }
