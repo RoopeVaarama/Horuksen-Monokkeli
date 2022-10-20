@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Param, Post, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { CreateRequest } from './schemas/create-request.schema';
 import { ValueSearch } from './schemas/value-search.schema';
 import { TemplateService } from './template.service';
 
@@ -11,12 +12,16 @@ export class TemplateController {
         private readonly templateService: TemplateService
     ) { }
 
-    // create a new search template
+    // create new search templates
     @Post('/create')
-    @ApiCreatedResponse({ status: 200, description: 'Template created', type: ValueSearch })
+    @ApiCreatedResponse({ status: 200, description: 'Templates created', type: CreateRequest })
     @UsePipes(new ValidationPipe({ transform: true }))
-    async newTemplate(@Body() search: ValueSearch): Promise<ValueSearch> {
-        return await this.templateService.createTemplate(search);
+    async newTemplate(@Body() request: CreateRequest): Promise<ValueSearch[]> {
+        let createdTemplates: ValueSearch[] = [];
+        for (let i = 0; i < request.templates.length; ++i) {
+            createdTemplates.push(await this.templateService.createTemplate(request.templates[i]));
+        }
+        return createdTemplates;
     }
 
     // returns all templates of a user
