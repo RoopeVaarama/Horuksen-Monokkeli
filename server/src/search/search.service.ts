@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PDFExtract, PDFExtractOptions, PDFExtractPage, PDFExtractResult, PDFExtractText } from 'pdf.js-extract';
 import { Result } from './schemas/result.schema';
-import { Search } from './schemas/search.schema';
+import { Terms } from './schemas/terms.schema';
 
 
 enum Direction { Right, Below, Left, Above }
@@ -13,7 +13,7 @@ const margin = 5;
 export class SearchService {
 
     // Only finds exact matches
-    async search(contents: PDFExtractResult, search: Search): Promise<Result[]> {
+    async search(contents: PDFExtractResult, terms: Terms): Promise<Result[]> {
         const pageArray = contents.pages;
         let pageIndex: number;
         const results: Result[] = [];
@@ -26,21 +26,17 @@ export class SearchService {
 
             for (entryIndex = 0; entryIndex < contentArray.length; ++entryIndex) {
                 let entry = contentArray[entryIndex];
-                if (this.keyMatch(search.key, entry.str)) {
+                if (this.keyMatch(terms.key, entry.str)) {
                     let result = new Result();
                     result.page = pageIndex + 1;
                     result.key_x = entry.x;
                     result.key_y = entry.y;
-                    result.key = search.key;
-                    if (!search.findValues) result.value = null
-                    else {
-                        let res = this.findValue(search, page, entry.x, entry.y);
-                        if (res != null) {
-                            result.value = res.str;
-                            result.val_x = res.x;
-                            result.val_y = res.y;
-                        }
-
+                    result.key = terms.key;
+                    let res = this.findValue(terms, page, entry.x, entry.y);
+                    if (res != null) {
+                        result.value = res.str;
+                        result.val_x = res.x;
+                        result.val_y = res.y;
                     }
                     results.push(result);
                 }
@@ -50,7 +46,7 @@ export class SearchService {
     }
 
     // Returns the closest value in the desired direction within margin
-    findValue(search: Search, page: PDFExtractPage, key_x: number, key_y: number) {
+    findValue(terms: Terms, page: PDFExtractPage, key_x: number, key_y: number) {
         const contentArray = page.content;
         let entryIndex: number;
         let candidates: PDFExtractText[] = [];
@@ -58,7 +54,7 @@ export class SearchService {
         for (entryIndex = 0; entryIndex < contentArray.length; ++entryIndex) {
             let val = contentArray[entryIndex];
             if (val.str != ' ' && val.str != '') {
-                switch (search.direction) {
+                switch (terms.direction) {
                     case Direction.Right: {
                         if (this.inMargin(val.y, key_y) && val.x > key_x)
                             candidates.push(val);
@@ -83,9 +79,9 @@ export class SearchService {
                 }
             }
         }
-        if ((search.direction == Direction.Right || search.direction == Direction.Left) && candidates.length > 0)
+        if ((terms.direction == Direction.Right || terms.direction == Direction.Left) && candidates.length > 0)
             return this.closestOnX(key_x, candidates);
-        if ((search.direction == Direction.Above || search.direction == Direction.Below) && candidates.length > 0)
+        if ((terms.direction == Direction.Above || terms.direction == Direction.Below) && candidates.length > 0)
             return this.closestOnY(key_y, candidates);
         return null;
     }
