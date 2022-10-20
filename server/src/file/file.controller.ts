@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Body, Param, UploadedFile, UseInterceptors, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UploadedFile, UseInterceptors, Res, StreamableFile, Header, HttpException } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiCreatedResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
 import multer from 'multer';
 import { PDFExtractResult } from 'pdf.js-extract';
+import { createReadStream } from 'fs';
+import { join } from 'path';
 
 @Controller('file')
 export class FileController {
@@ -11,9 +13,8 @@ export class FileController {
     ) { }
 
     @Post('upload')
-    @UseInterceptors(FileInterceptor('image'))
+    @UseInterceptors(FileInterceptor('file'))
     async uploadFile(@UploadedFile() file: Express.Multer.File) {
-        console.log(file);
         const response = {
             originalname: file.originalname,
             filename: file.filename,
@@ -21,9 +22,18 @@ export class FileController {
         return response;
     }
 
-    @Get(':imgpath')
-    seeUploadedFile(@Param('imgpath') image, @Res() res) {
-        return res.sendFile(image, { root: './files' });
+    @Get('/get/:filename')
+    @Header('Content-Type', 'application/pdf')
+    getFile(@Param('filename') filename: string): StreamableFile {
+        //const exampleFiles = ["pdf1.pdf", "pdf2.pdf", "pdf3.pdf", "invoice.pdf"];
+        try{
+            const file = createReadStream(join(process.cwd(), `/test_pdfs/${filename}`));
+            return new StreamableFile(file);
+        }
+        catch(err){
+            throw new HttpException("File not found.", 404);
+        }
+        return null;
     }
 
 }
