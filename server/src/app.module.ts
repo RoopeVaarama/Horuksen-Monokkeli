@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import { User, UserSchema } from './users/schemas/user.schema';
 import { SearchModule } from './search/search.module';
 import { UsersModule } from './users/users.module';
+import { TemplateModule } from './template/template.module';
 
 
 @Module({
@@ -25,7 +26,8 @@ import { UsersModule } from './users/users.module';
       inject: [ConfigService],
     }),
     SearchModule,
-    UsersModule
+    UsersModule,
+    TemplateModule
   ],
   controllers: [AppController],
   providers: [AppService],

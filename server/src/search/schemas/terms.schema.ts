@@ -52,4 +52,4 @@ export class Terms {
 
 }
 
-export const SearchSchema = SchemaFactory.createForClass(Terms);
+export const TermsSchema = SchemaFactory.createForClass(Terms);
