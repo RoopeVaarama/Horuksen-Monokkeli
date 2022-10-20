@@ -8,11 +8,13 @@ import {
   TextField,
   Typography
 } from '@mui/material'
+import { SearchRounded } from '@mui/icons-material'
 import { FormattedMessage } from 'react-intl'
 import StyledPaper from '../../common/StyledPaper/StyledPaper'
-import SearchIcon from '@mui/icons-material/Search'
+import FileGroup from './FileGroup'
 
 const files = []
+const fileGroups = ['Laskut Reaktorilta', 'CV:t']
 
 const SearchField = styled(TextField)(() => ({
   variant: 'outlined',
@@ -26,13 +28,11 @@ const StyledDiv = styled('div')(() => ({
   width: '100vh'
 }))
 
-const FileGroup = ''
-
 const FilesPage = ({ isComplete, onComplete }: { isComplete: boolean; onComplete: () => void }) => {
   return (
     <StyledPaper sx={{ width: 'calc(100% - 48px)' }}>
-      <StyledDiv id='divi'>
-        <UtilityBar container justifyContent='space-between' alignItems='center' wrap='nowrap'>
+      <StyledDiv>
+        <UtilityBar container alignItems='center'>
           <Grid item sx={{ width: 1 / 3 }}>
             <FormControlLabel
               control={<Checkbox name='chooseAll' size='small' />}
@@ -49,7 +49,7 @@ const FilesPage = ({ isComplete, onComplete }: { isComplete: boolean; onComplete
               InputProps={{
                 startAdornment: (
                   <InputAdornment position='start'>
-                    <SearchIcon />
+                    <SearchRounded />
                   </InputAdornment>
                 )
               }}
@@ -57,20 +57,18 @@ const FilesPage = ({ isComplete, onComplete }: { isComplete: boolean; onComplete
           </Grid>
         </UtilityBar>
         <Stack
+          spacing={2}
           component='ol'
           sx={{
             width: '100%',
             pl: 0,
             listStyleType: 'none',
-            my: 0,
-            '.MuiListItemButton-root:hover': {
-              backgroundColor: 'background.paper'
-            }
+            my: 2
           }}
         >
-          <h3>Item1</h3>
-          <h3>Item2</h3>
-          <h3>Item3</h3>
+          {fileGroups.map((i) => (
+            <FileGroup key={i} groupName={i} />
+          ))}
         </Stack>
       </StyledDiv>
     </StyledPaper>
