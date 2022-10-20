@@ -3,8 +3,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiCreatedResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
 import multer from 'multer';
 import { PDFExtractResult } from 'pdf.js-extract';
-import { createReadStream } from 'fs';
-import { join } from 'path';
+import { createReadStream, existsSync } from 'fs';
+import path, { join } from 'path';
 
 @Controller('file')
 export class FileController {
@@ -25,15 +25,11 @@ export class FileController {
     @Get('/get/:filename')
     @Header('Content-Type', 'application/pdf')
     getFile(@Param('filename') filename: string): StreamableFile {
-        //const exampleFiles = ["pdf1.pdf", "pdf2.pdf", "pdf3.pdf", "invoice.pdf"];
-        try{
-            const file = createReadStream(join(process.cwd(), `/test_pdfs/${filename}`));
-            return new StreamableFile(file);
-        }
-        catch(err){
+        const filePath = 'test_pdfs/' + filename;
+        if(!existsSync(filePath)){
             throw new HttpException("File not found.", 404);
         }
-        return null;
+        const file = createReadStream(join(process.cwd(), filePath));
+        return new StreamableFile(file);;
     }
-
 }
