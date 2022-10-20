@@ -6,6 +6,8 @@ import AppFrame from './components/AppFrame'
 
 const AsyncSearchContainer = lazy(() => import('./components/SearchContainer'))
 const AsyncPageNotFoundContainer = lazy(() => import('./components/PageNotFoundContainer'))
+const AsyncSignInContainer = lazy(() => import('./components/SignInContainer'))
+const AsyncRegisterContainer = lazy(() => import('./components/RegisterContainer'))
 
 function App() {
   return (
@@ -35,6 +37,8 @@ function App() {
               </div>
             }
           />
+          <Route path='/signin' element={<AsyncSignInContainer />} />
+          <Route path='/register' element={<AsyncRegisterContainer />} />
           <Route path='*' element={<AsyncPageNotFoundContainer />} />
         </Routes>
       </Suspense>

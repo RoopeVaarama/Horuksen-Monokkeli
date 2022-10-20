@@ -47,25 +47,27 @@ const Toolbar = ({ height }: { height: string | number }) => {
                 </Typography>
               </Link>
             </Grid>
-            <Grid item sx={{ display: { xs: 'none', sm: 'block' } }}>
-              {TOOLBAR_ROUTES.map((route) => (
-                <Link
-                  key={route.intlId}
-                  to={route.link}
-                  style={{
-                    color:
-                      route.link === location.pathname
-                        ? theme.palette.secondary.light
-                        : theme.palette.background.paper,
-                    margin: theme.spacing(0, 1),
-                    textDecoration: 'none',
-                    textTransform: 'uppercase'
-                  }}
-                >
-                  <FormattedMessage id={route.intlId} defaultMessage={route.intlDefault} />
-                </Link>
-              ))}
-            </Grid>
+            {location.pathname !== '/signin' && location.pathname !== '/register' && (
+              <Grid item sx={{ display: { xs: 'none', sm: 'block' } }}>
+                {TOOLBAR_ROUTES.map((route) => (
+                  <Link
+                    key={route.intlId}
+                    to={route.link}
+                    style={{
+                      color:
+                        route.link === location.pathname
+                          ? theme.palette.secondary.light
+                          : theme.palette.background.paper,
+                      margin: theme.spacing(0, 1),
+                      textDecoration: 'none',
+                      textTransform: 'uppercase'
+                    }}
+                  >
+                    <FormattedMessage id={route.intlId} defaultMessage={route.intlDefault} />
+                  </Link>
+                ))}
+              </Grid>
+            )}
           </Grid>
           <Grid item>
             <IconButton
