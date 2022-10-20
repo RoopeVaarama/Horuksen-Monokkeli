@@ -15,7 +15,7 @@ function App() {
       <Suspense
         fallback={
           <Box py={2} width='100%' display='flex' justifyContent='center'>
-            <CircularProgress />
+            <CircularProgress color='secondary' />
           </Box>
         }
       >

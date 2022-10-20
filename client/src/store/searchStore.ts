@@ -1,12 +1,14 @@
 import create from 'zustand'
 import { relativePositions, locationsOnPage } from '../constants'
-import { LocationOnPage } from '../types/LocationOnPage'
-import { RelativePosition } from '../types/RelativePosition'
-import { Template } from '../types/Template'
+import { fetcher } from '../tools/fetcher'
+import { Template, SearchResult, RelativePosition, LocationOnPage } from '../types'
 
-interface TemplateState {
+interface SearchState {
   latestId: number
   templates: Template[]
+  results: SearchResult[]
+  refreshSearch: boolean
+  searching: boolean
   addTemplate: () => void
   updateKeyword: (id: number, newState: string) => void
   updateRelativePosition: (id: number, newState: RelativePosition['value']) => void
@@ -14,11 +16,15 @@ interface TemplateState {
   updateBoolOnlyKeyword: (id: number, newState: boolean) => void
   updateBoolFontSizeDependent: (id: number, newState: boolean) => void
   deleteTemplate: (id: number) => void
+  search: () => void
 }
 
-export const useTemplateStore = create<TemplateState>((set) => ({
+export const useSearchStore = create<SearchState>((set, get) => ({
   latestId: 0,
   templates: [],
+  results: [],
+  searching: false,
+  refreshSearch: true,
   addTemplate: () => {
     set((state) => ({
       templates: [
@@ -32,7 +38,8 @@ export const useTemplateStore = create<TemplateState>((set) => ({
           fontSizeDependent: true
         } as Template
       ],
-      latestId: state.latestId + 1
+      latestId: state.latestId + 1,
+      refreshSearch: true
     }))
   },
   updateKeyword: (id, newState) => {
@@ -43,7 +50,8 @@ export const useTemplateStore = create<TemplateState>((set) => ({
         } else {
           return template
         }
-      })
+      }),
+      refreshSearch: true
     }))
   },
   updateRelativePosition: (id, newState) => {
@@ -54,7 +62,8 @@ export const useTemplateStore = create<TemplateState>((set) => ({
         } else {
           return template
         }
-      })
+      }),
+      refreshSearch: true
     }))
   },
   updateLocationOnPage: (id, newState) => {
@@ -65,7 +74,8 @@ export const useTemplateStore = create<TemplateState>((set) => ({
         } else {
           return template
         }
-      })
+      }),
+      refreshSearch: true
     }))
   },
   updateBoolOnlyKeyword: (id: number, newState: boolean) => {
@@ -76,7 +86,8 @@ export const useTemplateStore = create<TemplateState>((set) => ({
         } else {
           return template
         }
-      })
+      }),
+      refreshSearch: true
     }))
   },
   updateBoolFontSizeDependent: (id: number, newState: boolean) => {
@@ -87,12 +98,30 @@ export const useTemplateStore = create<TemplateState>((set) => ({
         } else {
           return template
         }
-      })
+      }),
+      refreshSearch: true
     }))
   },
   deleteTemplate: (id) => {
     set((state) => ({
-      templates: state.templates.filter((template) => template.id !== id)
+      templates: state.templates.filter((template) => template.id !== id),
+      refreshSearch: true
     }))
+  },
+  search: async () => {
+    if (!get().searching && get().refreshSearch) {
+      set({ searching: true })
+      const body = {
+        key: get().templates[0].keyword,
+        direction: get().templates[0].relativePosition
+      }
+      const data = await fetcher({
+        method: 'POST',
+        path: 'search',
+        id: 'invoice.pdf',
+        body: body
+      })
+      set({ results: data, searching: false, refreshSearch: false })
+    }
   }
 }))
