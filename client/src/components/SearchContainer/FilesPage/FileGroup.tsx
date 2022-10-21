@@ -1,12 +1,29 @@
 import { useState } from 'react'
-import { Checkbox, Collapse, ListItemButton, Divider, Stack } from '@mui/material'
+import {
+  Checkbox,
+  Collapse,
+  ListItemButton,
+  Divider,
+  Stack,
+  Typography,
+  styled
+} from '@mui/material'
 import { ExpandLess, ExpandMore } from '@mui/icons-material'
 import FileItem from './FileItem'
+
+const Sidetext = styled('div')(() => ({
+  display: 'flex',
+  alignItems: 'center'
+}))
 
 const FileGroup = (props: { groupName: string }) => {
   const { groupName } = props
 
   const [chooseAll, setChooseAll] = useState(false)
+
+  const toggleAll = () => {
+    setChooseAll((current) => !current)
+  }
 
   const [open, setOpen] = useState(false)
   const toggle = () => {
@@ -27,7 +44,11 @@ const FileGroup = (props: { groupName: string }) => {
           onClick={toggle}
           sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
         >
-          {groupName} {open ? <ExpandLess /> : <ExpandMore />}
+          <Typography variant='subtitle1'>{groupName}</Typography>
+          <Sidetext>
+            <Typography variant='caption'>x/x valittu</Typography>
+            {open ? <ExpandLess /> : <ExpandMore />}
+          </Sidetext>
         </ListItemButton>
       </Stack>
       <Collapse in={open}>

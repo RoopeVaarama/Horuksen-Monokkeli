@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Stack, Divider, ListItemButton, Checkbox, Typography } from '@mui/material'
+import { Button, Stack, Divider, ListItemButton, Checkbox, Typography } from '@mui/material'
 
 const FileItem = (props: { fileName: string }) => {
   const { fileName } = props
@@ -7,6 +7,7 @@ const FileItem = (props: { fileName: string }) => {
   const toggle = () => {
     setSelected((currently) => !currently)
   }
+
   return (
     <Stack
       alignItems='center'
@@ -22,6 +23,7 @@ const FileItem = (props: { fileName: string }) => {
       >
         <Typography variant='subtitle2'>{fileName}</Typography>
       </ListItemButton>
+      <Button>Avaa</Button>
     </Stack>
   )
 }

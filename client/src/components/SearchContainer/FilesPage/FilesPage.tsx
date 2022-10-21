@@ -13,7 +13,6 @@ import { FormattedMessage } from 'react-intl'
 import StyledPaper from '../../common/StyledPaper/StyledPaper'
 import FileGroup from './FileGroup'
 
-const files = []
 const fileGroups = ['Laskut Reaktorilta', 'CV:t']
 
 const SearchField = styled(TextField)(() => ({
@@ -76,21 +75,3 @@ const FilesPage = ({ isComplete, onComplete }: { isComplete: boolean; onComplete
 }
 
 export default FilesPage
-
-/**
- * return (
-    <Stack display='flex' alignItems='center' spacing={2}>
-      <Typography>
-        <FormattedMessage id='selectFiles' defaultMessage='Valitse tiedostot' />
-      </Typography>
-      <Button
-        id='placeholderButton'
-        onClick={onComplete}
-        sx={{ width: 'max-content' }}
-        variant='contained'
-      >
-        {isComplete ? 'Merkitse keskeneräiseksi' : 'Merkitse valmiiksi'}
-      </Button>
-    </Stack>
-  )
- */
