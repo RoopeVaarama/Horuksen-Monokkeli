@@ -13,6 +13,7 @@ RUN npm install
 COPY . .
 
 FROM base as test
+RUN npm install -g jest
 RUN npm test
 
 FROM base as build

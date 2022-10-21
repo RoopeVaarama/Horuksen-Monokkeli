@@ -1,40 +1,50 @@
 import { Injectable } from '@nestjs/common';
 import { PDFExtract, PDFExtractOptions, PDFExtractResult } from 'pdf.js-extract';
+import { HttpException } from '@nestjs/common';
 
 @Injectable()
 export class ParseService {
 
-    async parsePdfNoValidation(file: string): Promise<PDFExtractResult> {
+    async parsePdf(file: string): Promise<PDFExtractResult> {
         const pdfExtract = new PDFExtract();
         const options: PDFExtractOptions = {};
-        return await pdfExtract.extract(file, options);
-    }
-
-    async parsePdf(file: string): Promise<PDFExtractResult> {
-        return await this.checkFileValidity(file);
-    }
-
-    checkFileValidity(file: string) {
-        const PDFExtract = require('pdf.js-extract').PDFExtract;
-        const pdfExtract = new PDFExtract();
-        const options = {};
-        let extractedPDF = pdfExtract.extract(`${file}`, options, (err, data) => {
-            if (err){
-                console.log(err);
-                return null;
+        let extractedPDF;
+        try {
+            extractedPDF = await pdfExtract.extract(file, options);
+        }
+        catch (err) {
+            if (err.name == "InvalidPDFException") {
+                throw new HttpException("File found, but it's not in PDF format. " + 
+                "Make sure file ending is .pdf", 400);
             }
-            let linesInTotal = 0;
-            for (let pageIndex = 0; pageIndex < data.pages.length; ++pageIndex) {
-                const page = data.pages[pageIndex];
-                const lines = PDFExtract.utils.pageToLines(page, 2);
-                linesInTotal += lines;
+            else {
+                throw new HttpException("File not found. " + 
+                "Make sure the file name is correct and file exists.", 404);
             }
+            return null;
+        }
 
-            if (linesInTotal == 0) {
-                //TODO: replace with something else
-                console.log("This document seems to have no text. Are you sure you want to use this file?")
-            }
-        });
+        if (this.doesDocumentHaveText(extractedPDF) == false) {
+            //TODO: this text not disaplayed in return message.
+            //Return code still works fine.
+            throw new HttpException("No content in PDF. " + 
+            "PDF found and extracted, but no text in it could be found.", 204);
+        }
+
+
         return extractedPDF;
+    }
+
+    doesDocumentHaveText(data: PDFExtractResult) {
+        let contentInTotal = 0;
+        for (let pageIndex = 0; pageIndex < data.pages.length; ++pageIndex) {
+            const page = data.pages[pageIndex];
+            contentInTotal += page.content.length;
+        }
+
+        if (contentInTotal == 0) {
+            return false;
+        }
+        return true;
     }
 }

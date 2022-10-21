@@ -18,5 +18,13 @@
   "profile": "Profile",
   "relativePosition": "Relative position",
   "selectFiles": "Select files",
-  "selectKeywords": "Select keywords"
+  "selectKeywords": "Select keywords",
+  "signIn": "Sign in",
+  "register": "Register",
+  "email": "Email",
+  "password": "Password",
+  "name": "Name",
+  "repeatPassword": "Repeat password",
+  "shortPassword": "Minimum length 8 characters",
+  "mismatchPassword": "Passwords don't match"
 }
