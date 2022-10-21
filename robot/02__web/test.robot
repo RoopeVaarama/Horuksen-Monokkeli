@@ -11,4 +11,4 @@ Check Title
 
 Check Navigation
     New Page    ${FRONTEND_URL}
-    Get Text    xpath=//a[contains(text(),'Uusi haku')]    ==    UUSI HAKU
+    Get Text    xpath=//a[contains(text(),'Uusi haku')]    ==    UUSI ASD
