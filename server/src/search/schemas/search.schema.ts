@@ -8,26 +8,25 @@ export type ResultDocument = Search & Document;
 
 @Schema()
 export class Search {
+  @Prop()
+  @ApiProperty()
+  userId = 'Kikki Hiiri';
 
-    @Prop()
-    @ApiProperty()
-    userId: string = "Kikki Hiiri";
+  @Prop({ default: new Date() })
+  @ApiProperty()
+  date: number;
 
-    @Prop({ default: new Date() })
-    @ApiProperty()
-    date: number;
+  @Prop()
+  @ApiProperty()
+  terms: Terms;
 
-    @Prop()
-    @ApiProperty()
-    terms: Terms;
+  @Prop()
+  @ApiProperty()
+  files: any[];
 
-    @Prop()
-    @ApiProperty()
-    files: any[];
-
-    @Prop()
-    @ApiProperty()
-    results: Result[] = [];
+  @Prop()
+  @ApiProperty()
+  results: Result[] = [];
 }
 
 export const SearchSchema = SchemaFactory.createForClass(Search);

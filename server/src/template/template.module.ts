@@ -5,8 +5,8 @@ import { TemplateController } from './template.controller';
 import { TemplateService } from './template.service';
 
 @Module({
-    imports: [MongooseModule.forFeature([{ name: ValueSearch.name, schema: ValueSearchSchema }]),],
-    controllers: [TemplateController],
-    providers: [TemplateService],
+  imports: [MongooseModule.forFeature([{ name: ValueSearch.name, schema: ValueSearchSchema }])],
+  controllers: [TemplateController],
+  providers: [TemplateService],
 })
 export class TemplateModule {}

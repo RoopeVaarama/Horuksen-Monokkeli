@@ -8,7 +8,6 @@ import { SearchModule } from './search/search.module';
 import { UsersModule } from './users/users.module';
 import { TemplateModule } from './template/template.module';
 
-
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -27,9 +26,9 @@ import { TemplateModule } from './template/template.module';
     }),
     SearchModule,
     UsersModule,
-    TemplateModule
+    TemplateModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}
