@@ -5,9 +5,12 @@ import { SearchService } from './search.service';
 import { PDFExtractResult } from 'pdf.js-extract';
 import { Terms } from './schemas/terms.schema';
 import { Result } from './schemas/result.schema';
-import { ValueSearch } from './schemas/value-search.schema';
-import { TemplateService } from './template.service';
+import { TemplateService } from '../template//template.service';
+import { ValueSearch } from '../template/schemas/value-search.schema';
+import { Search } from './schemas/search.schema';
+import { SearchRequest } from './schemas/search-request.schema';
 
+@ApiTags('search')
 @Controller('search')
 export class SearchController {
     constructor(
@@ -33,29 +36,34 @@ export class SearchController {
     }
 
     // performs a search (currently just on Invoice.pdf) with the specified template id
-    @Get('/valuesearch/:tid')
+    @Get('/templatesearch/:tid')
     @ApiCreatedResponse({ status: 200, description: 'Search completed', type: ValueSearch })
-    async valueSearch(@Param('tid') tid: string): Promise<Result[]> {
+    async valueSearchWithId(@Param('tid') tid: string): Promise<Result[]> {
         const contents = await this.parseService.parsePdf(`test_pdfs/invoice.pdf`);
         if (contents == null) return null;
         const search = await this.templateService.getTemplate(tid);
         return await this.service.search(contents, search.terms);
     }
 
-    // create a new search template
-    @Post('/create')
-    @ApiCreatedResponse({ status: 200, description: 'Template created', type: ValueSearch })
+    // performs a search with the received SearchRequest-object
+    @Post('/valuesearch')
+    @ApiCreatedResponse({ status: 200, description: 'Search completed', type: SearchRequest })
     @UsePipes(new ValidationPipe({ transform: true }))
-    async newTemplate(@Body() search: ValueSearch): Promise<ValueSearch> {
-        return await this.templateService.createTemplate(search);
+    async valueSearch(@Body() searchRequest: SearchRequest): Promise<Search> {
+        let search = new Search();
+        search.files = searchRequest.files;
+        search.terms = searchRequest.terms;
+        for (let i: number = 0; i < searchRequest.files.length; ++i) {
+            let file = searchRequest.files[i];
+            let contents = await this.parseService.parsePdf(`test_pdfs/${file}`);
+            if (contents == null) break;
+            let results = await this.service.search(contents, search.terms);
+            search.results = [...search.results, ...results];
+        }
+        return search;
     }
 
-    // returns all templates of a user
-    @Get('/templates/:uid')
-    @ApiCreatedResponse({ status: 200, description: 'Templates of user fetched', type: [ValueSearch] })
-    async getTemplates(@Param('uid') uid: string): Promise<ValueSearch[]> {
-        return await this.templateService.getTemplates(uid);
-    }
+
 
   @Post(':file')
   @ApiCreatedResponse({ status: 201, description: "Search completed.", type: ValueSearch })
