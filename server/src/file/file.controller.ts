@@ -22,7 +22,7 @@ export class FileController {
 
   @Post('/upload')
   @UseInterceptors(FileInterceptor('file'))
-  @ApiResponse({ status: 200, description: 'All users returned', type: Object })
+  @ApiResponse({ status: 200, description: 'File successfully uploaded', type: Object })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -44,7 +44,7 @@ export class FileController {
   }
 
   @Get('/get')
-  @ApiResponse({ status: 200, description: 'All users returned', type: [String] })
+  @ApiResponse({ status: 200, description: 'All filenames returned', type: [String] })
   async getFile(): Promise<string[]> {
     return await this.service.getAllFiles();
   }
