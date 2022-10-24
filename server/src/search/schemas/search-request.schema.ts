@@ -10,14 +10,14 @@ export type ValueSearchDocument = SearchRequest & Document;
 
 @Schema()
 export class SearchRequest {
-  @Prop({ required: true })
+  @Prop({ type: Terms, required: true })
   @ApiProperty()
   @IsNotEmpty()
   @Type(() => Terms)
   @ValidateNested()
   terms: Terms;
 
-  @Prop({ required: true })
+  @Prop({ type: [], required: true })
   @ApiProperty()
   @IsNotEmpty()
   files: any[];

@@ -15,13 +15,13 @@ import {
 import { Type } from 'class-transformer';
 import { User } from '../../users/schemas/user.schema';
 import { Terms } from '../../search/schemas/terms.schema';
-import { ValueSearch } from './value-search.schema';
+import { ValueSearch, ValueSearchSchema } from './value-search.schema';
 
 export type ValueSearchDocument = CreateRequest & Document;
 
 @Schema()
 export class CreateRequest {
-  @Prop({ required: true })
+  @Prop({ type: [ValueSearchSchema], required: true }) // Needs to use Schema within type
   @ApiProperty({ type: [ValueSearch] })
   @IsNotEmpty()
   @IsArray()

@@ -1,32 +1,33 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import { Document } from 'mongoose';
-import { Result } from './result.schema';
+import mongoose, { Document } from 'mongoose';
+import { Result, ResultSchema } from './result.schema';
 import { Terms } from './terms.schema';
 
 export type ResultDocument = Search & Document;
 
-@Schema()
+@Schema({ timestamps: { createdAt: 'created_at' } })
 export class Search {
-  @Prop()
+  @Prop({ type: String }) // Should this be a relation to User?
   @ApiProperty()
   userId = 'Kikki Hiiri';
 
-  @Prop({ default: new Date() })
-  @ApiProperty()
-  date: number;
+  // Currently using timestamps option
+  // @Prop({ type: Date, default: new Date() })
+  // @ApiProperty()
+  // date: Date;
 
-  @Prop()
+  @Prop({ type: Terms }) // Should this be a relation to a template or Terms array, rather than a single Terms object?
   @ApiProperty()
   terms: Terms;
 
-  @Prop()
+  @Prop({ type: [] }) // Either string array, or array of relations to database file objects
   @ApiProperty()
   files: any[];
 
-  @Prop()
+  @Prop({ type: [ResultSchema], default: [] }) // Needs to use Schema within type. Unsure if this applies to non-array schema model types.
   @ApiProperty()
-  results: Result[] = [];
+  results: Result[];
 }
 
 export const SearchSchema = SchemaFactory.createForClass(Search);
