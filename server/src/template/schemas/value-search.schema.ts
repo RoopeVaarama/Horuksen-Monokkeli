@@ -1,10 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import mongoose, { Document } from 'mongoose';
-import { IsBoolean, IsNumber, IsOptional, IsString, Max, Min, ValidateNested } from 'class-validator';
-import { Terms } from './terms.schema';
+import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 import { User } from '../../users/schemas/user.schema';
+import { Terms } from '../../search/schemas/terms.schema';
 
 export type ValueSearchDocument = ValueSearch & Document;
 
@@ -25,6 +25,7 @@ export class ValueSearch {
 
     @Prop({ required: true })
     @ApiProperty()
+    @IsNotEmpty()
     @Type(() => Terms)
     @ValidateNested()
     terms: Terms;

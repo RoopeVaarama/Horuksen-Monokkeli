@@ -7,6 +7,13 @@ export type ResultDocument = Result & Document;
 @Schema()
 export class Result {
 
+    @Prop()
+    @ApiProperty()
+    file: string;
+
+    @Prop()
+    @ApiProperty()
+    page: number;
 
     @Prop()
     @ApiProperty()
@@ -15,10 +22,6 @@ export class Result {
     @Prop()
     @ApiProperty()
     value: string;
-
-    @Prop()
-    @ApiProperty()
-    page: number;
 
     @Prop()
     @ApiProperty()

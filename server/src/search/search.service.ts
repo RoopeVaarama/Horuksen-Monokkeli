@@ -28,6 +28,7 @@ export class SearchService {
                 let entry = contentArray[entryIndex];
                 if (this.keyMatch(terms.key, entry.str)) {
                     let result = new Result();
+                    result.file = contents.filename;
                     result.page = pageIndex + 1;
                     result.key_x = entry.x;
                     result.key_y = entry.y;
