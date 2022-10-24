@@ -47,7 +47,7 @@ const SignInButton = styled(Button)(({ theme }) => ({
   color: theme.palette.primary.main
 }))
 
-const SignInLink = styled(Link)(({ theme }) => ({
+const SignInLink = styled(Link)(() => ({
   fontSize: '12px',
   display: 'flex',
   justifyContent: 'center'

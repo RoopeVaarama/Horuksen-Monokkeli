@@ -5,7 +5,6 @@ import { User, UserDocument } from './schemas/user.schema';
 
 @Injectable()
 export class UsersService {
-
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
   /**
@@ -23,29 +22,28 @@ export class UsersService {
    * @param user User object
    * @returns Updated user, excluding password
    */
-  async updateUser(id: String, user: User): Promise<User> {
-    const updatedUser = await this.userModel.findOneAndUpdate({_id: id}, {...user}).exec();
+  async updateUser(id: string, user: User): Promise<User> {
+    const updatedUser = await this.userModel.findOneAndUpdate({ _id: id }, { ...user }).exec();
 
-    return await this.userModel.findById(updatedUser._id).select({password: 0}).exec();
-  }
-
-
-/**
- * Deletes user with given id
- * @param id ID of user to delete
- * @returns Boolean, whether the delete was successful or not
- */
-  async deleteUser(id: String): Promise<boolean> {
-    const deleteResponse = await this.userModel.deleteOne({_id: id}).exec();
-    return deleteResponse.acknowledged; 
+    return await this.userModel.findById(updatedUser._id).select({ password: 0 }).exec();
   }
 
   /**
-   * 
+   * Deletes user with given id
+   * @param id ID of user to delete
+   * @returns Boolean, whether the delete was successful or not
+   */
+  async deleteUser(id: string): Promise<boolean> {
+    const deleteResponse = await this.userModel.deleteOne({ _id: id }).exec();
+    return deleteResponse.acknowledged;
+  }
+
+  /**
+   *
    * @returns A list of all users.
    */
   async getUsers(): Promise<User[]> {
-    const users = await this.userModel.find().select({password: 0}).exec();
+    const users = await this.userModel.find().select({ password: 0 }).exec();
 
     return users;
   }
