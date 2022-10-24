@@ -24,21 +24,27 @@ const FileItem = (props: {
   }
   useEffect(() => {
     onToggle(name, selected)
+    console.log('Item selected effect')
   }, [selected])
 
   useEffect(() => {
     override && setSelected(checked)
+    console.log('Item override effect')
   })
+
+  console.log(name + ': ' + selected)
 
   return (
     <Stack
+      id='fileitem-row'
       alignItems='center'
       direction='row'
       divider={<Divider orientation='vertical' variant='middle' flexItem />}
       sx={{ border: 0.5, marginLeft: 5 }}
     >
-      <Checkbox size='small' checked={selected} onClick={toggle} />
+      <Checkbox id='fileitem-checkbox' size='small' checked={selected} onClick={toggle} />
       <ListItemButton
+        id='fileitem-listitembutton'
         onClick={toggle}
         disableRipple
         sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
@@ -46,11 +52,11 @@ const FileItem = (props: {
         <Typography variant='subtitle2'>{fileName}</Typography>
       </ListItemButton>
       <Sidetext>
-        <Typography variant='caption'>
+        <Typography id='fileitem-date' variant='caption'>
           <FormattedMessage id='added' defaultMessage='Lisätty '></FormattedMessage>
           {date}
         </Typography>
-        <Button>
+        <Button id='fileitem-open-button'>
           <FormattedMessage id='open' defaultMessage='Avaa' />
         </Button>
       </Sidetext>

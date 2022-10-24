@@ -23,8 +23,13 @@ const Sidetext = styled('div')(() => ({
   alignItems: 'center'
 }))
 
-const FileGroup = (props: { groupName: string }) => {
-  const { groupName } = props
+const FileGroup = (props: {
+  groupName: string
+  preDeterminedCheck: boolean
+  checked: boolean
+  onChange: (name: string, selected: boolean) => void
+}) => {
+  const { groupName, preDeterminedCheck, checked, onChange } = props
 
   //Lisää tähän tiedostojen tiedot fetchin kautta
   const [children, setChildren] = useState(
@@ -32,9 +37,7 @@ const FileGroup = (props: { groupName: string }) => {
       return { name: file.name, date: file.date, checked: false }
     })
   )
-
   const [override, setOverride] = useState(false)
-
   const [chooseAll, setChooseAll] = useState(false)
 
   const toggleAll = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,18 +64,6 @@ const FileGroup = (props: { groupName: string }) => {
     updateGroup()
   }
 
-  const fileItems = children.map((file) => (
-    <FileItem
-      key={file.name}
-      name={file.name}
-      date={file.date}
-      fileName={file.name}
-      checked={chooseAll}
-      override={override}
-      onToggle={onItemToggle}
-    />
-  ))
-
   const check = () => {
     setChooseAll(true)
   }
@@ -87,45 +78,75 @@ const FileGroup = (props: { groupName: string }) => {
   }
 
   const countChosen = (): number => {
-    let selected = 0
-    children.forEach((child) => {
-      if (child.checked) {
-        selected++
-      }
-    })
-    return selected
+    return children.reduce((prev, curr) => prev + (curr.checked ? 1 : 0), 0)
   }
+
+  // Create components
+  const fileItems = children.map((file) => (
+    <FileItem
+      key={file.name}
+      name={file.name}
+      date={file.date}
+      fileName={file.name}
+      checked={chooseAll}
+      override={override}
+      onToggle={onItemToggle}
+    />
+  ))
 
   useEffect(() => {
     // If all files are selected, check the main checkbox
     chosenFiles === totalFiles ? check() : uncheck()
     // Checking or unchecking coming from sub-components, don't roll the change back
     setOverride(false)
+    console.log('Group chosenFiles effect')
   }, [chosenFiles, totalFiles])
 
+  useEffect(() => {
+    onChange(groupName, chooseAll)
+    console.log('Group chooseAll effect')
+  }, [chooseAll])
+
+  // Roll the select all to files
+  useEffect(() => {
+    if (preDeterminedCheck) {
+      setChooseAll(checked)
+      setOverride(true)
+    }
+    console.log('Group rolling effect')
+  })
+
+  console.log('Group ' + groupName + ': ' + chooseAll)
+
   return (
-    <Stack>
+    <Stack id='filegroup-row'>
       <Stack
+        id='filegroup-bar'
         direction='row'
         divider={<Divider orientation='vertical' variant='middle' flexItem />}
         sx={{ border: 1 }}
       >
-        <Checkbox size='small' onChange={toggleAll} checked={chooseAll} />
+        <Checkbox id='filegroup-checkbox' size='small' onChange={toggleAll} checked={chooseAll} />
         <ListItemButton
+          id='filegroup-button'
           disableRipple
           onClick={toggleCollapse}
           sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
         >
-          <Typography variant='subtitle1'>{groupName}</Typography>
-          <Sidetext>
-            <Typography variant='caption'>
+          <Typography id='filegroup-name' variant='subtitle1'>
+            {groupName}
+          </Typography>
+          <Sidetext id='filegroup-sub-bar'>
+            <Typography id='filegroup-group-info' variant='caption'>
               {chosenFiles}/{totalFiles} valittu
             </Typography>
             {open ? <ExpandLess /> : <ExpandMore />}
           </Sidetext>
         </ListItemButton>
       </Stack>
-      <Collapse in={open}>{fileItems}</Collapse>
+      <Collapse id='filegroup-files-container' in={open}>
+        {fileItems}
+      </Collapse>
     </Stack>
   )
 }
