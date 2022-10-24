@@ -1,27 +1,46 @@
-import { Button, Stack, Typography } from '@mui/material'
+import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined'
+import { ListItemButton, Typography, Stack } from '@mui/material'
+import TemplateSelector from './TemplateSelector/TemplateSelector'
+import StyledPaper from '../../common/StyledPaper/StyledPaper'
+import { useSearchStore } from '../../../store/searchStore'
 import { FormattedMessage } from 'react-intl'
 
-const TemplatesPage = ({
-  isComplete,
-  onComplete
-}: {
-  isComplete: boolean
-  onComplete: () => void
-}) => {
+const TemplatesPage = () => {
+  const { templates, addTemplate } = useSearchStore()
+
+  const onAddNewTemplate = () => {
+    addTemplate()
+  }
+
   return (
-    <Stack display='flex' alignItems='center' spacing={2}>
-      <Typography>
-        <FormattedMessage id='selectKeywords' defaultMessage='Valitse avainsanat' />
-      </Typography>
-      <Button
-        id='placeholderButton'
-        onClick={onComplete}
-        sx={{ width: 'max-content' }}
-        variant='contained'
+    <StyledPaper sx={{ width: 'calc(100% - 48px)' }}>
+      <Stack
+        component='ol'
+        sx={{
+          width: '100%',
+          pl: 0,
+          listStyleType: 'none',
+          my: 0,
+          '.MuiListItemButton-root:hover': {
+            backgroundColor: 'background.paper'
+          }
+        }}
       >
-        {isComplete ? 'Merkitse keskeneräiseksi' : 'Merkitse valmiiksi'}
-      </Button>
-    </Stack>
+        {templates.map((template, i) => (
+          <TemplateSelector key={template.id} marker={i + 1} template={template} />
+        ))}
+        <ListItemButton
+          onClick={onAddNewTemplate}
+          disableRipple
+          sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+        >
+          <Typography variant='button' color='primary'>
+            <FormattedMessage id='addRow' defaultMessage='Lisää rivi' />
+          </Typography>
+          <AddCircleOutlineOutlinedIcon color='primary' />
+        </ListItemButton>
+      </Stack>
+    </StyledPaper>
   )
 }
 
