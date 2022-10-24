@@ -40,7 +40,6 @@ export class FileController {
       originalname: file.originalname,
       filename: file.filename,
     };
-    console.log(file);
     return response;
   }
 
