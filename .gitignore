@@ -404,3 +404,6 @@ Temporary Items
 .apdisk
 
 =======
+
+/server/files
+/server/nodemon.json

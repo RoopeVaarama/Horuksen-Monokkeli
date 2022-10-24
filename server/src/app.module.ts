@@ -5,6 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { User, UserSchema } from './users/schemas/user.schema';
 import { SearchModule } from './search/search.module';
+import { FileModule } from './file/file.module';
 import { UsersModule } from './users/users.module';
 import { TemplateModule } from './template/template.module';
 
@@ -26,6 +27,7 @@ import { TemplateModule } from './template/template.module';
     }),
     SearchModule,
     UsersModule,
+    FileModule,
     TemplateModule,
   ],
   controllers: [AppController],
