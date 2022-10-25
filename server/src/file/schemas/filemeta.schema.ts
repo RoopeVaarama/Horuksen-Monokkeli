@@ -17,7 +17,6 @@ export class FileMeta {
 
   /*
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
-  @ApiProperty()
   author: User;
   */
 
