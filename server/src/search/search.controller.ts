@@ -46,11 +46,30 @@ export class SearchController {
   // performs a search (currently just on Invoice.pdf) with the specified template id
   @Get('/templatesearch/:tid')
   @ApiCreatedResponse({ status: 200, description: 'Search completed', type: ValueSearch })
-  async valueSearchWithId(@Param('tid') tid: string): Promise<Result[]> {
+  async valueSearchWithId(@Body() files: string[], @Param('tid') tid: string): Promise<Result[]> {
     const contents = await this.parseService.parsePdf(`test_pdfs/invoice.pdf`);
     if (contents == null) return null;
     const search = await this.templateService.getTemplate(tid);
     return await this.service.search(contents, search.terms);
+  }
+
+  // multifile search with template id and a string array of file names, for demo purposes
+  @Post('/multifile_search/:tid')
+  @ApiCreatedResponse({ status: 200, description: 'Search completed', type: ValueSearch })
+  async multifileSearchWithId(
+    @Body() files: string[],
+    @Param('tid') tid: string,
+  ): Promise<Result[]> {
+    const search = await this.templateService.getTemplate(tid);
+    let results: Result[] = [];
+    for (let i = 0; i < files.length; ++i) {
+      const file = files[i];
+      const contents = await this.parseService.parsePdf(`test_pdfs/${file}`);
+      if (contents == null) break;
+      const fileResults = await this.service.search(contents, search.terms);
+      results = [...results, ...fileResults];
+    }
+    return results;
   }
 
   // performs a search with the received SearchRequest-object
@@ -61,6 +80,7 @@ export class SearchController {
     const search = new Search();
     search.files = searchRequest.files;
     search.terms = searchRequest.terms;
+    search.results = [];
     for (let i = 0; i < searchRequest.files.length; ++i) {
       const file = searchRequest.files[i];
       const contents = await this.parseService.parsePdf(`test_pdfs/${file}`);

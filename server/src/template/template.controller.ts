@@ -1,5 +1,14 @@
-import { Body, Controller, Get, Param, Post, UsePipes, ValidationPipe } from '@nestjs/common';
-import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
+import { ApiCreatedResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateRequest } from './schemas/create-request.schema';
 import { ValueSearch } from './schemas/value-search.schema';
 import { TemplateService } from './template.service';
@@ -21,6 +30,12 @@ export class TemplateController {
     return createdTemplates;
   }
 
+  @Delete('/delete/:id')
+  @ApiResponse({ status: 200, description: 'Template deleted', type: Boolean })
+  async deleteUser(@Param('id') id: string) {
+    return await this.templateService.deleteTemplate(id);
+  }
+
   // returns all templates of a user
   @Get('/templates/:uid')
   @ApiCreatedResponse({
@@ -30,5 +45,16 @@ export class TemplateController {
   })
   async getTemplates(@Param('uid') uid: string): Promise<ValueSearch[]> {
     return await this.templateService.getTemplates(uid);
+  }
+
+  // returns all stored templates
+  @Get('all')
+  @ApiCreatedResponse({
+    status: 200,
+    description: 'All templates fetched',
+    type: [ValueSearch],
+  })
+  async getAllTemplates(): Promise<ValueSearch[]> {
+    return await this.templateService.getAllTemplates();
   }
 }

@@ -16,9 +16,6 @@ enum Direction {
   Above,
 }
 
-// Hardcoded allowed offset on axis for now, maybe include in search?
-const margin = 5;
-
 @Injectable()
 export class SearchService {
   // Only finds exact matches
@@ -57,27 +54,31 @@ export class SearchService {
   // Returns the closest value in the desired direction within margin
   findValue(terms: Terms, page: PDFExtractPage, key_x: number, key_y: number) {
     const contentArray = page.content;
-    let entryIndex: number;
     const candidates: PDFExtractText[] = [];
+    let entryIndex: number;
 
     for (entryIndex = 0; entryIndex < contentArray.length; ++entryIndex) {
       const val = contentArray[entryIndex];
       if (val.str != ' ' && val.str != '') {
         switch (terms.direction) {
           case Direction.Right: {
-            if (this.inMargin(val.y, key_y) && val.x > key_x) candidates.push(val);
+            if (this.inMargin(val.y, key_y, terms.allowedOffset) && val.x > key_x)
+              candidates.push(val);
             break;
           }
           case Direction.Below: {
-            if (this.inMargin(val.x, key_x) && val.y > key_y) candidates.push(val);
+            if (this.inMargin(val.x, key_x, terms.allowedOffset) && val.y > key_y)
+              candidates.push(val);
             break;
           }
           case Direction.Left: {
-            if (this.inMargin(val.y, key_y) && val.x < key_x) candidates.push(val);
+            if (this.inMargin(val.y, key_y, terms.allowedOffset) && val.x < key_x)
+              candidates.push(val);
             break;
           }
           case Direction.Above: {
-            if (this.inMargin(val.x, key_x) && val.y < key_y) candidates.push(val);
+            if (this.inMargin(val.x, key_x, terms.allowedOffset) && val.y < key_y)
+              candidates.push(val);
             break;
           }
           default:
@@ -98,7 +99,7 @@ export class SearchService {
     return null;
   }
 
-  inMargin(val: number, key: number) {
+  inMargin(val: number, key: number, margin: number) {
     return val >= key - margin && val <= key + margin;
   }
 
