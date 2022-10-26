@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { Document } from 'mongoose';
-import { IsBoolean, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
+import { IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
 
 export type TermsDocument = Terms & Document;
 
@@ -17,36 +17,36 @@ export class Terms {
   @IsNumber()
   @Min(0)
   @Max(3)
-  direction = 0;
+  direction: number = 0;
 
   @Prop({ type: Number })
   @ApiProperty()
   @IsNumber()
   @IsOptional()
-  allowedOffset = 10;
+  allowedOffset: number = 10;
 
   @Prop({ type: String })
   @ApiProperty()
   @IsString()
-  valueMatch = '.*';
+  valueMatch: string = '.*';
 
   @Prop({ type: String })
   @ApiProperty()
   @IsString()
   @IsOptional()
-  valuePrune = '.*';
+  valuePrune: string = '.*';
 
   @Prop({ type: String })
   @ApiProperty()
   @IsNumber()
   @IsOptional()
-  ignoreFirst = 0;
+  ignoreFirst: number = 0;
 
   @Prop({ type: String })
   @ApiProperty()
   @IsNumber()
   @IsOptional()
-  maxPerPage = 0;
+  maxPerPage: number = 0;
 }
 
 export const TermsSchema = SchemaFactory.createForClass(Terms);

@@ -1,10 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import mongoose, { Document } from 'mongoose';
+import { Document } from 'mongoose';
 import { Result, ResultSchema } from './result.schema';
 import { Terms } from './terms.schema';
 
-export type ResultDocument = Search & Document;
+export type SearchDocument = Search & Document;
 
 @Schema({ timestamps: { createdAt: 'created_at' } })
 export class Search {

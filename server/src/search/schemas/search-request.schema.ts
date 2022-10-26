@@ -1,12 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import mongoose, { Document } from 'mongoose';
+import { Document } from 'mongoose';
 import { IsNotEmpty, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
-import { User } from '../../users/schemas/user.schema';
 import { Terms } from '../../search/schemas/terms.schema';
 
-export type ValueSearchDocument = SearchRequest & Document;
+export type SearchRequestDocument = SearchRequest & Document;
 
 @Schema()
 export class SearchRequest {
