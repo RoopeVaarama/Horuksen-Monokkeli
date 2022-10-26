@@ -19,18 +19,18 @@ export type ValueSearchDocument = ValueSearch & Document;
 
 @Schema()
 export class ValueSearch {
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   @ApiProperty()
   @IsString()
   userId: string;
 
-  @Prop()
+  @Prop({ type: String })
   @ApiProperty()
   @IsString()
   @IsOptional()
   title = 'Avain-arvohaku';
 
-  @Prop({ required: true })
+  @Prop({ type: Terms, required: true })
   @ApiProperty()
   @IsNotEmpty()
   @Type(() => Terms)

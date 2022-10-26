@@ -7,42 +7,42 @@ export type TermsDocument = Terms & Document;
 
 @Schema()
 export class Terms {
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   @ApiProperty()
   @IsString()
   key: string;
 
-  @Prop({ required: true })
+  @Prop({ type: Number, required: true })
   @ApiProperty()
   @IsNumber()
   @Min(0)
   @Max(3)
   direction = 0;
 
-  @Prop()
+  @Prop({ type: Number })
   @ApiProperty()
   @IsNumber()
   @IsOptional()
   allowedOffset = 10;
 
-  @Prop()
+  @Prop({ type: String })
   @ApiProperty()
   @IsString()
   valueMatch = '.*';
 
-  @Prop()
+  @Prop({ type: String })
   @ApiProperty()
   @IsString()
   @IsOptional()
   valuePrune = '.*';
 
-  @Prop()
+  @Prop({ type: String })
   @ApiProperty()
   @IsNumber()
   @IsOptional()
   ignoreFirst = 0;
 
-  @Prop()
+  @Prop({ type: String })
   @ApiProperty()
   @IsNumber()
   @IsOptional()

@@ -6,35 +6,35 @@ export type ResultDocument = Result & Document;
 
 @Schema()
 export class Result {
-  @Prop()
+  @Prop({ type: String })
   @ApiProperty()
   file: string;
 
-  @Prop()
+  @Prop({ type: Number })
   @ApiProperty()
   page: number;
 
-  @Prop()
+  @Prop({ type: String })
   @ApiProperty()
   key: string;
 
-  @Prop()
+  @Prop({ type: String })
   @ApiProperty()
   value: string;
 
-  @Prop()
+  @Prop({ type: Number })
   @ApiProperty()
   key_x: number;
 
-  @Prop()
+  @Prop({ type: Number })
   @ApiProperty()
   key_y: number;
 
-  @Prop()
+  @Prop({ type: Number })
   @ApiProperty()
   val_x: number;
 
-  @Prop()
+  @Prop({ type: Number })
   @ApiProperty()
   val_y: number;
 }
