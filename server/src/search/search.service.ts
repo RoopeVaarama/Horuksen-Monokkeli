@@ -7,7 +7,7 @@ import {
   PDFExtractText,
 } from 'pdf.js-extract';
 import { Result } from './schemas/result.schema';
-import { Terms } from './schemas/terms.schema';
+import { Term } from '../template/schemas/term.schema';
 
 enum Direction {
   Right,
@@ -19,7 +19,7 @@ enum Direction {
 @Injectable()
 export class SearchService {
   // Only finds exact matches
-  async search(contents: PDFExtractResult, terms: Terms): Promise<Result[]> {
+  async search(contents: PDFExtractResult, terms: Term): Promise<Result[]> {
     const pageArray = contents.pages;
     let pageIndex: number;
     const results: Result[] = [];
@@ -52,7 +52,7 @@ export class SearchService {
   }
 
   // Returns the closest value in the desired direction within margin
-  findValue(terms: Terms, page: PDFExtractPage, key_x: number, key_y: number) {
+  findValue(terms: Term, page: PDFExtractPage, key_x: number, key_y: number) {
     const contentArray = page.content;
     const candidates: PDFExtractText[] = [];
     let entryIndex: number;

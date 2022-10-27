@@ -3,18 +3,18 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Document } from 'mongoose';
 import { IsNotEmpty, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
-import { Terms } from '../../search/schemas/terms.schema';
+import { Term } from '../../template/schemas/term.schema';
 
 export type SearchRequestDocument = SearchRequest & Document;
 
 @Schema()
 export class SearchRequest {
-  @Prop({ type: Terms, required: true })
+  @Prop({ type: Term, required: true })
   @ApiProperty()
   @IsNotEmpty()
-  @Type(() => Terms)
+  @Type(() => Term)
   @ValidateNested()
-  terms: Terms;
+  terms: Term;
 
   @Prop({ type: [], required: true })
   @ApiProperty()
