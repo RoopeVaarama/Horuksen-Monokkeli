@@ -16,7 +16,7 @@ import {
   FileTypeValidator,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiCreatedResponse, ApiConsumes, ApiResponse, ApiTags, ApiBody, ApiNotFoundResponse } from '@nestjs/swagger';
+import { ApiConsumes, ApiResponse, ApiTags, ApiBody, ApiNotFoundResponse } from '@nestjs/swagger';
 import { FileService } from './file.service';
 import { ListService } from './list.service';
 import { FileMeta } from './schemas/filemeta.schema';
@@ -28,7 +28,7 @@ export class FileController {
   constructor(
     private readonly fileService: FileService,
     private readonly listService: ListService,
-  ) { }
+  ) {}
 
   @Post('/upload')
   @UseInterceptors(FileInterceptor('file'))

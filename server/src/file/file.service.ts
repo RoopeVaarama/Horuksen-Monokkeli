@@ -6,7 +6,7 @@ import { FileMeta, FileMetaDocument } from './schemas/filemeta.schema';
 
 @Injectable()
 export class FileService {
-  constructor(@InjectModel(FileMeta.name) private fileMetaModel: Model<FileMetaDocument>) { }
+  constructor(@InjectModel(FileMeta.name) private fileMetaModel: Model<FileMetaDocument>) {}
 
   // file could use a type definition
   async createFileMeta(file: Express.Multer.File): Promise<FileMeta> {
