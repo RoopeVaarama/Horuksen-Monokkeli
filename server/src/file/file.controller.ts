@@ -16,7 +16,7 @@ import {
   FileTypeValidator,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiCreatedResponse, ApiConsumes, ApiResponse, ApiTags, ApiBody } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiConsumes, ApiResponse, ApiTags, ApiBody, ApiNotFoundResponse } from '@nestjs/swagger';
 import { FileService } from './file.service';
 import { ListService } from './list.service';
 import { FileMeta } from './schemas/filemeta.schema';
@@ -28,7 +28,7 @@ export class FileController {
   constructor(
     private readonly fileService: FileService,
     private readonly listService: ListService,
-  ) {}
+  ) { }
 
   @Post('/upload')
   @UseInterceptors(FileInterceptor('file'))
@@ -63,7 +63,11 @@ export class FileController {
   }
 
   @Delete('/:id')
-  @ApiResponse({ status: 200, description: 'FileMeta deleted', type: Boolean })
+  @ApiResponse({ status: 200, description: 'File deleted', type: Boolean })
+  @ApiNotFoundResponse({
+    status: 404,
+    description: 'File not found',
+  })
   async deleteFile(@Param('id') id: string) {
     return await this.fileService.deleteFile(id);
   }

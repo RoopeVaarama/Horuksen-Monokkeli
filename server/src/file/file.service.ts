@@ -6,7 +6,7 @@ import { FileMeta, FileMetaDocument } from './schemas/filemeta.schema';
 
 @Injectable()
 export class FileService {
-  constructor(@InjectModel(FileMeta.name) private fileMetaModel: Model<FileMetaDocument>) {}
+  constructor(@InjectModel(FileMeta.name) private fileMetaModel: Model<FileMetaDocument>) { }
 
   // file could use a type definition
   async createFileMeta(file: Express.Multer.File): Promise<FileMeta> {
@@ -23,7 +23,13 @@ export class FileService {
   }
 
   async deleteFile(id: string): Promise<boolean> {
-    const fileToRemove = (await this.fileMetaModel.findById(id)).filepath;
+    let fileToRemove: string;
+    try {
+      fileToRemove = (await this.fileMetaModel.findById(id)).filepath;
+    } catch (err) {
+      throw new HttpException('File not found.', 404);
+    }
+
     unlinkSync(fileToRemove);
     const deleteResponse = await this.fileMetaModel.deleteOne({ _id: id }).exec();
     return deleteResponse.acknowledged;
