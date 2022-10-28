@@ -1,7 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { existsSync, opendirSync, readdir } from 'fs';
+import { existsSync, opendirSync, readdir, unlinkSync } from 'fs';
 import { FileMeta, FileMetaDocument } from './schemas/filemeta.schema';
 
 @Injectable()
@@ -9,7 +9,7 @@ export class FileService {
   constructor(@InjectModel(FileMeta.name) private fileMetaModel: Model<FileMetaDocument>) {}
 
   // file could use a type definition
-  async createFileMeta(file): Promise<FileMeta> {
+  async createFileMeta(file: Express.Multer.File): Promise<FileMeta> {
     const filemeta = new FileMeta();
     filemeta.filename = file.originalname;
     filemeta.filepath = file.destination + '/' + file.filename;
@@ -22,8 +22,9 @@ export class FileService {
     return files;
   }
 
-  async deleteFileMeta(id: string): Promise<boolean> {
-    // TODO: Delete saved file alongside filemeta
+  async deleteFile(id: string): Promise<boolean> {
+    const fileToRemove = (await this.fileMetaModel.findById(id)).filepath;
+    unlinkSync(fileToRemove);
     const deleteResponse = await this.fileMetaModel.deleteOne({ _id: id }).exec();
     return deleteResponse.acknowledged;
   }

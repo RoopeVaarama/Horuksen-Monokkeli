@@ -65,7 +65,7 @@ export class FileController {
   @Delete('/:id')
   @ApiResponse({ status: 200, description: 'FileMeta deleted', type: Boolean })
   async deleteFile(@Param('id') id: string) {
-    return await this.fileService.deleteFileMeta(id);
+    return await this.fileService.deleteFile(id);
   }
 
   @Get('/get')
