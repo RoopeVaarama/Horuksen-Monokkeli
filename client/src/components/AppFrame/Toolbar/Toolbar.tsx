@@ -94,21 +94,23 @@ const Toolbar = ({ height }: { height: string | number }) => {
               open={Boolean(anchorEl)}
               onClose={() => setAnchorEl(null)}
             >
-              <Box display={{ xs: 'block', sm: 'none' }} mb={1}>
-                {TOOLBAR_ROUTES.map((route) => (
-                  <MenuItem
-                    key={route.intlId}
-                    component={Link}
-                    to={route.link}
-                    onClick={() => setAnchorEl(null)}
-                    disabled={route.link === location.pathname}
-                  >
-                    <Typography textAlign='center'>
-                      {<FormattedMessage id={route.intlId} defaultMessage={route.intlDefault} />}
-                    </Typography>
-                  </MenuItem>
-                ))}
-              </Box>
+              {location.pathname !== '/signin' && location.pathname !== '/register' && (
+                <Box display={{ xs: 'block', sm: 'none' }} mb={1}>
+                  {TOOLBAR_ROUTES.map((route) => (
+                    <MenuItem
+                      key={route.intlId}
+                      component={Link}
+                      to={route.link}
+                      onClick={() => setAnchorEl(null)}
+                      disabled={route.link === location.pathname}
+                    >
+                      <Typography textAlign='center'>
+                        {<FormattedMessage id={route.intlId} defaultMessage={route.intlDefault} />}
+                      </Typography>
+                    </MenuItem>
+                  ))}
+                </Box>
+              )}
               <LanguageSelector />
             </Menu>
           </Grid>

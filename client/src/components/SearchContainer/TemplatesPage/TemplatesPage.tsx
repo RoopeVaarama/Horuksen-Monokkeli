@@ -2,11 +2,11 @@ import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOu
 import { ListItemButton, Typography, Stack } from '@mui/material'
 import TemplateSelector from './TemplateSelector/TemplateSelector'
 import StyledPaper from '../../common/StyledPaper/StyledPaper'
-import { useTemplateStore } from '../../../store/templateStore'
+import { useSearchStore } from '../../../store/searchStore'
 import { FormattedMessage } from 'react-intl'
 
 const TemplatesPage = () => {
-  const { templates, addTemplate } = useTemplateStore()
+  const { templates, addTemplate } = useSearchStore()
 
   const onAddNewTemplate = () => {
     addTemplate()

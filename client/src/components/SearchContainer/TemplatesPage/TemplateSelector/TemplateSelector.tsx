@@ -22,14 +22,12 @@ import {
   SelectChangeEvent
 } from '@mui/material'
 import { FormattedMessage } from 'react-intl'
-import { Template } from '../../../../types/Template'
-import { useTemplateStore } from '../../../../store/templateStore'
+import { useSearchStore } from '../../../../store/searchStore'
 import { relativePositions, locationsOnPage } from '../../../../constants'
-import { RelativePosition } from '../../../../types/RelativePosition'
-import { LocationOnPage } from '../../../../types/LocationOnPage'
+import { RelativePosition, LocationOnPage, Template } from '../../../../types'
 
 const TemplateSelector = ({ marker, template }: { marker: number; template: Template }) => {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(true)
   const [textFieldError, setTextFieldError] = useState(false)
   const {
     deleteTemplate,
@@ -38,7 +36,7 @@ const TemplateSelector = ({ marker, template }: { marker: number; template: Temp
     updateLocationOnPage,
     updateBoolOnlyKeyword,
     updateBoolFontSizeDependent
-  } = useTemplateStore()
+  } = useSearchStore()
 
   const theme = useTheme()
   return (

@@ -2,7 +2,7 @@ import { Stack, Step, StepButton, Stepper, styled } from '@mui/material'
 import StepConnector, { stepConnectorClasses } from '@mui/material/StepConnector'
 import { useEffect, useState } from 'react'
 import { FormattedMessage } from 'react-intl'
-import { useTemplateStore } from '../../store/templateStore'
+import { useSearchStore } from '../../store/searchStore'
 import { Template } from '../../types/Template'
 import FilesPage from './FilesPage'
 import ResultsPage from './ResultsPage'
@@ -65,7 +65,7 @@ const SearchContainer = () => {
   const [completed, setCompleted] = useState<readonly boolean[]>(
     new Array<boolean>(STEPS.length).fill(false)
   )
-  const { templates } = useTemplateStore()
+  const { templates } = useSearchStore()
 
   const handleStep = (step: number) => () => {
     setActiveStep(step)
