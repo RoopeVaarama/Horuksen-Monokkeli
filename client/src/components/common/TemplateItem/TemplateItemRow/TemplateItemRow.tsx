@@ -22,23 +22,24 @@ import {
 } from '@mui/material'
 import { FormattedMessage } from 'react-intl'
 import { directions } from '../../../../constants'
-import { Direction, TemplateRow } from '../../../../types'
+import { Direction, TemplateRow, TemplateVariant } from '../../../../types'
 import { useTemplateStore } from '../../../../store/templateStore'
 
 const TemplateItemRow = ({
   marker,
   templateRow,
-  isDraft = false
+  variant
 }: {
   marker: number
   templateRow: TemplateRow
-  isDraft?: boolean
+  variant: TemplateVariant
 }) => {
   const theme = useTheme()
   const [open, setOpen] = useState(true)
   const [textFieldError, setTextFieldError] = useState(false)
   const { deleteTemplateDraftRow, updateTemplateDraftKey, updateTemplateDraftDirection } =
     useTemplateStore()
+  const isDraft = variant === 'draft'
 
   const handleDeleteRow = () => {
     if (isDraft && templateRow.id !== undefined) {

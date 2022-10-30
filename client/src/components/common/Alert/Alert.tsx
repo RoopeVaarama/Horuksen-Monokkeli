@@ -8,8 +8,8 @@ const Alert = ({
   onSave
 }: {
   message: string | JSX.Element
-  onCancel: () => void
-  onSave: () => void
+  onCancel?: () => void
+  onSave?: () => void
 }) => {
   return (
     <Stack
@@ -19,7 +19,7 @@ const Alert = ({
       borderRadius={1}
       alignItems='center'
       justifyContent='space-between'
-      sx={{ backgroundColor: 'rgb(229, 246, 253)', height: '40px' }}
+      sx={{ backgroundColor: 'rgb(229, 246, 253)', height: '40px', width: '100%' }}
     >
       <Stack direction='row' spacing={1}>
         <InfoOutlinedIcon color='secondary' />
@@ -28,12 +28,16 @@ const Alert = ({
         </Typography>
       </Stack>
       <Stack direction='row' spacing={1}>
-        <Button onClick={() => onCancel()}>
-          <FormattedMessage id='cancel' defaultMessage='Peruuta' />
-        </Button>
-        <Button variant='contained' onClick={() => onSave()}>
-          <FormattedMessage id='save' defaultMessage='Tallenna' />
-        </Button>
+        {onCancel && (
+          <Button onClick={() => onCancel()}>
+            <FormattedMessage id='cancel' defaultMessage='Peruuta' />
+          </Button>
+        )}
+        {onSave && (
+          <Button variant='contained' onClick={() => onSave()}>
+            <FormattedMessage id='save' defaultMessage='Tallenna' />
+          </Button>
+        )}
       </Stack>
     </Stack>
   )

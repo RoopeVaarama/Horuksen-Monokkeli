@@ -1,5 +1,7 @@
 import { useState } from 'react'
-import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined'
+import AddCircleIcon from '@mui/icons-material/AddCircle'
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle'
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import DeleteIcon from '@mui/icons-material/Delete'
 import ExpandLess from '@mui/icons-material/ExpandLess'
 import ExpandMore from '@mui/icons-material/ExpandMore'
@@ -14,24 +16,30 @@ import {
   TextField,
   Typography
 } from '@mui/material'
-import { Template } from '../../../types'
+import { Template, TemplateVariant } from '../../../types'
 import StyledPaper from '../StyledPaper/StyledPaper'
 import { FormattedMessage } from 'react-intl'
 import { useTemplateStore } from '../../../store/templateStore'
 import TemplateItemRow from './TemplateItemRow'
+import { useSearchStore } from '../../../store/searchStore'
 
-const TemplateItem = ({ template, isDraft = false }: { template: Template; isDraft?: boolean }) => {
+const TemplateItem = ({ template, variant }: { template: Template; variant: TemplateVariant }) => {
   const theme = useTheme()
   const { deleteTemplateDraft, updateTemplateDraftTitle, addTemplateDraftRow, deleteTemplate } =
     useTemplateStore()
-  const [open, setOpen] = useState(isDraft)
+  const { addTemplateToSearch, removeTemplateFromSearch } = useSearchStore()
+  const [open, setOpen] = useState(true)
   const [textFieldError, setTextFieldError] = useState(false)
 
-  const handleDelete = () => {
-    if (isDraft) {
+  const handleAction = () => {
+    if (variant === 'draft') {
       deleteTemplateDraft()
-    } else if (template._id) {
+    } else if (variant === 'noEdit' && template._id) {
       deleteTemplate(template._id)
+    } else if (variant === 'searchOption' && template._id) {
+      addTemplateToSearch(template)
+    } else if (variant === 'searchSelected' && template._id) {
+      removeTemplateFromSearch(template._id)
     }
   }
   const handleUpdateTitle = (newTitle: string) => {
@@ -77,14 +85,14 @@ const TemplateItem = ({ template, isDraft = false }: { template: Template; isDra
             justifyContent: 'flex-end'
           }}
         >
-          {!isDraft && <ListItemText>{template.title}</ListItemText>}
+          {variant !== 'draft' && <ListItemText>{template.title}</ListItemText>}
           {open ? <ExpandLess color='primary' /> : <ExpandMore color='primary' />}
         </ListItemButton>
         <Collapse in={open} sx={{ backgroundColor: alpha(theme.palette.secondary.light, 0.05) }}>
           {template.terms.map((row, i) => (
-            <TemplateItemRow key={row.id ?? i} templateRow={row} marker={i + 1} isDraft={isDraft} />
+            <TemplateItemRow key={row.id ?? i} templateRow={row} marker={i + 1} variant={variant} />
           ))}
-          {isDraft && (
+          {variant === 'draft' && (
             <ListItemButton
               onClick={handleAddRow}
               disableRipple
@@ -101,11 +109,11 @@ const TemplateItem = ({ template, isDraft = false }: { template: Template; isDra
               <Typography variant='button' color='primary'>
                 <FormattedMessage id='addRow' defaultMessage='Lisää rivi' />
               </Typography>
-              <AddCircleOutlineOutlinedIcon color='primary' />
+              <AddCircleOutlineIcon color='primary' />
             </ListItemButton>
           )}
         </Collapse>
-        {isDraft && (
+        {variant === 'draft' && (
           <Stack
             direction='row'
             sx={{
@@ -128,22 +136,32 @@ const TemplateItem = ({ template, isDraft = false }: { template: Template; isDra
           </Stack>
         )}
         <IconButton
-          onClick={handleDelete}
+          onClick={handleAction}
           sx={{
             position: 'absolute',
             top: '8px',
             right: '-48px',
             ':hover': {
-              backgroundColor: alpha(theme.palette.error.light, 0.1),
+              backgroundColor: alpha(
+                variant === 'searchOption'
+                  ? theme.palette.success.light
+                  : theme.palette.error.light,
+                0.1
+              ),
               transitionDuration: '200ms',
               '.MuiSvgIcon-root': {
-                color: theme.palette.error.main,
+                color:
+                  variant === 'searchOption'
+                    ? theme.palette.success.main
+                    : theme.palette.error.main,
                 transition: 'color 200ms'
               }
             }
           }}
         >
-          <DeleteIcon color='primary' />
+          {variant === 'searchOption' && <AddCircleIcon color='primary' />}
+          {variant === 'searchSelected' && <RemoveCircleIcon color='primary' />}
+          {(variant === 'draft' || variant === 'noEdit') && <DeleteIcon color='primary' />}
         </IconButton>
       </Stack>
     </StyledPaper>

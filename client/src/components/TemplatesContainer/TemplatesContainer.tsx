@@ -69,10 +69,10 @@ const TemplatesContainer = () => {
                 </Button>
               )}
             </Box>
-            {templateDraft && <TemplateItem template={templateDraft} isDraft />}
+            {templateDraft && <TemplateItem template={templateDraft} variant='draft' />}
             {Array.isArray(templates) &&
               templates.map((template) => (
-                <TemplateItem key={template.title} template={template} />
+                <TemplateItem key={template.title} template={template} variant='noEdit' />
               ))}
           </Stack>
         </>

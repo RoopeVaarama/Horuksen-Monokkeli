@@ -1,128 +1,56 @@
 import create from 'zustand'
-import { directions, locationsOnPage } from '../constants'
 import { fetcher } from '../tools/fetcher'
-import { SearchResult, Direction, LocationOnPage } from '../types'
-import { TemplateRow } from '../types/TemplateRowOld'
+import { templatesArrayToSearch } from '../tools/temporaryConverters'
+import { SearchResult, Template } from '../types'
 
 interface SearchState {
-  latestId: number
-  templates: TemplateRow[]
+  searchTemplates: Template[]
   results: SearchResult[]
   refreshSearch: boolean
   searching: boolean
-  addTemplate: () => void
-  updateKeyword: (id: number, newState: string) => void
-  updateRelativePosition: (id: number, newState: Direction['value']) => void
-  updateLocationOnPage: (id: number, newState: LocationOnPage['value']) => void
-  updateBoolOnlyKeyword: (id: number, newState: boolean) => void
-  updateBoolFontSizeDependent: (id: number, newState: boolean) => void
-  deleteTemplate: (id: number) => void
+  addTemplateToSearch: (template: Template) => void
+  removeTemplateFromSearch: (id: string) => void
+  resetSearchParamaters: () => void
   search: () => void
 }
 
 export const useSearchStore = create<SearchState>((set, get) => ({
-  latestId: 0,
-  templates: [],
+  searchTemplates: [],
   results: [],
-  searching: false,
   refreshSearch: true,
-  addTemplate: () => {
+  searching: false,
+  addTemplateToSearch: (template: Template) => {
     set((state) => ({
-      templates: [
-        ...state.templates,
-        {
-          id: state.latestId + 1,
-          keyword: '',
-          relativePosition: directions[0].value,
-          locationOnPage: locationsOnPage[0].value,
-          onlyKeyword: true,
-          fontSizeDependent: true
-        } as TemplateRow
-      ],
-      latestId: state.latestId + 1,
+      searchTemplates: [...state.searchTemplates, template],
       refreshSearch: true
     }))
   },
-  updateKeyword: (id, newState) => {
+  removeTemplateFromSearch: (id: string) => {
     set((state) => ({
-      templates: state.templates.map((template) => {
-        if (template.id === id) {
-          return { ...template, keyword: newState }
-        } else {
-          return template
-        }
-      }),
+      searchTemplates: state.searchTemplates.filter((template) => template._id !== id),
       refreshSearch: true
     }))
   },
-  updateRelativePosition: (id, newState) => {
-    set((state) => ({
-      templates: state.templates.map((template) => {
-        if (template.id === id) {
-          return { ...template, relativePosition: newState }
-        } else {
-          return template
-        }
-      }),
-      refreshSearch: true
-    }))
-  },
-  updateLocationOnPage: (id, newState) => {
-    set((state) => ({
-      templates: state.templates.map((template) => {
-        if (template.id === id) {
-          return { ...template, locationOnPage: newState }
-        } else {
-          return template
-        }
-      }),
-      refreshSearch: true
-    }))
-  },
-  updateBoolOnlyKeyword: (id: number, newState: boolean) => {
-    set((state) => ({
-      templates: state.templates.map((template) => {
-        if (template.id === id) {
-          return { ...template, onlyKeyword: newState }
-        } else {
-          return template
-        }
-      }),
-      refreshSearch: true
-    }))
-  },
-  updateBoolFontSizeDependent: (id: number, newState: boolean) => {
-    set((state) => ({
-      templates: state.templates.map((template) => {
-        if (template.id === id) {
-          return { ...template, fontSizeDependent: newState }
-        } else {
-          return template
-        }
-      }),
-      refreshSearch: true
-    }))
-  },
-  deleteTemplate: (id) => {
-    set((state) => ({
-      templates: state.templates.filter((template) => template.id !== id),
-      refreshSearch: true
-    }))
+  resetSearchParamaters: () => {
+    set({
+      searchTemplates: [],
+      refreshSearch: false
+    })
   },
   search: async () => {
-    if (!get().searching && get().refreshSearch) {
+    if (!get().searching && get().refreshSearch && get().searchTemplates.length !== 0) {
       set({ searching: true })
-      const body = {
-        key: get().templates[0].keyword,
-        direction: get().templates[0].relativePosition
+      try {
+        const data = await fetcher({
+          method: 'POST',
+          path: 'search',
+          id: 'invoice.pdf',
+          body: templatesArrayToSearch(get().searchTemplates)
+        })
+        set({ searching: false, refreshSearch: false, results: data })
+      } catch (e) {
+        set({ searching: false })
       }
-      const data = await fetcher({
-        method: 'POST',
-        path: 'search',
-        id: 'invoice.pdf',
-        body: body
-      })
-      set({ results: data, searching: false, refreshSearch: false })
     }
   }
 }))

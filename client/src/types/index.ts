@@ -1,7 +1,7 @@
-import { LocationOnPage } from './LocationOnPage'
 import { Direction } from './Direction'
 import { SearchResult } from './SearchResult'
 import { TemplateRow } from './TemplateRow'
 import { Template } from './Template'
+import { TemplateVariant } from './TemplateVariant'
 
-export type { LocationOnPage, Direction, SearchResult, Template, TemplateRow }
+export type { Direction, SearchResult, Template, TemplateRow, TemplateVariant }
