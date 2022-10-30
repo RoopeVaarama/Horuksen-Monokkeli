@@ -3,7 +3,7 @@ import StepConnector, { stepConnectorClasses } from '@mui/material/StepConnector
 import { useEffect, useState } from 'react'
 import { FormattedMessage } from 'react-intl'
 import { useSearchStore } from '../../store/searchStore'
-import { Template } from '../../types/Template'
+import { TemplateRow } from '../../types/TemplateRowOld'
 import FilesPage from './FilesPage'
 import ResultsPage from './ResultsPage'
 import TemplatesPage from './TemplatesPage'
@@ -95,7 +95,7 @@ const SearchContainer = () => {
 
   useEffect(() => {
     handleCompletion(
-      templates.length > 0 && templates.every((value: Template) => value.keyword !== '')
+      templates.length > 0 && templates.every((value: TemplateRow) => value.keyword !== '')
     )
   }, [templates])
 

@@ -1,7 +1,6 @@
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined'
 import { ListItemButton, Typography, Stack } from '@mui/material'
-import TemplateSelector from './TemplateSelector/TemplateSelector'
-import StyledPaper from '../../common/StyledPaper/StyledPaper'
+import { StyledPaper, TemplateRowSelector } from '../../common'
 import { useSearchStore } from '../../../store/searchStore'
 import { FormattedMessage } from 'react-intl'
 
@@ -27,7 +26,7 @@ const TemplatesPage = () => {
         }}
       >
         {templates.map((template, i) => (
-          <TemplateSelector key={template.id} marker={i + 1} template={template} />
+          <TemplateRowSelector key={template.id} marker={i + 1} template={template} search />
         ))}
         <ListItemButton
           onClick={onAddNewTemplate}

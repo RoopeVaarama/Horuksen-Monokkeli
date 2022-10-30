@@ -1,17 +1,18 @@
 import create from 'zustand'
-import { relativePositions, locationsOnPage } from '../constants'
+import { directions, locationsOnPage } from '../constants'
 import { fetcher } from '../tools/fetcher'
-import { Template, SearchResult, RelativePosition, LocationOnPage } from '../types'
+import { SearchResult, Direction, LocationOnPage } from '../types'
+import { TemplateRow } from '../types/TemplateRowOld'
 
 interface SearchState {
   latestId: number
-  templates: Template[]
+  templates: TemplateRow[]
   results: SearchResult[]
   refreshSearch: boolean
   searching: boolean
   addTemplate: () => void
   updateKeyword: (id: number, newState: string) => void
-  updateRelativePosition: (id: number, newState: RelativePosition['value']) => void
+  updateRelativePosition: (id: number, newState: Direction['value']) => void
   updateLocationOnPage: (id: number, newState: LocationOnPage['value']) => void
   updateBoolOnlyKeyword: (id: number, newState: boolean) => void
   updateBoolFontSizeDependent: (id: number, newState: boolean) => void
@@ -32,11 +33,11 @@ export const useSearchStore = create<SearchState>((set, get) => ({
         {
           id: state.latestId + 1,
           keyword: '',
-          relativePosition: relativePositions[0].value,
+          relativePosition: directions[0].value,
           locationOnPage: locationsOnPage[0].value,
           onlyKeyword: true,
           fontSizeDependent: true
-        } as Template
+        } as TemplateRow
       ],
       latestId: state.latestId + 1,
       refreshSearch: true

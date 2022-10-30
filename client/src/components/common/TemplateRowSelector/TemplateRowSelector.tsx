@@ -22,20 +22,29 @@ import {
   SelectChangeEvent
 } from '@mui/material'
 import { FormattedMessage } from 'react-intl'
-import { useSearchStore } from '../../../../store/searchStore'
-import { relativePositions, locationsOnPage } from '../../../../constants'
-import { RelativePosition, LocationOnPage, Template } from '../../../../types'
+import { useSearchStore } from '../../../store/searchStore'
+import { directions, locationsOnPage } from '../../../constants'
+import { Direction, LocationOnPage } from '../../../types'
+import { TemplateRow } from '../../../types/TemplateRowOld'
 
-const TemplateSelector = ({ marker, template }: { marker: number; template: Template }) => {
+const TemplateRowSelector = ({
+  marker,
+  template,
+  search = false
+}: {
+  marker: number
+  template: TemplateRow
+  search?: boolean
+}) => {
   const [open, setOpen] = useState(true)
   const [textFieldError, setTextFieldError] = useState(false)
   const {
-    deleteTemplate,
-    updateKeyword,
-    updateRelativePosition,
-    updateLocationOnPage,
-    updateBoolOnlyKeyword,
-    updateBoolFontSizeDependent
+    deleteTemplate: searchDeleteTemplate,
+    updateKeyword: searchUpdateKeyword,
+    updateRelativePosition: searchUpdateRelativePosition,
+    updateLocationOnPage: searchUpdateLocationOnPage,
+    updateBoolOnlyKeyword: searchUpdateBoolOnlyKeyword,
+    updateBoolFontSizeDependent: searchUpdateBoolFontSizeDependent
   } = useSearchStore()
 
   const theme = useTheme()
@@ -70,9 +79,9 @@ const TemplateSelector = ({ marker, template }: { marker: number; template: Temp
                   color='secondary'
                   size='small'
                   value={template.relativePosition}
-                  onChange={(e: SelectChangeEvent<RelativePosition['value']>) => {
+                  onChange={(e: SelectChangeEvent<Direction['value']>) => {
                     if (typeof e.target.value !== 'string')
-                      updateRelativePosition(template.id, e.target.value)
+                      searchUpdateRelativePosition(template.id, e.target.value)
                   }}
                   IconComponent={ExpandMore}
                   label={
@@ -82,7 +91,7 @@ const TemplateSelector = ({ marker, template }: { marker: number; template: Temp
                     />
                   }
                 >
-                  {relativePositions.map((relPos) => (
+                  {directions.map((relPos) => (
                     <MenuItem key={relPos.intlId} value={relPos.value}>
                       <FormattedMessage id={relPos.intlId} defaultMessage={relPos.defaultMessage} />
                     </MenuItem>
@@ -102,7 +111,7 @@ const TemplateSelector = ({ marker, template }: { marker: number; template: Temp
                   value={template.locationOnPage}
                   onChange={(e: SelectChangeEvent<LocationOnPage['value']>) => {
                     if (typeof e.target.value !== 'string')
-                      updateLocationOnPage(template.id, e.target.value)
+                      searchUpdateLocationOnPage(template.id, e.target.value)
                   }}
                   IconComponent={ExpandMore}
                   label={<FormattedMessage id='pagePosition' defaultMessage='Sijainti sivulla' />}
@@ -128,7 +137,7 @@ const TemplateSelector = ({ marker, template }: { marker: number; template: Temp
               control={
                 <Checkbox
                   color='secondary'
-                  onChange={(e) => updateBoolOnlyKeyword(template.id, e.target.checked)}
+                  onChange={(e) => searchUpdateBoolOnlyKeyword(template.id, e.target.checked)}
                 />
               }
               label={<FormattedMessage id='onlyTheKeyword' defaultMessage='Vain avainsana' />}
@@ -143,7 +152,7 @@ const TemplateSelector = ({ marker, template }: { marker: number; template: Temp
               control={
                 <Checkbox
                   color='secondary'
-                  onChange={(e) => updateBoolFontSizeDependent(template.id, e.target.checked)}
+                  onChange={(e) => searchUpdateBoolFontSizeDependent(template.id, e.target.checked)}
                 />
               }
               label={
@@ -176,13 +185,13 @@ const TemplateSelector = ({ marker, template }: { marker: number; template: Temp
             } else {
               setTextFieldError(true)
             }
-            updateKeyword(template.id, e.target.value)
+            searchUpdateKeyword(template.id, e.target.value)
           }}
           label={<FormattedMessage id='keyWord' defaultMessage='Avainsana' />}
         />
       </Stack>
       <IconButton
-        onClick={() => deleteTemplate(template.id)}
+        onClick={() => searchDeleteTemplate(template.id)}
         sx={{
           position: 'absolute',
           top: '8px',
@@ -203,4 +212,4 @@ const TemplateSelector = ({ marker, template }: { marker: number; template: Temp
   )
 }
 
-export default TemplateSelector
+export default TemplateRowSelector
