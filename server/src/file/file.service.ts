@@ -8,6 +8,15 @@ import { FileMeta, FileMetaDocument } from './schemas/filemeta.schema';
 export class FileService {
   constructor(@InjectModel(FileMeta.name) private fileMetaModel: Model<FileMetaDocument>) {}
 
+  async canFileBeFound(fileId: string): Promise<boolean> {
+    try {
+      await this.fileMetaModel.findById(fileId);
+    } catch (err) {
+      throw new HttpException('File not found', 404);
+    }
+    return true;
+  }
+
   // file could use a type definition
   async createFileMeta(file: Express.Multer.File): Promise<FileMeta> {
     const filemeta = new FileMeta();
@@ -23,12 +32,8 @@ export class FileService {
   }
 
   async deleteFile(id: string): Promise<boolean> {
-    let fileToRemove: string;
-    try {
-      fileToRemove = (await this.fileMetaModel.findById(id)).filepath;
-    } catch (err) {
-      throw new HttpException('File not found.', 404);
-    }
+    await this.canFileBeFound(id);
+    const fileToRemove = (await this.fileMetaModel.findById(id)).filepath;
 
     unlinkSync(fileToRemove);
     const deleteResponse = await this.fileMetaModel.deleteOne({ _id: id }).exec();
@@ -56,4 +61,6 @@ export class FileService {
 
     return arrToReturn;
   }
+
+
 }
