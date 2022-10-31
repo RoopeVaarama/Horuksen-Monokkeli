@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { Document } from 'mongoose';
 import { Result, ResultSchema } from './result.schema';
-import { Terms } from './terms.schema';
+import { Term } from '../../template/schemas/term.schema';
 
 export type SearchDocument = Search & Document;
 
@@ -17,9 +17,9 @@ export class Search {
   // @ApiProperty()
   // date: Date;
 
-  @Prop({ type: Terms }) // Should this be a relation to a template or Terms array, rather than a single Terms object?
+  @Prop({ type: Term }) // Should this be a relation to a template or Terms array, rather than a single Terms object?
   @ApiProperty()
-  terms: Terms;
+  terms: Term;
 
   @Prop({ type: [] }) // Either string array, or array of relations to database file objects
   @ApiProperty()
