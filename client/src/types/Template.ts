@@ -1,7 +1,7 @@
 import { TemplateRow } from './TemplateRow'
 
 export interface Template {
-  userId: string
+  author: string
   title: string
   terms: TemplateRow[]
   _id?: string

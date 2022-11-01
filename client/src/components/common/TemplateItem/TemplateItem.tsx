@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
+import EditIcon from '@mui/icons-material/Edit'
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -22,12 +23,24 @@ import { FormattedMessage } from 'react-intl'
 import { useTemplateStore } from '../../../store/templateStore'
 import TemplateItemRow from './TemplateItemRow'
 import { useSearchStore } from '../../../store/searchStore'
+import { useUserStore } from '../../../store/userStore'
+import { titleAlreadyExists } from '../../../tools/validation'
+
+const BUTTON_WIDTH = '48px'
+const DB_BUTTON_WIDTH = '88px'
 
 const TemplateItem = ({ template, variant }: { template: Template; variant: TemplateVariant }) => {
   const theme = useTheme()
-  const { deleteTemplateDraft, updateTemplateDraftTitle, addTemplateDraftRow, deleteTemplate } =
-    useTemplateStore()
+  const {
+    templates,
+    deleteTemplateDraft,
+    updateTemplateDraftTitle,
+    addTemplateDraftRow,
+    deleteTemplate,
+    createTemplateDraft
+  } = useTemplateStore()
   const { addTemplateToSearch, removeTemplateFromSearch } = useSearchStore()
+  const { userId } = useUserStore()
   const [open, setOpen] = useState(true)
   const [textFieldError, setTextFieldError] = useState(false)
 
@@ -42,8 +55,12 @@ const TemplateItem = ({ template, variant }: { template: Template; variant: Temp
       removeTemplateFromSearch(template._id)
     }
   }
+  const handleEdit = () => {
+    window.scrollTo(0, 0)
+    createTemplateDraft(userId, template)
+  }
   const handleUpdateTitle = (newTitle: string) => {
-    if (newTitle) {
+    if (newTitle && !titleAlreadyExists(templates, newTitle, template._id)) {
       setTextFieldError(false)
     } else {
       setTextFieldError(true)
@@ -56,9 +73,10 @@ const TemplateItem = ({ template, variant }: { template: Template; variant: Temp
 
   return (
     <StyledPaper
+      id={`templateItem-${template.title}`}
       sx={{
         position: 'relative',
-        width: 'calc(100% - 48px)',
+        width: `calc(100% - ${variant === 'noEdit' ? DB_BUTTON_WIDTH : BUTTON_WIDTH})`,
         borderBottom: 'none'
       }}
     >
@@ -140,7 +158,7 @@ const TemplateItem = ({ template, variant }: { template: Template; variant: Temp
           sx={{
             position: 'absolute',
             top: '8px',
-            right: '-48px',
+            right: variant === 'noEdit' ? `-${DB_BUTTON_WIDTH}` : `-${BUTTON_WIDTH}`,
             ':hover': {
               backgroundColor: alpha(
                 variant === 'searchOption'
@@ -163,6 +181,26 @@ const TemplateItem = ({ template, variant }: { template: Template; variant: Temp
           {variant === 'searchSelected' && <RemoveCircleIcon color='primary' />}
           {(variant === 'draft' || variant === 'noEdit') && <DeleteIcon color='primary' />}
         </IconButton>
+        {variant === 'noEdit' && (
+          <IconButton
+            onClick={handleEdit}
+            sx={{
+              position: 'absolute',
+              top: '8px',
+              right: '-48px',
+              ':hover': {
+                backgroundColor: alpha(theme.palette.success.light, 0.1),
+                transitionDuration: '200ms',
+                '.MuiSvgIcon-root': {
+                  color: theme.palette.success.main,
+                  transition: 'color 200ms'
+                }
+              }
+            }}
+          >
+            <EditIcon color='primary' />
+          </IconButton>
+        )}
       </Stack>
     </StyledPaper>
   )

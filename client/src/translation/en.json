@@ -22,6 +22,7 @@
   "selectTemplatesForSearch": "Select templates to use for search",
   "noTemplatesSelected": "You haven't selected any templates yet!",
   "noTemplatestoSelected": "No templates are left to select for search.",
+  "noTemplatesCreated": "You have not created any templates yet.",
   "noResults": "No results.",
   "search": "Search",
   "cancel": "Cancel",

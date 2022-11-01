@@ -1,5 +1,5 @@
 import AddIcon from '@mui/icons-material/Add'
-import { Button, Stack, Typography, CircularProgress, Box } from '@mui/material'
+import { Button, Stack, Typography, CircularProgress, Box, useTheme } from '@mui/material'
 import { TemplateItem } from '../common'
 import { FormattedMessage } from 'react-intl'
 import { useTemplateStore } from '../../store/templateStore'
@@ -11,14 +11,17 @@ import { useUserStore } from '../../store/userStore'
  * Page container for url /templates
  */
 const TemplatesContainer = () => {
+  const theme = useTheme()
   const {
+    draftIsEdit,
     fetching,
     templates,
     templateDraft,
     resetTemplates,
     createTemplateDraft,
     deleteTemplateDraft,
-    createTemplate
+    createTemplate,
+    updateTemplate
   } = useTemplateStore()
   const { userId } = useUserStore()
 
@@ -29,7 +32,11 @@ const TemplatesContainer = () => {
     deleteTemplateDraft()
   }
   const handleCreateTemplate = () => {
-    createTemplate()
+    if (draftIsEdit) {
+      updateTemplate()
+    } else {
+      createTemplate()
+    }
   }
 
   useEffect(() => {
@@ -69,11 +76,28 @@ const TemplatesContainer = () => {
                 </Button>
               )}
             </Box>
-            {templateDraft && <TemplateItem template={templateDraft} variant='draft' />}
+            {templateDraft && (
+              <Box
+                id='draftContainer'
+                sx={{ '&>div': { boxShadow: `0px 0px 0px 1px ${theme.palette.secondary.main}` } }}
+              >
+                <TemplateItem template={templateDraft} variant='draft' />
+              </Box>
+            )}
             {Array.isArray(templates) &&
               templates.map((template) => (
-                <TemplateItem key={template.title} template={template} variant='noEdit' />
+                <TemplateItem key={template._id} template={template} variant='noEdit' />
               ))}
+            {Array.isArray(templates) && templates.length === 0 && !templateDraft && (
+              <Alert
+                message={
+                  <FormattedMessage
+                    id='noTemplatesCreated'
+                    defaultMessage='Et ole luonut yhtään templatea vielä.'
+                  />
+                }
+              />
+            )}
           </Stack>
         </>
       )}

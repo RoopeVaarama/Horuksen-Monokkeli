@@ -18,7 +18,9 @@ import {
   FormControl,
   InputLabel,
   SelectChangeEvent,
-  Box
+  Box,
+  FormControlLabel,
+  Checkbox
 } from '@mui/material'
 import { FormattedMessage } from 'react-intl'
 import { directions } from '../../../../constants'
@@ -37,8 +39,12 @@ const TemplateItemRow = ({
   const theme = useTheme()
   const [open, setOpen] = useState(true)
   const [textFieldError, setTextFieldError] = useState(false)
-  const { deleteTemplateDraftRow, updateTemplateDraftKey, updateTemplateDraftDirection } =
-    useTemplateStore()
+  const {
+    deleteTemplateDraftRow,
+    updateTemplateDraftKey,
+    updateTemplateDraftDirection,
+    updateTemplateDraftKeyOnly
+  } = useTemplateStore()
   const isDraft = variant === 'draft'
 
   const handleDeleteRow = () => {
@@ -61,6 +67,11 @@ const TemplateItemRow = ({
       updateTemplateDraftDirection(templateRow.id, newDirection)
     }
   }
+  const handleUpdateKeyOnly = (newState: boolean) => {
+    if (isDraft && templateRow.id !== undefined) {
+      updateTemplateDraftKeyOnly(templateRow.id, newState)
+    }
+  }
 
   return (
     <Box position='relative'>
@@ -80,32 +91,63 @@ const TemplateItemRow = ({
       </ListItemButton>
       <Collapse in={open} sx={{ backgroundColor: alpha(theme.palette.secondary.light, 0.1) }}>
         <Grid container p={2} columnSpacing={4} rowSpacing={2}>
-          <Grid item xs={12}>
-            <FormControl fullWidth>
-              <InputLabel id='relativePositionLabel'>
-                <FormattedMessage id='relativePosition' defaultMessage='Suhteellinen sijainti' />
-              </InputLabel>
-              <Select
-                labelId='relativePositionLabel'
-                color='secondary'
-                size='small'
-                value={templateRow.direction}
-                disabled={!isDraft}
-                onChange={(e: SelectChangeEvent<Direction['value']>) => {
-                  if (typeof e.target.value !== 'string') handleUpdateDirection(e.target.value)
-                }}
-                IconComponent={ExpandMore}
-                label={
+          <Grid
+            container
+            item
+            xs={12}
+            sm={6}
+            rowSpacing={2}
+            sx={{ 'label.Mui-focused': { color: theme.palette.secondary.main } }}
+          >
+            <Grid item xs={12}>
+              <FormControl fullWidth>
+                <InputLabel id='relativePositionLabel'>
                   <FormattedMessage id='relativePosition' defaultMessage='Suhteellinen sijainti' />
-                }
-              >
-                {directions.map((dir) => (
-                  <MenuItem key={dir.intlId} value={dir.value}>
-                    <FormattedMessage id={dir.intlId} defaultMessage={dir.defaultMessage} />
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+                </InputLabel>
+                <Select
+                  labelId='relativePositionLabel'
+                  color='secondary'
+                  size='small'
+                  value={templateRow.direction}
+                  disabled={!isDraft}
+                  onChange={(e: SelectChangeEvent<Direction['value']>) => {
+                    if (typeof e.target.value !== 'string') handleUpdateDirection(e.target.value)
+                  }}
+                  IconComponent={ExpandMore}
+                  label={
+                    <FormattedMessage
+                      id='relativePosition'
+                      defaultMessage='Suhteellinen sijainti'
+                    />
+                  }
+                >
+                  {directions.map((dir) => (
+                    <MenuItem key={dir.intlId} value={dir.value}>
+                      <FormattedMessage id={dir.intlId} defaultMessage={dir.defaultMessage} />
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+          </Grid>
+          <Grid container item xs={12} sm={6} direction='column'>
+            <FormControlLabel
+              sx={{
+                maxWidth: 'max-content',
+                '.MuiTypography-root': { fontSize: '14px' },
+                '.MuiButtonBase-root': { p: '4px', mr: '4px' },
+                mr: [3, 0]
+              }}
+              checked={templateRow.keyOnly}
+              disabled={!isDraft}
+              control={
+                <Checkbox
+                  color='secondary'
+                  onChange={(e) => handleUpdateKeyOnly(e.target.checked)}
+                />
+              }
+              label={<FormattedMessage id='onlyTheKeyword' defaultMessage='Vain avainsana' />}
+            />
           </Grid>
         </Grid>
         <Divider sx={{ borderColor: theme.palette.grey[300] }} />
