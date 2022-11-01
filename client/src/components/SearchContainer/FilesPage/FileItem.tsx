@@ -24,15 +24,11 @@ const FileItem = (props: {
   }
   useEffect(() => {
     onToggle(name, selected)
-    console.log('Item selected effect')
   }, [selected])
 
   useEffect(() => {
     override && setSelected(checked)
-    console.log('Item override effect')
   })
-
-  console.log(name + ': ' + selected)
 
   return (
     <Stack

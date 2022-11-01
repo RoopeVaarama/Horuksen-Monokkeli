@@ -28,20 +28,30 @@ const FileGroup = (props: {
   preDeterminedCheck: boolean
   checked: boolean
   onChange: (name: string, selected: boolean) => void
+  returnSelected: (selected: { name: String; date: String; checked: Boolean }[]) => void
 }) => {
   const { groupName, preDeterminedCheck, checked, onChange } = props
 
   //Lisää tähän tiedostojen tiedot fetchin kautta
-  const [children, setChildren] = useState(
-    files.map((file) => {
-      return { name: file.name, date: file.date, checked: false }
-    })
-  )
+  const [children, setChildren] = useState([{ name: '', date: '', checked: false }])
+
+  useEffect(() => {
+    fetch('http://localhost:3002/files/get')
+      .then((response) => response.json())
+      .then((data) =>
+        setChildren(
+          data.map((filename: string) => {
+            return { name: filename, date: '', checked: false }
+          })
+        )
+      )
+  }, [])
+
   const [override, setOverride] = useState(false)
-  const [chooseAll, setChooseAll] = useState(false)
+  const [allSelected, setAllSelected] = useState(false)
 
   const toggleAll = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setChooseAll(event.target.checked)
+    setAllSelected(event.target.checked)
     setOverride(true)
   }
 
@@ -65,11 +75,11 @@ const FileGroup = (props: {
   }
 
   const check = () => {
-    setChooseAll(true)
+    setAllSelected(true)
   }
 
   const uncheck = () => {
-    setChooseAll(false)
+    setAllSelected(false)
   }
 
   const updateGroup = () => {
@@ -88,7 +98,7 @@ const FileGroup = (props: {
       name={file.name}
       date={file.date}
       fileName={file.name}
-      checked={chooseAll}
+      checked={allSelected}
       override={override}
       onToggle={onItemToggle}
     />
@@ -97,26 +107,30 @@ const FileGroup = (props: {
   useEffect(() => {
     // If all files are selected, check the main checkbox
     chosenFiles === totalFiles ? check() : uncheck()
-    // Checking or unchecking coming from sub-components, don't roll the change back
+    // Checking or unchecking is coming from sub-components, don't roll the change back
     setOverride(false)
-    console.log('Group chosenFiles effect')
   }, [chosenFiles, totalFiles])
 
   useEffect(() => {
-    onChange(groupName, chooseAll)
-    console.log('Group chooseAll effect')
-  }, [chooseAll])
+    onChange(groupName, allSelected)
+  }, [allSelected])
 
   // Roll the select all to files
   useEffect(() => {
     if (preDeterminedCheck) {
-      setChooseAll(checked)
+      setAllSelected(checked)
       setOverride(true)
     }
-    console.log('Group rolling effect')
   })
 
-  console.log('Group ' + groupName + ': ' + chooseAll)
+  useEffect(() => {
+    var selectedFiles: { name: String; date: String; checked: Boolean }[] = []
+    children.forEach((child) => {
+      if (child.checked === true) {
+        selectedFiles.push(child)
+      }
+    })
+  }, [chosenFiles])
 
   return (
     <Stack id='filegroup-row'>
@@ -126,7 +140,7 @@ const FileGroup = (props: {
         divider={<Divider orientation='vertical' variant='middle' flexItem />}
         sx={{ border: 1 }}
       >
-        <Checkbox id='filegroup-checkbox' size='small' onChange={toggleAll} checked={chooseAll} />
+        <Checkbox id='filegroup-checkbox' size='small' onChange={toggleAll} checked={allSelected} />
         <ListItemButton
           id='filegroup-button'
           disableRipple

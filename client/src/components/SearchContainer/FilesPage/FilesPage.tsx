@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import {
+  Button,
   Checkbox,
   FormControlLabel,
   Grid,
@@ -11,10 +12,11 @@ import {
 } from '@mui/material'
 import { SearchRounded } from '@mui/icons-material'
 import { FormattedMessage } from 'react-intl'
+//import { fetcher } from '../../../tools/fetcher'
 import StyledPaper from '../../common/StyledPaper/StyledPaper'
 import FileGroup from './FileGroup'
 
-const fileGroups = [{ groupName: 'Laskut Reaktorilta' }, { groupName: 'CV:t' }]
+const fileGroups = [{ groupName: 'Kaikki tiedostot' }]
 
 const SearchField = styled(TextField)(() => ({
   variant: 'outlined',
@@ -41,6 +43,7 @@ const FilesPage = ({ isComplete, onComplete }: { isComplete: boolean; onComplete
   )
   const [totalGroups, setTotalGroups] = useState(children.length)
   const [selectedGroups, setSelectedGroups] = useState(0)
+  const [selectedFiles, setSelectedFiles] = useState([{}])
 
   const toggleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
     // Roll selection to sub-components
@@ -84,6 +87,7 @@ const FilesPage = ({ isComplete, onComplete }: { isComplete: boolean; onComplete
       preDeterminedCheck={preChecked}
       checked={allSelected}
       onChange={listenChanges}
+      returnSelected={getSelectedFiles}
     />
   ))
 
@@ -94,11 +98,21 @@ const FilesPage = ({ isComplete, onComplete }: { isComplete: boolean; onComplete
     setPreChecked(false)
   }
 
+  // TODO Tiedostojen id:t ei oikein toimi
+  const getSelectedFiles = (selected: { name: String; date: String; checked: Boolean }[]) => {
+    setSelectedFiles(selected)
+  }
+
+  const handleSelection = () => {
+    console.log('Valitut tiedostot: ')
+    selectedFiles.forEach((file) => {
+      console.log(file)
+    })
+  }
+
   useEffect(() => {
     updateView()
   }, [selectedGroups, totalGroups])
-
-  console.log('Render. Selected: ' + allSelected)
 
   return (
     <StyledPaper sx={{ width: 'calc(100% - 48px)' }}>
@@ -147,6 +161,15 @@ const FilesPage = ({ isComplete, onComplete }: { isComplete: boolean; onComplete
           }}
         >
           {allFileGroups}
+        </Stack>
+        <hr />
+        <Stack direction='row' marginBottom='10px' sx={{ justifyContent: 'space-evenly' }}>
+          <Button variant='outlined'>
+            <FormattedMessage id='uploadFiles' defaultMessage='Lataa tiedostoja' />
+          </Button>
+          <Button variant='outlined' onClick={handleSelection}>
+            <FormattedMessage id='selectFiles' defaultMessage='Valitse tiedostot' />
+          </Button>
         </Stack>
       </StyledDiv>
     </StyledPaper>
