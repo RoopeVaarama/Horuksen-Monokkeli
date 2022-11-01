@@ -4,57 +4,82 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { ApiCreatedResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CreateRequest } from './schemas/create-request.schema';
-import { ValueSearch } from './schemas/value-search.schema';
+import {
+  ApiBadRequestResponse,
+  ApiCreatedResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { Template, TemplateDocument } from './schemas/template.schema';
 import { TemplateService } from './template.service';
 
 @ApiTags('templates')
-@Controller('template')
+@Controller('/template')
 export class TemplateController {
   constructor(private readonly templateService: TemplateService) {}
 
-  // create new search templates
-  @Post('/create')
-  @ApiCreatedResponse({ status: 200, description: 'Templates created', type: CreateRequest })
+  @Post('/')
+  @ApiCreatedResponse({ description: 'Template created succesfully', type: Template })
+  @ApiBadRequestResponse({ description: 'Invalid request body' })
   @UsePipes(new ValidationPipe({ transform: true }))
-  async newTemplate(@Body() request: CreateRequest): Promise<ValueSearch[]> {
-    const createdTemplates: ValueSearch[] = [];
-    for (let i = 0; i < request.templates.length; ++i) {
-      createdTemplates.push(await this.templateService.createTemplate(request.templates[i]));
-    }
-    return createdTemplates;
+  async createTemplate(@Body() template: Template): Promise<Template> {
+    const created = (await this.templateService.createTemplate(template)) as TemplateDocument;
+    // Return only selected values
+    const returnObj = {
+      title: created.title,
+      author: created.author,
+      terms: created.terms,
+      _id: created._id,
+    };
+    return returnObj as Template;
   }
 
-  @Delete('/delete/:id')
-  @ApiResponse({ status: 200, description: 'Template deleted', type: Boolean })
-  async deleteUser(@Param('id') id: string) {
-    return await this.templateService.deleteTemplate(id);
-  }
-
-  // returns all templates of a user
-  @Get('/templates/:uid')
-  @ApiCreatedResponse({
-    status: 200,
-    description: 'Templates of user fetched',
-    type: [ValueSearch],
-  })
-  async getTemplates(@Param('uid') uid: string): Promise<ValueSearch[]> {
-    return await this.templateService.getTemplates(uid);
-  }
-
-  // returns all stored templates
-  @Get('all')
-  @ApiCreatedResponse({
-    status: 200,
-    description: 'All templates fetched',
-    type: [ValueSearch],
-  })
-  async getAllTemplates(): Promise<ValueSearch[]> {
+  // FUTURE TODO: Change service to only return documents where author === req.user._id, pass user or _id to service
+  // FUTURE TODO: Change service to also return public/shared templates
+  // QUESTION: Should terms be excluded from return values to reduce payload?
+  @Get('/')
+  @ApiOkResponse({ description: 'Template list retrieved successfully', type: [Template] })
+  async getTemplates() {
     return await this.templateService.getAllTemplates();
+  }
+
+  // This could be removed from final implementation
+  @Get('/u/:uid')
+  @ApiOkResponse({ description: 'Template list for user retrieved successfully', type: Template })
+  @ApiBadRequestResponse({ description: 'Invalid request parameters' })
+  @ApiNotFoundResponse({ description: 'Resource not found' })
+  async getTemplatesByUser(@Param('uid') uid: string): Promise<Template[]> {
+    return await this.templateService.getTemplatesByUserId(uid);
+  }
+
+  @Get('/:id')
+  @ApiOkResponse({ description: 'Template retrieved successfully', type: Template })
+  @ApiBadRequestResponse({ description: 'Invalid request parameters' })
+  @ApiNotFoundResponse({ description: 'Resource not found' })
+  async getTemplateById(@Param('id') id: string): Promise<Template> {
+    return this.templateService.getTemplateById(id);
+  }
+
+  @Patch('/:id')
+  @ApiOkResponse({ description: 'Template updated succesfully', type: Boolean })
+  @ApiBadRequestResponse({ description: 'Invalid request body or parameters' })
+  @ApiNotFoundResponse({ description: 'Resource not found' })
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async updateTemplate(@Param('id') id: string, @Body() template: Template): Promise<Template> {
+    return await this.templateService.updateTemplate(id, template);
+  }
+
+  @Delete('/:id')
+  @ApiOkResponse({ description: 'Template deleted succesfully', type: Boolean })
+  @ApiBadRequestResponse({ description: 'Invalid request parameters' })
+  @ApiNotFoundResponse({ description: 'Resource not found' })
+  async deleteTemplate(@Param('id') id: string): Promise<boolean> {
+    return await this.templateService.deleteTemplate(id);
   }
 }
