@@ -6,37 +6,37 @@ export type ResultDocument = Result & Document;
 
 @Schema()
 export class Result {
+  @Prop({ type: String })
+  @ApiProperty()
+  file: string;
 
+  @Prop({ type: Number })
+  @ApiProperty()
+  page: number;
 
-    @Prop()
-    @ApiProperty()
-    key: string;
+  @Prop({ type: String })
+  @ApiProperty()
+  key: string;
 
-    @Prop()
-    @ApiProperty()
-    value: string;
+  @Prop({ type: String })
+  @ApiProperty()
+  value: string;
 
-    @Prop()
-    @ApiProperty()
-    page: number;
+  @Prop({ type: Number })
+  @ApiProperty()
+  key_x: number;
 
-    @Prop()
-    @ApiProperty()
-    key_x: number;
+  @Prop({ type: Number })
+  @ApiProperty()
+  key_y: number;
 
-    @Prop()
-    @ApiProperty()
-    key_y: number;
+  @Prop({ type: Number })
+  @ApiProperty()
+  val_x: number;
 
-    @Prop()
-    @ApiProperty()
-    val_x: number;
-
-    @Prop()
-    @ApiProperty()
-    val_y: number;
-
-
+  @Prop({ type: Number })
+  @ApiProperty()
+  val_y: number;
 }
 
 export const ResultSchema = SchemaFactory.createForClass(Result);

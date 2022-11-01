@@ -1,15 +1,19 @@
 import { Module } from '@nestjs/common';
 import { SearchController } from './search.controller';
 import { SearchService } from './search.service';
-import { ParseService } from "./parse.service";
-import { TemplateService } from './template.service';
+import { ParseService } from './parse.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ValueSearch, ValueSearchSchema } from './schemas/valueSearch.schema';
+import { TemplateService } from '../template/template.service';
+import { Search, SearchSchema } from './schemas/search.schema';
+import { Template, TemplateSchema } from '../template/schemas/template.schema';
 
 @Module({
-    imports: [MongooseModule.forFeature([{ name: ValueSearch.name, schema: ValueSearchSchema }]),],
-    providers: [SearchService, ParseService, TemplateService],
-    controllers: [SearchController],
-    exports: [SearchService, ParseService],
+  imports: [
+    MongooseModule.forFeature([{ name: Search.name, schema: SearchSchema }]),
+    MongooseModule.forFeature([{ name: Template.name, schema: TemplateSchema }]),
+  ],
+  providers: [SearchService, ParseService, TemplateService],
+  controllers: [SearchController],
+  exports: [SearchService, ParseService],
 })
-export class SearchModule { }
+export class SearchModule {}
