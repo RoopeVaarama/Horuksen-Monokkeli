@@ -6,6 +6,7 @@ import { useTemplateStore } from '../../store/templateStore'
 import { useEffect } from 'react'
 import Alert from '../common/Alert'
 import { useUserStore } from '../../store/userStore'
+import { Template } from '../../types'
 
 /**
  * Page container for url /templates
@@ -25,6 +26,13 @@ const TemplatesContainer = () => {
   } = useTemplateStore()
   const { userId } = useUserStore()
 
+  const filteredTemplates = (oldTemplates: Template[]) => {
+    if (templateDraft?._id) {
+      return oldTemplates.filter((template) => template._id !== templateDraft._id)
+    } else {
+      return oldTemplates
+    }
+  }
   const handleCreateTemplateDraft = () => {
     createTemplateDraft(userId)
   }
@@ -85,7 +93,7 @@ const TemplatesContainer = () => {
               </Box>
             )}
             {Array.isArray(templates) &&
-              templates.map((template) => (
+              filteredTemplates(templates).map((template) => (
                 <TemplateItem key={template._id} template={template} variant='noEdit' />
               ))}
             {Array.isArray(templates) && templates.length === 0 && !templateDraft && (

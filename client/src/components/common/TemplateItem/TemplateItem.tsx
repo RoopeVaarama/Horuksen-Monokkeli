@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
+import CancelIcon from '@mui/icons-material/Cancel'
 import EditIcon from '@mui/icons-material/Edit'
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
@@ -179,7 +180,8 @@ const TemplateItem = ({ template, variant }: { template: Template; variant: Temp
         >
           {variant === 'searchOption' && <AddCircleIcon color='primary' />}
           {variant === 'searchSelected' && <RemoveCircleIcon color='primary' />}
-          {(variant === 'draft' || variant === 'noEdit') && <DeleteIcon color='primary' />}
+          {variant === 'noEdit' && <DeleteIcon color='primary' />}
+          {variant === 'draft' && <CancelIcon color='primary' />}
         </IconButton>
         {variant === 'noEdit' && (
           <IconButton
