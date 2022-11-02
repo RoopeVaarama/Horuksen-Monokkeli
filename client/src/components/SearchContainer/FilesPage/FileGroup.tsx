@@ -28,7 +28,7 @@ const FileGroup = (props: {
   preDeterminedCheck: boolean
   checked: boolean
   onChange: (name: string, selected: boolean) => void
-  returnSelected: (selected: { name: String; date: String; checked: Boolean }[]) => void
+  returnSelected: (selected: { name: string; date: string; checked: boolean }[]) => void
 }) => {
   const { groupName, preDeterminedCheck, checked, onChange } = props
 
@@ -124,7 +124,7 @@ const FileGroup = (props: {
   })
 
   useEffect(() => {
-    var selectedFiles: { name: String; date: String; checked: Boolean }[] = []
+    const selectedFiles: { name: string; date: string; checked: boolean }[] = []
     children.forEach((child) => {
       if (child.checked === true) {
         selectedFiles.push(child)

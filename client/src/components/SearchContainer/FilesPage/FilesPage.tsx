@@ -15,6 +15,7 @@ import { FormattedMessage } from 'react-intl'
 //import { fetcher } from '../../../tools/fetcher'
 import StyledPaper from '../../common/StyledPaper/StyledPaper'
 import FileGroup from './FileGroup'
+import FileUploader from './FileUploader'
 
 const fileGroups = [{ groupName: 'Kaikki tiedostot' }]
 
@@ -79,6 +80,11 @@ const FilesPage = ({ isComplete, onComplete }: { isComplete: boolean; onComplete
     updateSelectedGroups()
   }
 
+  // TODO Tiedostojen id:t ei oikein toimi
+  const getSelectedFiles = (selected: { name: string; date: string; checked: boolean }[]) => {
+    setSelectedFiles(selected)
+  }
+
   // Create components
   const allFileGroups = children.map((filegroup) => (
     <FileGroup
@@ -98,11 +104,6 @@ const FilesPage = ({ isComplete, onComplete }: { isComplete: boolean; onComplete
     setPreChecked(false)
   }
 
-  // TODO Tiedostojen id:t ei oikein toimi
-  const getSelectedFiles = (selected: { name: String; date: String; checked: Boolean }[]) => {
-    setSelectedFiles(selected)
-  }
-
   const handleSelection = () => {
     console.log('Valitut tiedostot: ')
     selectedFiles.forEach((file) => {
@@ -113,6 +114,11 @@ const FilesPage = ({ isComplete, onComplete }: { isComplete: boolean; onComplete
   useEffect(() => {
     updateView()
   }, [selectedGroups, totalGroups])
+
+  // Käsittele tiedosto(t?)
+  const fileUploaded = () => {
+    console.log('Hello')
+  }
 
   return (
     <StyledPaper sx={{ width: 'calc(100% - 48px)' }}>
@@ -164,9 +170,7 @@ const FilesPage = ({ isComplete, onComplete }: { isComplete: boolean; onComplete
         </Stack>
         <hr />
         <Stack direction='row' marginBottom='10px' sx={{ justifyContent: 'space-evenly' }}>
-          <Button variant='outlined'>
-            <FormattedMessage id='uploadFiles' defaultMessage='Lataa tiedostoja' />
-          </Button>
+          <FileUploader fileUploaded={fileUploaded} />
           <Button variant='outlined' onClick={handleSelection}>
             <FormattedMessage id='selectFiles' defaultMessage='Valitse tiedostot' />
           </Button>
