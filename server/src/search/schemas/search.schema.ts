@@ -8,16 +8,11 @@ import { Type } from 'class-transformer';
 
 export type SearchDocument = Search & Document;
 
-@Schema({ timestamps: { createdAt: 'created_at' } })
+@Schema({ timestamps: {} })
 export class Search {
   @Prop({ type: String }) // Should this be a relation to User?
   @ApiProperty()
   userId = 'Kikki Hiiri';
-
-  // Currently using timestamps option
-  // @Prop({ type: Date, default: new Date() })
-  // @ApiProperty()
-  // date: Date;
 
   @Prop({ type: [TermSchema], required: true })
   @ApiProperty({ type: [Term] })

@@ -19,7 +19,7 @@ enum Direction {
 @Injectable()
 export class SearchService {
   // Only finds exact matches
-  async search(contents: PDFExtractResult, terms: Term[]): Promise<Result[]> {
+  async search(contents: PDFExtractResult, terms: Term[], fileId: string): Promise<Result[]> {
     const pageArray = contents.pages;
     let pageIndex: number;
     let i: number;
@@ -31,6 +31,7 @@ export class SearchService {
         let ignore = terms[i].ignoreFirst;
         let max = terms[i].maxPerPage;
         if (terms[i].maxPerPage == 0) max = -1;
+        if (ignore > 0) contentArray.sort((a: PDFExtractText, b: PDFExtractText) => a.y - b.y);
         let entryIndex: number;
 
         for (entryIndex = 0; entryIndex < contentArray.length; ++entryIndex) {
@@ -42,7 +43,7 @@ export class SearchService {
               continue;
             }
             const result = new Result();
-            result.file = contents.filename;
+            result.file = fileId;
             result.page = pageIndex + 1;
             result.termIndex = i;
             result.key_x = entry.x;
