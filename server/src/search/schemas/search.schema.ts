@@ -2,7 +2,9 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { Document } from 'mongoose';
 import { Result, ResultSchema } from './result.schema';
-import { Term } from '../../template/schemas/term.schema';
+import { Term, TermSchema } from '../../template/schemas/term.schema';
+import { IsArray, IsNotEmpty, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export type SearchDocument = Search & Document;
 
@@ -17,9 +19,13 @@ export class Search {
   // @ApiProperty()
   // date: Date;
 
-  @Prop({ type: Term }) // Should this be a relation to a template or Terms array, rather than a single Terms object?
-  @ApiProperty()
-  terms: Term;
+  @Prop({ type: [TermSchema], required: true })
+  @ApiProperty({ type: [Term] })
+  @IsNotEmpty()
+  @IsArray()
+  @Type(() => Term)
+  @ValidateNested({ each: true })
+  terms: Term[];
 
   @Prop({ type: [] }) // Either string array, or array of relations to database file objects
   @ApiProperty()
