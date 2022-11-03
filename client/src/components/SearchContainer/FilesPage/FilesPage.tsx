@@ -12,7 +12,6 @@ import {
 } from '@mui/material'
 import { SearchRounded } from '@mui/icons-material'
 import { FormattedMessage } from 'react-intl'
-//import { fetcher } from '../../../tools/fetcher'
 import StyledPaper from '../../common/StyledPaper/StyledPaper'
 import FileGroup from './FileGroup'
 import FileUploader from './FileUploader'
@@ -80,7 +79,6 @@ const FilesPage = ({ isComplete, onComplete }: { isComplete: boolean; onComplete
     updateSelectedGroups()
   }
 
-  // TODO Tiedostojen id:t ei oikein toimi
   const getSelectedFiles = (selected: { name: string; date: string; checked: boolean }[]) => {
     setSelectedFiles(selected)
   }
@@ -115,9 +113,22 @@ const FilesPage = ({ isComplete, onComplete }: { isComplete: boolean; onComplete
     updateView()
   }, [selectedGroups, totalGroups])
 
+  const uploadFile = (formData: FormData) => {
+    fetch('http://localhost:3002/files/upload', {
+      method: 'POST',
+
+      body: formData
+    })
+      .then((response) => response.json())
+      .then((data) => console.log(data))
+      .catch((error) => console.log(error))
+  }
+
   // Käsittele tiedosto(t?)
-  const fileUploaded = () => {
-    console.log('Hello')
+  const fileUploaded = (file: File) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    uploadFile(formData)
   }
 
   return (

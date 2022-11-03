@@ -30,10 +30,12 @@ const FileGroup = (props: {
   onChange: (name: string, selected: boolean) => void
   returnSelected: (selected: { name: string; date: string; checked: boolean }[]) => void
 }) => {
-  const { groupName, preDeterminedCheck, checked, onChange } = props
+  const { groupName, preDeterminedCheck, checked, onChange, returnSelected } = props
 
   //Lisää tähän tiedostojen tiedot fetchin kautta
   const [children, setChildren] = useState([{ name: '', date: '', checked: false }])
+
+  // File names only
 
   useEffect(() => {
     fetch('http://localhost:3002/files/get')
@@ -46,6 +48,21 @@ const FileGroup = (props: {
         )
       )
   }, [])
+
+  // Files
+  /*
+  useEffect(() => {
+    fetch('http://localhost:3002/files/get')
+      .then((response) => response.json())
+      .then((data) =>
+        setChildren(
+          data.map((file: any) => {
+            return { key: file._id, name: file.filename, date: '', checked: false }
+          })
+        )
+      )
+  }, [])
+  */
 
   const [override, setOverride] = useState(false)
   const [allSelected, setAllSelected] = useState(false)
@@ -130,6 +147,7 @@ const FileGroup = (props: {
         selectedFiles.push(child)
       }
     })
+    returnSelected(selectedFiles)
   }, [chosenFiles])
 
   return (
