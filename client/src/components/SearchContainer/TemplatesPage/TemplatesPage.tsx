@@ -1,46 +1,56 @@
-import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined'
-import { ListItemButton, Typography, Stack } from '@mui/material'
-import TemplateSelector from './TemplateSelector/TemplateSelector'
-import StyledPaper from '../../common/StyledPaper/StyledPaper'
+import { Typography, Stack } from '@mui/material'
+import { Alert, TemplateItem } from '../../common'
 import { useSearchStore } from '../../../store/searchStore'
+import { useTemplateStore } from '../../../store/templateStore'
 import { FormattedMessage } from 'react-intl'
 
 const TemplatesPage = () => {
-  const { templates, addTemplate } = useSearchStore()
+  const { searchTemplates } = useSearchStore()
+  const { templates } = useTemplateStore()
 
-  const onAddNewTemplate = () => {
-    addTemplate()
+  const removeSelected = () => {
+    return templates.filter((template) => !searchTemplates.find((s) => s._id === template._id))
   }
 
   return (
-    <StyledPaper sx={{ width: 'calc(100% - 48px)' }}>
-      <Stack
-        component='ol'
-        sx={{
-          width: '100%',
-          pl: 0,
-          listStyleType: 'none',
-          my: 0,
-          '.MuiListItemButton-root:hover': {
-            backgroundColor: 'background.paper'
+    <Stack id='templatesPage' spacing={1} width='100%'>
+      <Typography variant='h6' sx={{ py: 1 }}>
+        <FormattedMessage id='search' defaultMessage='Haku' />
+      </Typography>
+      {searchTemplates.map((template, i) => (
+        <TemplateItem key={template.title} template={template} variant='searchSelected' />
+      ))}
+      {searchTemplates.length === 0 && (
+        <Alert
+          message={
+            <FormattedMessage
+              id='noTemplatesSelected'
+              defaultMessage='Et ole valinnut vielä yhtään templatea!'
+            />
           }
-        }}
-      >
-        {templates.map((template, i) => (
-          <TemplateSelector key={template.id} marker={i + 1} template={template} />
+        />
+      )}
+      <Typography variant='h6' sx={{ pt: 2, pb: 1 }}>
+        <FormattedMessage
+          id='selectTemplatesForSearch'
+          defaultMessage='Valitse templatet, joita käyttää haussa'
+        />
+      </Typography>
+      {Array.isArray(templates) &&
+        removeSelected().map((template) => (
+          <TemplateItem key={template.title} template={template} variant='searchOption' />
         ))}
-        <ListItemButton
-          onClick={onAddNewTemplate}
-          disableRipple
-          sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-        >
-          <Typography variant='button' color='primary'>
-            <FormattedMessage id='addRow' defaultMessage='Lisää rivi' />
-          </Typography>
-          <AddCircleOutlineOutlinedIcon color='primary' />
-        </ListItemButton>
-      </Stack>
-    </StyledPaper>
+      {searchTemplates.length === templates.length && (
+        <Alert
+          message={
+            <FormattedMessage
+              id='noTemplatestoSelected'
+              defaultMessage='Ei templateja jäljellä valittavaksi.'
+            />
+          }
+        />
+      )}
+    </Stack>
   )
 }
 
