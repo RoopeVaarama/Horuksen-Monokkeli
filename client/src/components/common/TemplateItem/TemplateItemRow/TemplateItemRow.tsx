@@ -48,28 +48,28 @@ const TemplateItemRow = ({
   const isDraft = variant === 'draft'
 
   const handleDeleteRow = () => {
-    if (isDraft && templateRow.id !== undefined) {
-      deleteTemplateDraftRow(templateRow.id)
+    if (isDraft) {
+      deleteTemplateDraftRow(templateRow._id, templateRow.localId)
     }
   }
   const handleUpdateKey = (newKey: string) => {
-    if (isDraft && templateRow.id !== undefined) {
+    if (isDraft) {
       if (newKey) {
         setTextFieldError(false)
       } else {
         setTextFieldError(true)
       }
-      updateTemplateDraftKey(templateRow.id, newKey)
+      updateTemplateDraftKey(newKey, templateRow._id, templateRow.localId)
     }
   }
   const handleUpdateDirection = (newDirection: Direction['value']) => {
-    if (isDraft && templateRow.id !== undefined) {
-      updateTemplateDraftDirection(templateRow.id, newDirection)
+    if (isDraft) {
+      updateTemplateDraftDirection(newDirection, templateRow._id, templateRow.localId)
     }
   }
   const handleUpdateKeyOnly = (newState: boolean) => {
-    if (isDraft && templateRow.id !== undefined) {
-      updateTemplateDraftKeyOnly(templateRow.id, newState)
+    if (isDraft) {
+      updateTemplateDraftKeyOnly(newState, templateRow._id, templateRow.localId)
     }
   }
 
