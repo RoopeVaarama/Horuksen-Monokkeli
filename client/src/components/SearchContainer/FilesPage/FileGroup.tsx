@@ -10,13 +10,7 @@ import {
 } from '@mui/material'
 import { ExpandLess, ExpandMore } from '@mui/icons-material'
 import FileItem from './FileItem'
-
-// Mock files
-const files = [
-  { name: 'File1', date: '2022-01-01' },
-  { name: 'File2', date: '2022-02-02' },
-  { name: 'File3', date: '2022-02-02' }
-]
+import { useSearchStore } from '../../../store/searchStore'
 
 const Sidetext = styled('div')(() => ({
   display: 'flex',
@@ -28,48 +22,79 @@ const FileGroup = (props: {
   preDeterminedCheck: boolean
   checked: boolean
   onChange: (name: string, selected: boolean) => void
-  returnSelected: (selected: { name: string; date: string; checked: boolean }[]) => void
 }) => {
-  const { groupName, preDeterminedCheck, checked, onChange, returnSelected } = props
+  const { files } = useSearchStore()
+  const { groupName, preDeterminedCheck, checked, onChange } = props
 
-  //Lisää tähän tiedostojen tiedot fetchin kautta
-  const [children, setChildren] = useState([{ name: '', date: '', checked: false }])
-
-  // File names only
-
-  useEffect(() => {
-    fetch('http://localhost:3002/files/get')
-      .then((response) => response.json())
-      .then((data) =>
-        setChildren(
-          data.map((filename: string) => {
-            return { name: filename, date: '', checked: false }
-          })
-        )
-      )
-  }, [])
+  const [children, setChildren] = useState<
+    {
+      id: string
+      author: string
+      filename: string
+      date: string
+      dateObj: Date
+      checked: boolean
+    }[]
+  >([])
 
   // Files
-  /*
   useEffect(() => {
-    fetch('http://localhost:3002/files/get')
-      .then((response) => response.json())
-      .then((data) =>
-        setChildren(
-          data.map((file: any) => {
-            return { key: file._id, name: file.filename, date: '', checked: false }
-          })
-        )
-      )
+    console.log('Fetch')
+    if (groupName === 'Kaikki tiedostot') {
+      fetchAllFiles()
+    } else {
+      console.log('Ehkä jotain muuta?')
+    }
   }, [])
-  */
+
+  const fetchAllFiles = () => {
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/files`)
+      .then((response) => response.json())
+      .then((data) => {
+        const selectedIDs = files.map((file) => {
+          return file._id
+        })
+        const newData = data.map((file: any) => {
+          const date = new Date(file.createdAt).toLocaleDateString()
+          return {
+            id: file._id,
+            author: file.author,
+            filename: file.filename,
+            date: date,
+            dateObj: file.createdAt,
+            checked: selectedIDs.includes(file._id)
+          }
+        })
+        // Sort from newest to oldest
+        newData.sort(function compareFn(
+          a: { name: string; date: string; dateObj: Date; checked: boolean },
+          b: { name: string; date: string; dateObj: Date; checked: boolean }
+        ) {
+          return a.dateObj > b.dateObj ? -1 : 1
+        })
+        setChildren(newData)
+      })
+  }
 
   const [override, setOverride] = useState(false)
-  const [allSelected, setAllSelected] = useState(false)
+  const [groupSelected, setGroupSelected] = useState(false)
 
-  const toggleAll = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setAllSelected(event.target.checked)
+  const toggleGroup = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setGroupSelected(event.target.checked)
     setOverride(true)
+  }
+
+  const check = () => {
+    setGroupSelected(true)
+  }
+
+  const uncheck = () => {
+    setGroupSelected(false)
+  }
+
+  const updateGroup = () => {
+    setTotalFiles(children.length)
+    setChosenFiles(countChosen)
   }
 
   const [open, setOpen] = useState(false)
@@ -81,45 +106,19 @@ const FileGroup = (props: {
   const [chosenFiles, setChosenFiles] = useState(0)
   const [totalFiles, setTotalFiles] = useState(0)
 
-  const onItemToggle = (key: string, selected: boolean) => {
+  const onItemToggle = (id: string, selected: boolean) => {
     setChildren((current) => {
       current.forEach((item) => {
-        item.name === key && (item.checked = selected)
+        item.id === id && (item.checked = selected)
       })
       return current
     })
     updateGroup()
   }
 
-  const check = () => {
-    setAllSelected(true)
-  }
-
-  const uncheck = () => {
-    setAllSelected(false)
-  }
-
-  const updateGroup = () => {
-    setTotalFiles(children.length)
-    setChosenFiles(countChosen)
-  }
-
   const countChosen = (): number => {
     return children.reduce((prev, curr) => prev + (curr.checked ? 1 : 0), 0)
   }
-
-  // Create components
-  const fileItems = children.map((file) => (
-    <FileItem
-      key={file.name}
-      name={file.name}
-      date={file.date}
-      fileName={file.name}
-      checked={allSelected}
-      override={override}
-      onToggle={onItemToggle}
-    />
-  ))
 
   useEffect(() => {
     // If all files are selected, check the main checkbox
@@ -129,26 +128,18 @@ const FileGroup = (props: {
   }, [chosenFiles, totalFiles])
 
   useEffect(() => {
-    onChange(groupName, allSelected)
-  }, [allSelected])
+    onChange(groupName, groupSelected)
+  }, [groupSelected])
 
-  // Roll the select all to files
+  // Roll the select all to files when the group is checked
   useEffect(() => {
     if (preDeterminedCheck) {
-      setAllSelected(checked)
+      setGroupSelected(checked)
       setOverride(true)
     }
   })
 
-  useEffect(() => {
-    const selectedFiles: { name: string; date: string; checked: boolean }[] = []
-    children.forEach((child) => {
-      if (child.checked === true) {
-        selectedFiles.push(child)
-      }
-    })
-    returnSelected(selectedFiles)
-  }, [chosenFiles])
+  console.log(groupName + ': ' + groupSelected)
 
   return (
     <Stack id='filegroup-row'>
@@ -158,7 +149,12 @@ const FileGroup = (props: {
         divider={<Divider orientation='vertical' variant='middle' flexItem />}
         sx={{ border: 1 }}
       >
-        <Checkbox id='filegroup-checkbox' size='small' onChange={toggleAll} checked={allSelected} />
+        <Checkbox
+          id='filegroup-checkbox'
+          size='small'
+          onChange={toggleGroup}
+          checked={groupSelected}
+        />
         <ListItemButton
           id='filegroup-button'
           disableRipple
@@ -177,7 +173,20 @@ const FileGroup = (props: {
         </ListItemButton>
       </Stack>
       <Collapse id='filegroup-files-container' in={open}>
-        {fileItems}
+        {children.length > 0 &&
+          children.map((file) => (
+            <FileItem
+              key={file.id}
+              id={file.id}
+              author={file.author}
+              date={file.date}
+              fileName={file.filename}
+              groupName={groupName}
+              checked={groupSelected}
+              override={override}
+              onToggle={onItemToggle}
+            />
+          ))}
       </Collapse>
     </Stack>
   )

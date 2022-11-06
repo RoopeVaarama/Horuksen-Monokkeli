@@ -1,17 +1,20 @@
 import create from 'zustand'
 import { fetcher } from '../tools/fetcher'
 import { templatesArrayToSearch } from '../tools/temporaryConverters'
-import { SearchResult, Template } from '../types'
+import { FileMeta, SearchResult, Template } from '../types'
 
 interface SearchState {
   searchTemplates: Template[]
   results: SearchResult[]
   refreshSearch: boolean
   searching: boolean
+  files: FileMeta[]
   addTemplateToSearch: (template: Template) => void
   removeTemplateFromSearch: (id: string) => void
   resetSearchParamaters: () => void
   search: () => void
+  addFileToSearch: (file: FileMeta) => void
+  removeFileFromSearch: (fileToRemove: FileMeta) => void
 }
 
 export const useSearchStore = create<SearchState>((set, get) => ({
@@ -19,6 +22,7 @@ export const useSearchStore = create<SearchState>((set, get) => ({
   results: [],
   refreshSearch: true,
   searching: false,
+  files: [],
   addTemplateToSearch: (template: Template) => {
     set((state) => ({
       searchTemplates: [...state.searchTemplates, template],
@@ -52,5 +56,15 @@ export const useSearchStore = create<SearchState>((set, get) => ({
         set({ searching: false })
       }
     }
+  },
+  addFileToSearch(file: FileMeta) {
+    set((state) => ({
+      files: [...state.files, file]
+    }))
+  },
+  removeFileFromSearch(fileToRemove: FileMeta) {
+    set((state) => ({
+      files: state.files.filter((file) => file._id != fileToRemove._id)
+    }))
   }
 }))

@@ -33,42 +33,35 @@ const StyledDiv = styled('div')(() => ({
 //TO DO: ylimääräinen false-true-false -togglailu pois
 
 const FilesPage = ({ isComplete, onComplete }: { isComplete: boolean; onComplete: () => void }) => {
-  const [allSelected, setAllSelected] = useState(false)
+  const [boxChecked, setBoxChecked] = useState(false)
   const [preChecked, setPreChecked] = useState(false)
 
+  // Filegroups nyt kovakoodattu, korvaa kun listat on käytössä (myös lkm)
   const [children, setChildren] = useState(
     fileGroups.map((file) => {
-      return { groupName: file.groupName, selected: false }
+      return { key: file.groupName, groupName: file.groupName, selected: false }
     })
   )
+
   const [totalGroups, setTotalGroups] = useState(children.length)
   const [selectedGroups, setSelectedGroups] = useState(0)
   const [selectedFiles, setSelectedFiles] = useState([{}])
 
   const toggleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
     // Roll selection to sub-components
-    setAllSelected(event.target.checked)
+    setBoxChecked(event.target.checked)
     setPreChecked(true)
   }
 
   const check = () => {
-    setAllSelected(true)
+    setBoxChecked(true)
   }
 
   const uncheck = () => {
-    setAllSelected(false)
+    setBoxChecked(false)
   }
 
-  const updateCount = () => {
-    const sum = children.reduce((prev, curr) => prev + (curr.selected ? 1 : 0), 0)
-    return sum
-  }
-
-  const updateSelectedGroups = () => {
-    setTotalGroups(children.length)
-    setSelectedGroups(updateCount)
-  }
-
+  // Update the state change to children
   const listenChanges = (name: string, selected: boolean) => {
     setChildren((groups) => {
       groups.forEach((group) => {
@@ -76,32 +69,12 @@ const FilesPage = ({ isComplete, onComplete }: { isComplete: boolean; onComplete
       })
       return groups
     })
-    updateSelectedGroups()
+    // Update accordingly
+    setTotalGroups(children.length)
+    setSelectedGroups(children.reduce((prev, curr) => prev + (curr.selected ? 1 : 0), 0))
   }
 
-  const getSelectedFiles = (selected: { name: string; date: string; checked: boolean }[]) => {
-    setSelectedFiles(selected)
-  }
-
-  // Create components
-  const allFileGroups = children.map((filegroup) => (
-    <FileGroup
-      key={filegroup.groupName}
-      groupName={filegroup.groupName}
-      preDeterminedCheck={preChecked}
-      checked={allSelected}
-      onChange={listenChanges}
-      returnSelected={getSelectedFiles}
-    />
-  ))
-
-  const updateView = () => {
-    // If all files are selected, check the main checkbox
-    selectedGroups === totalGroups ? check() : uncheck()
-    // Checking or unchecking coming from sub-components, don't roll the change back
-    setPreChecked(false)
-  }
-
+  //TO DO tee jotain oikeeta valituille tiedostoille
   const handleSelection = () => {
     console.log('Valitut tiedostot: ')
     selectedFiles.forEach((file) => {
@@ -110,26 +83,43 @@ const FilesPage = ({ isComplete, onComplete }: { isComplete: boolean; onComplete
   }
 
   useEffect(() => {
-    updateView()
+    // If all files are selected, check the main checkbox
+    selectedGroups === totalGroups ? check() : uncheck()
+    // Checking or unchecking coming from sub-components, don't roll the change back
+    setPreChecked(false)
   }, [selectedGroups, totalGroups])
 
+  // TODO päivitä envistä urli
   const uploadFile = (formData: FormData) => {
-    fetch('http://localhost:3002/files/upload', {
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/files/upload`, {
       method: 'POST',
-
       body: formData
     })
       .then((response) => response.json())
-      .then((data) => console.log(data))
+      .then((data) => reRenderAfterUpdate(data._id))
       .catch((error) => console.log(error))
   }
 
-  // Käsittele tiedosto(t?)
-  const fileUploaded = (file: File) => {
-    const formData = new FormData()
-    formData.append('file', file)
-    uploadFile(formData)
+  // Käsittele tiedosto
+  const filesUploaded = (files: File[]) => {
+    files.forEach((file) => {
+      const formData = new FormData()
+      formData.append('file', file)
+      uploadFile(formData)
+    })
   }
+
+  // TO DO: file uploadin jälkeen pitäisi saada kaikki tiedostot -filegroup uudestaan renderöityä,
+  // jotta file ilmestyisi listaan
+  const reRenderAfterUpdate = (key: string) => {
+    setChildren((currChildren) => {
+      const ind = currChildren.findIndex((group) => group.groupName === 'Kaikki tiedostot')
+      currChildren[ind].key = key
+      return currChildren
+    })
+  }
+
+  console.log(boxChecked)
 
   return (
     <StyledPaper sx={{ width: 'calc(100% - 48px)' }}>
@@ -140,7 +130,9 @@ const FilesPage = ({ isComplete, onComplete }: { isComplete: boolean; onComplete
               control={
                 <Checkbox
                   name='chooseAll'
-                  checked={allSelected}
+                  //Store
+                  checked={boxChecked}
+                  //checked={allSelected}
                   size='small'
                   onChange={toggleSelectAll}
                 />
@@ -177,11 +169,19 @@ const FilesPage = ({ isComplete, onComplete }: { isComplete: boolean; onComplete
             my: 2
           }}
         >
-          {allFileGroups}
+          {children.map((filegroup) => (
+            <FileGroup
+              key={filegroup.groupName}
+              groupName={filegroup.groupName}
+              preDeterminedCheck={preChecked}
+              checked={boxChecked}
+              onChange={listenChanges}
+            />
+          ))}
         </Stack>
         <hr />
         <Stack direction='row' marginBottom='10px' sx={{ justifyContent: 'space-evenly' }}>
-          <FileUploader fileUploaded={fileUploaded} />
+          <FileUploader fileUploaded={filesUploaded} />
           <Button variant='outlined' onClick={handleSelection}>
             <FormattedMessage id='selectFiles' defaultMessage='Valitse tiedostot' />
           </Button>

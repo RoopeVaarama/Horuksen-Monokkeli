@@ -2,7 +2,7 @@ import { ChangeEvent, useRef } from 'react'
 import { Button } from '@mui/material'
 import { FormattedMessage } from 'react-intl'
 
-const FileUploader = (props: { fileUploaded: (file: File) => void }) => {
+const FileUploader = (props: { fileUploaded: (files: File[]) => void }) => {
   const { fileUploaded } = props
   const fileInput = useRef<HTMLInputElement>(null)
 
@@ -13,18 +13,25 @@ const FileUploader = (props: { fileUploaded: (file: File) => void }) => {
   // Käsittele tiedosto
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files !== null) {
-      const selectedFile = event.target.files[0]
-      console.log(selectedFile)
-      fileUploaded(selectedFile)
+      const selectedFiles = Array.from(event.target.files)
+      console.log(selectedFiles)
+      fileUploaded(selectedFiles)
     }
   }
 
   return (
     <>
-      <Button variant='outlined' onClick={handleUploadClick}>
+      <Button id='file-upload-button' variant='outlined' onClick={handleUploadClick}>
         <FormattedMessage id='uploadFiles' defaultMessage='Lataa tiedostoja' />
       </Button>
-      <input type='file' ref={fileInput} onChange={handleChange} style={{ display: 'none' }} />
+      <input
+        id='file-upload-input'
+        type='file'
+        multiple
+        ref={fileInput}
+        onChange={handleChange}
+        style={{ display: 'none' }}
+      />
     </>
   )
 }

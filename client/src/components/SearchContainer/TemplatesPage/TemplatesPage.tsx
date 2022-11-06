@@ -40,7 +40,7 @@ const TemplatesPage = () => {
         removeSelected().map((template) => (
           <TemplateItem key={template.title} template={template} variant='searchOption' />
         ))}
-      {searchTemplates.length === templates.length && (
+      {Array.isArray(templates) && searchTemplates.length === templates.length && (
         <Alert
           message={
             <FormattedMessage
