@@ -6,6 +6,8 @@ services:
       context: ./client/
     ports:
       - "3000:80"
+    environment:
+      - REACT_APP_BACKEND_URL
     restart: unless-stopped
 
   # Backend service
