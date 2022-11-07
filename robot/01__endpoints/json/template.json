@@ -1,0 +1,25 @@
+{
+    "title": "Robot Test Template",
+    "terms": [
+      {
+        "key": "Robot Term 1",
+        "keyOnly": false,
+        "direction": 0,
+        "allowedOffset": 10,
+        "valueMatch": ".*",
+        "valuePrune": ".*",
+        "ignoreFirst": 0,
+        "maxPerPage": 0
+      },
+      {
+        "key": "Robot Term 2",
+        "keyOnly": false,
+        "direction": 3,
+        "allowedOffset": 10,
+        "valueMatch": ".*",
+        "valuePrune": ".*",
+        "ignoreFirst": 0,
+        "maxPerPage": 0
+      }
+    ]
+}
