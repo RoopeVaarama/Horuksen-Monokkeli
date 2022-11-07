@@ -109,7 +109,12 @@ const TemplateItem = ({ template, variant }: { template: Template; variant: Temp
         </ListItemButton>
         <Collapse in={open} sx={{ backgroundColor: alpha(theme.palette.secondary.light, 0.05) }}>
           {template.terms.map((row, i) => (
-            <TemplateItemRow key={row.id ?? i} templateRow={row} marker={i + 1} variant={variant} />
+            <TemplateItemRow
+              key={row._id ?? row.localId}
+              templateRow={row}
+              marker={i + 1}
+              variant={variant}
+            />
           ))}
           {variant === 'draft' && (
             <ListItemButton

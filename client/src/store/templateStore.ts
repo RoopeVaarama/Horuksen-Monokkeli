@@ -15,11 +15,15 @@ interface TemplateState {
   createTemplateDraft: (userId: string, baseTemplate?: Template) => void
   deleteTemplateDraft: () => void
   addTemplateDraftRow: () => void
-  deleteTemplateDraftRow: (rowId: number) => void
+  deleteTemplateDraftRow: (id?: string, localId?: number) => void
   updateTemplateDraftTitle: (newTitle: string) => void
-  updateTemplateDraftKey: (rowId: number, newKey: string) => void
-  updateTemplateDraftDirection: (rowId: number, newDirection: Direction['value']) => void
-  updateTemplateDraftKeyOnly: (rowId: number, newState: boolean) => void
+  updateTemplateDraftKey: (newKey: string, id?: string, localId?: number) => void
+  updateTemplateDraftDirection: (
+    newDirection: Direction['value'],
+    id?: string,
+    localId?: number
+  ) => void
+  updateTemplateDraftKeyOnly: (newState: boolean, id?: string, localId?: number) => void
   resetTemplates: (userId: string) => void
   deleteTemplate: (id: string) => void
   createTemplate: () => void
@@ -30,7 +34,7 @@ interface TemplateState {
  * Store for interacting with templates stored in the database
  */
 export const useTemplateStore = create<TemplateState>((set, get) => ({
-  latestTemplateRowId: templateRowBase.id as number,
+  latestTemplateRowId: templateRowBase.localId as number,
   draftIsEdit: false,
   templateDraft: null,
   templates: [],
@@ -44,7 +48,7 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
   deleteTemplateDraft: () => {
     set(() => ({
       templateDraft: null,
-      latestTemplateRowId: templateRowBase.id
+      latestTemplateRowId: templateRowBase.localId
     }))
   },
   addTemplateDraftRow: () => {
@@ -54,19 +58,26 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
             ...state.templateDraft,
             terms: [
               ...state.templateDraft.terms,
-              { ...templateRowBase, id: state.latestTemplateRowId + 1 }
+              { ...templateRowBase, localId: state.latestTemplateRowId + 1 }
             ]
           }
         : null,
       latestTemplateRowId: state.latestTemplateRowId + 1
     }))
   },
-  deleteTemplateDraftRow: (rowId) => {
+  deleteTemplateDraftRow: (id?: string, localId?: number) => {
+    if (id === undefined && localId === undefined) {
+      return
+    }
     set((state) => ({
       templateDraft: state.templateDraft
         ? {
             ...state.templateDraft,
-            terms: state.templateDraft.terms.filter((row) => row.id !== rowId)
+            terms: state.templateDraft.terms.filter(
+              (row) =>
+                (row._id !== undefined && row._id !== id) ||
+                (row.localId !== undefined && row.localId !== localId)
+            )
           }
         : null
     }))
@@ -76,13 +87,16 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
       templateDraft: state.templateDraft ? { ...state.templateDraft, title: newTitle } : null
     }))
   },
-  updateTemplateDraftKey: (rowId: number, newKey: string) => {
+  updateTemplateDraftKey: (newKey: string, id?: string, localId?: number) => {
     set((state) => ({
       templateDraft: state.templateDraft
         ? {
             ...state.templateDraft,
             terms: state.templateDraft.terms.map((row) => {
-              if (row.id === rowId) {
+              if (
+                (row._id !== undefined && row._id === id) ||
+                (row.localId !== undefined && row.localId === localId)
+              ) {
                 return { ...row, key: newKey }
               } else {
                 return row
@@ -92,13 +106,20 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
         : null
     }))
   },
-  updateTemplateDraftDirection: (rowId: number, newDirection: Direction['value']) => {
+  updateTemplateDraftDirection: (
+    newDirection: Direction['value'],
+    id?: string,
+    localId?: number
+  ) => {
     set((state) => ({
       templateDraft: state.templateDraft
         ? {
             ...state.templateDraft,
             terms: state.templateDraft.terms.map((row) => {
-              if (row.id === rowId) {
+              if (
+                (row._id !== undefined && row._id === id) ||
+                (row.localId !== undefined && row.localId === localId)
+              ) {
                 return { ...row, direction: newDirection }
               } else {
                 return row
@@ -108,13 +129,16 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
         : null
     }))
   },
-  updateTemplateDraftKeyOnly: (rowId: number, newState: boolean) => {
+  updateTemplateDraftKeyOnly: (newState: boolean, id?: string, localId?: number) => {
     set((state) => ({
       templateDraft: state.templateDraft
         ? {
             ...state.templateDraft,
             terms: state.templateDraft.terms.map((row) => {
-              if (row.id === rowId) {
+              if (
+                (row._id !== undefined && row._id === id) ||
+                (row.localId !== undefined && row.localId === localId)
+              ) {
                 return { ...row, keyOnly: newState }
               } else {
                 return row
@@ -133,7 +157,7 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
           path: `${BASE_PATH}/u`,
           id: userId
         })
-        set({ fetching: false, templates: data })
+        set({ fetching: false, templates: Array.isArray(data) ? data : [] })
       } catch (e) {
         set({ fetching: false })
       }
@@ -180,7 +204,7 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
         set((state) => ({
           fetching: false,
           templateDraft: null,
-          latestTemplateRowId: templateRowBase.id,
+          latestTemplateRowId: templateRowBase.localId,
           templates: [...state.templates, data]
         }))
       } catch (e) {
@@ -212,7 +236,7 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
         set((state) => ({
           fetching: false,
           templateDraft: null,
-          latestTemplateRowId: templateRowBase.id,
+          latestTemplateRowId: templateRowBase.localId,
           templates: data
             ? state.templates.map((template) => {
                 if (template._id === data._id) {

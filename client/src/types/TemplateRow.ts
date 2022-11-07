@@ -10,5 +10,6 @@ export interface TemplateRow {
   valuePrune?: string
   ignoreFirst?: number
   maxPerPage?: number
-  id?: number
+  _id?: string
+  localId?: number
 }

@@ -1,7 +1,7 @@
 import { TemplateRow } from '../types'
 
 export const templateRowBase: TemplateRow = {
-  id: 1,
+  localId: 1,
   key: '',
   keyOnly: false,
   direction: 0,
