@@ -7,6 +7,7 @@ import {
   MenuItem,
   Toolbar as MUIToolbar,
   Typography,
+  useMediaQuery,
   useTheme
 } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
@@ -15,17 +16,13 @@ import { Link } from 'react-router-dom'
 import LanguageSelector from './LanguageSelector'
 import { useState } from 'react'
 import { useLocation } from 'react-router-dom'
-
-const TOOLBAR_ROUTES = [
-  { intlId: 'newSearch', intlDefault: 'Uusi haku', link: '/' },
-  { intlId: 'files', intlDefault: 'Tiedostot', link: '/files' },
-  { intlId: 'profile', intlDefault: 'Profiili', link: '/profile' }
-]
+import { toolbarRoutes } from '../../../constants'
 
 const Toolbar = ({ height }: { height: string | number }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const location = useLocation()
   const theme = useTheme()
+  const matches = useMediaQuery('(max-width:700px)')
   return (
     <AppBar position='fixed'>
       <MUIToolbar
@@ -48,8 +45,8 @@ const Toolbar = ({ height }: { height: string | number }) => {
               </Link>
             </Grid>
             {location.pathname !== '/signin' && location.pathname !== '/register' && (
-              <Grid item sx={{ display: { xs: 'none', sm: 'block' } }}>
-                {TOOLBAR_ROUTES.map((route) => (
+              <Grid item display={matches ? 'none' : 'block'}>
+                {toolbarRoutes.map((route) => (
                   <Link
                     key={route.intlId}
                     to={route.link}
@@ -95,8 +92,8 @@ const Toolbar = ({ height }: { height: string | number }) => {
               onClose={() => setAnchorEl(null)}
             >
               {location.pathname !== '/signin' && location.pathname !== '/register' && (
-                <Box display={{ xs: 'block', sm: 'none' }} mb={1}>
-                  {TOOLBAR_ROUTES.map((route) => (
+                <Box display={matches ? 'block' : 'none'} mb={1}>
+                  {toolbarRoutes.map((route) => (
                     <MenuItem
                       key={route.intlId}
                       component={Link}

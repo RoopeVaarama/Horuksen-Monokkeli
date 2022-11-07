@@ -1,6 +1,6 @@
-import { RelativePosition } from '../types/RelativePosition'
+import { Direction } from '../types/Direction'
 
-export const relativePositions: RelativePosition[] = [
+export const directions: Direction[] = [
   {
     intlId: 'onTheRight',
     defaultMessage: 'Oikealla',

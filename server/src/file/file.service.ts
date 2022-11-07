@@ -1,6 +1,6 @@
-import { HttpException, Injectable, Param } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { existsSync, opendirSync, readdir, unlinkSync } from 'fs';
 import { FileMeta, FileMetaDocument } from './schemas/filemeta.schema';
 
@@ -24,6 +24,13 @@ export class FileService {
     filemeta.filepath = file.destination + '/' + file.filename;
     filemeta.author = 'placeholder';
     return await new this.fileMetaModel(filemeta).save();
+  }
+
+  async getFileMeta(id): Promise<FileMeta> {
+    if (!Types.ObjectId.isValid(id)) throw new BadRequestException('Invalid id');
+    const file = await this.fileMetaModel.findById(id).exec();
+    if (!file) throw new NotFoundException('No file matching the id exists');
+    return file;
   }
 
   async getFiles(): Promise<FileMeta[]> {
