@@ -139,8 +139,6 @@ const FileGroup = (props: {
     }
   })
 
-  console.log(groupName + ': ' + groupSelected)
-
   return (
     <Stack id='filegroup-row'>
       <Stack

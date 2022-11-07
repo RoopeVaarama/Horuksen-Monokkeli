@@ -38,8 +38,6 @@ const FileItem = (props: {
     override && setFileSelected(checked)
   })
 
-  console.log(fileName + ': ' + fileSelected)
-
   return (
     <Stack
       id='fileitem-row'

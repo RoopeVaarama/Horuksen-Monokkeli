@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import {
-  Button,
   Checkbox,
   FormControlLabel,
   Grid,
@@ -32,7 +31,7 @@ const StyledDiv = styled('div')(() => ({
 
 //TO DO: ylimääräinen false-true-false -togglailu pois
 
-const FilesPage = ({ isComplete, onComplete }: { isComplete: boolean; onComplete: () => void }) => {
+const FilesPage = () => {
   const [boxChecked, setBoxChecked] = useState(false)
   const [preChecked, setPreChecked] = useState(false)
 
@@ -119,8 +118,6 @@ const FilesPage = ({ isComplete, onComplete }: { isComplete: boolean; onComplete
     })
   }
 
-  console.log(boxChecked)
-
   return (
     <StyledPaper sx={{ width: 'calc(100% - 48px)' }}>
       <StyledDiv>
@@ -130,9 +127,7 @@ const FilesPage = ({ isComplete, onComplete }: { isComplete: boolean; onComplete
               control={
                 <Checkbox
                   name='chooseAll'
-                  //Store
                   checked={boxChecked}
-                  //checked={allSelected}
                   size='small'
                   onChange={toggleSelectAll}
                 />
@@ -182,9 +177,6 @@ const FilesPage = ({ isComplete, onComplete }: { isComplete: boolean; onComplete
         <hr />
         <Stack direction='row' marginBottom='10px' sx={{ justifyContent: 'space-evenly' }}>
           <FileUploader fileUploaded={filesUploaded} />
-          <Button variant='outlined' onClick={handleSelection}>
-            <FormattedMessage id='selectFiles' defaultMessage='Valitse tiedostot' />
-          </Button>
         </Stack>
       </StyledDiv>
     </StyledPaper>
