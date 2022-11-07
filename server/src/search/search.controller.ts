@@ -1,22 +1,14 @@
-import {
-  ApiBadRequestResponse,
-  ApiCreatedResponse,
-  ApiNoContentResponse,
-  ApiNotAcceptableResponse,
-  ApiNotFoundResponse,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { Controller, Get, Post, Body, Param, ValidationPipe, UsePipes } from '@nestjs/common';
 import { ParseService } from './parse.service';
 import { SearchService } from './search.service';
 import { PDFExtractResult } from 'pdf.js-extract';
-import { Term } from '../template/schemas/term.schema';
 import { Result } from './schemas/result.schema';
 import { TemplateService } from '../template//template.service';
 import { Template } from '../template/schemas/template.schema';
 import { Search } from './schemas/search.schema';
 import { SearchRequest } from './schemas/search-request.schema';
+import { FileService } from '../file/file.service';
 
 @ApiTags('search')
 @Controller('search')
@@ -25,6 +17,7 @@ export class SearchController {
     private readonly service: SearchService,
     private readonly parseService: ParseService,
     private readonly templateService: TemplateService,
+    private readonly fileService: FileService,
   ) {}
 
   // extract the contents of a pdf
@@ -33,65 +26,29 @@ export class SearchController {
     return await this.parseService.parsePdf(`test_pdfs/${file}`);
   }
 
-  // old test endpoint, to be removed
-  @Post('/test/:file')
+  // Search with template id and a string array of file id's
+  @Post('/template_search/:tid')
   @ApiCreatedResponse({ status: 200, description: 'Search completed', type: Template })
-  @UsePipes(ValidationPipe)
-  async testSearch(@Body() search: Template, @Param('file') file: string): Promise<Result[]> {
-    const contents = await this.parseService.parsePdf(`test_pdfs/${file}`);
-    if (contents == null) return null;
-
-    // THIS IS ONLY A HACK. FIX IN SEARCH IMPLEMENTATION
-    if (!search.terms) return null;
-    const terms = search.terms[0];
-    // THIS IS ONLY A HACK. FIX IN SEARCH IMPLEMENTATION
-
-    return await this.service.search(contents, terms);
-  }
-
-  // performs a search (currently just on Invoice.pdf) with the specified template id
-  @Get('/templatesearch/:tid')
-  @ApiCreatedResponse({ status: 200, description: 'Search completed', type: Template })
-  async valueSearchWithId(@Body() files: string[], @Param('tid') tid: string): Promise<Result[]> {
-    const contents = await this.parseService.parsePdf(`test_pdfs/invoice.pdf`);
-    if (contents == null) return null;
-    const search = await this.templateService.getTemplateById(tid);
-
-    // THIS IS ONLY A HACK. FIX IN SEARCH IMPLEMENTATION
-    if (!search.terms) return null;
-    const terms = search.terms[0];
-    // THIS IS ONLY A HACK. FIX IN SEARCH IMPLEMENTATION
-
-    return await this.service.search(contents, terms);
-  }
-
-  // multifile search with template id and a string array of file names, for demo purposes
-  @Post('/multifile_search/:tid')
-  @ApiCreatedResponse({ status: 200, description: 'Search completed', type: Template })
-  async multifileSearchWithId(
-    @Body() files: string[],
-    @Param('tid') tid: string,
-  ): Promise<Result[]> {
-    const search = await this.templateService.getTemplateById(tid);
-
-    // THIS IS ONLY A HACK. FIX IN SEARCH IMPLEMENTATION
-    if (!search.terms) return null;
-    const terms = search.terms[0];
-    // THIS IS ONLY A HACK. FIX IN SEARCH IMPLEMENTATION
-
+  async multifileSearchWithId(@Body() files: string[], @Param('tid') tid: string): Promise<Search> {
+    const template = await this.templateService.getTemplateById(tid);
     let results: Result[] = [];
     for (let i = 0; i < files.length; ++i) {
-      const file = files[i];
-      const contents = await this.parseService.parsePdf(`test_pdfs/${file}`);
+      const fileId = files[i];
+      const file = await this.fileService.getFileMeta(fileId);
+      const contents = await this.parseService.parsePdf(`test_pdfs/${file.filename}`);
       if (contents == null) break;
-      const fileResults = await this.service.search(contents, terms);
+      const fileResults = await this.service.search(contents, template.terms, fileId);
       results = [...results, ...fileResults];
     }
-    return results;
+    const search = new Search();
+    search.files = files;
+    search.terms = template.terms;
+    search.results = results;
+    return search;
   }
 
-  // performs a search with the received SearchRequest-object
-  @Post('/valuesearch')
+  // Performs a search with the received SearchRequest-object
+  @Post('/search')
   @ApiCreatedResponse({ status: 200, description: 'Search completed', type: SearchRequest })
   @UsePipes(new ValidationPipe({ transform: true }))
   async valueSearch(@Body() searchRequest: SearchRequest): Promise<Search> {
@@ -100,32 +57,13 @@ export class SearchController {
     search.terms = searchRequest.terms;
     search.results = [];
     for (let i = 0; i < searchRequest.files.length; ++i) {
-      const file = searchRequest.files[i];
-      const contents = await this.parseService.parsePdf(`test_pdfs/${file}`);
+      const fileId = searchRequest.files[i];
+      const file = await this.fileService.getFileMeta(fileId);
+      const contents = await this.parseService.parsePdf(`test_pdfs/${file.filename}`);
       if (contents == null) break;
-      const results = await this.service.search(contents, search.terms);
+      const results = await this.service.search(contents, search.terms, fileId);
       search.results = [...search.results, ...results];
     }
     return search;
-  }
-
-  @Post(':file')
-  @ApiCreatedResponse({ status: 201, description: 'Search completed.', type: Template })
-  @ApiNoContentResponse({
-    status: 204,
-    description: 'No content in PDF. PDF found and extracted, but no text in it could be found.',
-  })
-  @ApiBadRequestResponse({
-    status: 400,
-    description: "File found, but it's not in PDF format. Make sure file ending is .pdf",
-  })
-  @ApiNotFoundResponse({
-    status: 404,
-    description: 'File not found. Make sure the file name is correct and file exists.',
-  })
-  async search(@Body() search: Term, @Param('file') file: string): Promise<Result[]> {
-    const contents = await this.parseService.parsePdf(`test_pdfs/${file}`);
-    if (contents == null) return null;
-    return await this.service.search(contents, search);
   }
 }

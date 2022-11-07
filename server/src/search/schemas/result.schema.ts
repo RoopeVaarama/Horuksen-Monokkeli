@@ -12,6 +12,10 @@ export class Result {
 
   @Prop({ type: Number })
   @ApiProperty()
+  termIndex: number;
+
+  @Prop({ type: Number })
+  @ApiProperty()
   page: number;
 
   @Prop({ type: String })

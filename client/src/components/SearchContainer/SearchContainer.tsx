@@ -1,9 +1,10 @@
-import { Stack, Step, StepButton, Stepper, styled } from '@mui/material'
+import { CircularProgress, Stack, Step, StepButton, Stepper, styled } from '@mui/material'
 import StepConnector, { stepConnectorClasses } from '@mui/material/StepConnector'
 import { useEffect, useState } from 'react'
 import { FormattedMessage } from 'react-intl'
 import { useSearchStore } from '../../store/searchStore'
-import { Template } from '../../types/Template'
+import { useTemplateStore } from '../../store/templateStore'
+import { useUserStore } from '../../store/userStore'
 import FilesPage from './FilesPage'
 import ResultsPage from './ResultsPage'
 import TemplatesPage from './TemplatesPage'
@@ -65,7 +66,9 @@ const SearchContainer = () => {
   const [completed, setCompleted] = useState<readonly boolean[]>(
     new Array<boolean>(STEPS.length).fill(false)
   )
-  const { templates } = useSearchStore()
+  const { searchTemplates, resetSearchParamaters } = useSearchStore()
+  const { fetching, resetTemplates } = useTemplateStore()
+  const { userId } = useUserStore()
 
   const handleStep = (step: number) => () => {
     setActiveStep(step)
@@ -94,13 +97,16 @@ const SearchContainer = () => {
   }
 
   useEffect(() => {
-    handleCompletion(
-      templates.length > 0 && templates.every((value: Template) => value.keyword !== '')
-    )
-  }, [templates])
+    handleCompletion(searchTemplates.length > 0)
+  }, [searchTemplates])
+
+  useEffect(() => {
+    resetSearchParamaters()
+    resetTemplates(userId)
+  }, [])
 
   return (
-    <Stack spacing={2}>
+    <Stack spacing={2} width='100%'>
       <Stepper nonLinear connector={<StyledStepConnector />} sx={{ py: 2 }}>
         {completed &&
           STEPS.map((step, i) => (
@@ -116,14 +122,17 @@ const SearchContainer = () => {
             </StyledStep>
           ))}
       </Stepper>
-      {activeStep === 0 && <TemplatesPage />}
-      {activeStep === 1 && (
-        <FilesPage
-          isComplete={completed[activeStep]}
-          onComplete={() => handleCompletion(!completed[activeStep])}
-        />
-      )}
-      {activeStep === 2 && <ResultsPage />}
+      <Stack width='100%' display='flex' alignItems='center'>
+        {activeStep === 0 &&
+          (fetching ? <CircularProgress color='secondary' /> : <TemplatesPage />)}
+        {activeStep === 1 && (
+          <FilesPage
+            isComplete={completed[activeStep]}
+            onComplete={() => handleCompletion(!completed[activeStep])}
+          />
+        )}
+        {activeStep === 2 && <ResultsPage />}
+      </Stack>
     </Stack>
   )
 }
