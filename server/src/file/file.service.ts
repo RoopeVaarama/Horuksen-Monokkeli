@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable, Param } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { existsSync, opendirSync, readdir, unlinkSync } from 'fs';
@@ -31,6 +31,20 @@ export class FileService {
     return files;
   }
 
+  async getFilesByIds(fileIds: string[]): Promise<FileMeta[]> {
+    const metasToReturn: FileMeta[] = [];
+    for (let i = 0; i < fileIds.length; i++) {
+      let fileMetaToPush: FileMeta;
+      try {
+        fileMetaToPush = await this.fileMetaModel.findById(fileIds.at(i));
+      } catch (err) {
+        continue;
+      }
+      metasToReturn.push(fileMetaToPush);
+    }
+    return metasToReturn;
+  }
+
   async deleteFile(id: string): Promise<boolean> {
     await this.canFileBeFound(id);
     const fileToRemove = (await this.fileMetaModel.findById(id)).filepath;
@@ -61,6 +75,4 @@ export class FileService {
 
     return arrToReturn;
   }
-
-
 }

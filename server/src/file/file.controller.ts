@@ -19,8 +19,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiConsumes, ApiResponse, ApiTags, ApiBody, ApiNotFoundResponse } from '@nestjs/swagger';
 import { FileService } from './file.service';
 import { ListService } from './list.service';
-import { FileMeta } from './schemas/filemeta.schema';
+import { FileMeta, FileMetaDocument } from './schemas/filemeta.schema';
 import { FileList } from './schemas/filelist.schema';
+import { Model } from 'mongoose';
 
 @ApiTags('files')
 @Controller('/files')
@@ -116,5 +117,26 @@ export class FileController {
   @ApiResponse({ status: 200, description: 'List deleted succesfully', type: Boolean })
   async deleteFileList(@Param('id') id: string) {
     return await this.listService.deleteFileList(id);
+  }
+
+  @Patch('/list/files/:listId')
+  @ApiResponse({ status: 200, description: 'Files added to list', type: Boolean })
+  async addFilesTtoList(
+    @Param('listId') listId: string,
+    @Body() fileIds: string[],
+  ): Promise<FileList> {
+    await this.listService.canListBeFound(listId);
+    const metas: FileMeta[] = await this.fileService.getFilesByIds(fileIds);
+    return await this.listService.addFilesToFileList(listId, metas);
+  }
+  @Delete('/list/files/:listId')
+  @ApiResponse({ status: 200, description: 'Files deleted from list', type: Boolean })
+  async deleteFilesFromFileList(
+    @Param('listId') listId: string,
+    @Body() fileIds: string[],
+  ): Promise<FileList> {
+    await this.listService.canListBeFound(listId);
+    const metas: FileMeta[] = await this.fileService.getFilesByIds(fileIds);
+    return await this.listService.removeFilesFromFileList(listId, metas);
   }
 }
