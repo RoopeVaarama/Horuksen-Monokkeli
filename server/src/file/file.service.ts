@@ -1,15 +1,24 @@
 import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { existsSync, opendirSync, readdir } from 'fs';
+import { existsSync, opendirSync, readdir, unlinkSync } from 'fs';
 import { FileMeta, FileMetaDocument } from './schemas/filemeta.schema';
 
 @Injectable()
 export class FileService {
   constructor(@InjectModel(FileMeta.name) private fileMetaModel: Model<FileMetaDocument>) {}
 
+  async canFileBeFound(fileId: string): Promise<boolean> {
+    try {
+      await this.fileMetaModel.findById(fileId);
+    } catch (err) {
+      throw new HttpException('File not found', 404);
+    }
+    return true;
+  }
+
   // file could use a type definition
-  async createFileMeta(file): Promise<FileMeta> {
+  async createFileMeta(file: Express.Multer.File): Promise<FileMeta> {
     const filemeta = new FileMeta();
     filemeta.filename = file.originalname;
     filemeta.filepath = file.destination + '/' + file.filename;
@@ -29,8 +38,25 @@ export class FileService {
     return files;
   }
 
-  async deleteFileMeta(id: string): Promise<boolean> {
-    // TODO: Delete saved file alongside filemeta
+  async getFilesByIds(fileIds: string[]): Promise<FileMeta[]> {
+    const metasToReturn: FileMeta[] = [];
+    for (let i = 0; i < fileIds.length; i++) {
+      let fileMetaToPush: FileMeta;
+      try {
+        fileMetaToPush = await this.fileMetaModel.findById(fileIds.at(i));
+      } catch (err) {
+        continue;
+      }
+      metasToReturn.push(fileMetaToPush);
+    }
+    return metasToReturn;
+  }
+
+  async deleteFile(id: string): Promise<boolean> {
+    await this.canFileBeFound(id);
+    const fileToRemove = (await this.fileMetaModel.findById(id)).filepath;
+
+    unlinkSync(fileToRemove);
     const deleteResponse = await this.fileMetaModel.deleteOne({ _id: id }).exec();
     return deleteResponse.acknowledged;
   }
