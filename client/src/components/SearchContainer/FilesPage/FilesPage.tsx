@@ -14,6 +14,7 @@ import { FormattedMessage } from 'react-intl'
 import StyledPaper from '../../common/StyledPaper/StyledPaper'
 import FileGroup from './FileGroup'
 import FileUploader from './FileUploader'
+import { useSearchStore } from '../../../store/searchStore'
 
 const fileGroups = [{ groupName: 'Kaikki tiedostot' }]
 
@@ -32,6 +33,8 @@ const StyledDiv = styled('div')(() => ({
 //TO DO: ylimääräinen false-true-false -togglailu pois
 
 const FilesPage = () => {
+  const { fileIDs } = useSearchStore()
+
   const [boxChecked, setBoxChecked] = useState(false)
   const [preChecked, setPreChecked] = useState(false)
 
@@ -44,7 +47,7 @@ const FilesPage = () => {
 
   const [totalGroups, setTotalGroups] = useState(children.length)
   const [selectedGroups, setSelectedGroups] = useState(0)
-  const [selectedFiles, setSelectedFiles] = useState([{}])
+  const [update, setUpdate] = useState(false)
 
   const toggleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
     // Roll selection to sub-components
@@ -73,13 +76,11 @@ const FilesPage = () => {
     setSelectedGroups(children.reduce((prev, curr) => prev + (curr.selected ? 1 : 0), 0))
   }
 
-  //TO DO tee jotain oikeeta valituille tiedostoille
-  const handleSelection = () => {
-    console.log('Valitut tiedostot: ')
-    selectedFiles.forEach((file) => {
-      console.log(file)
+  useEffect(() => {
+    setChildren((prevChildren) => {
+      return [...prevChildren]
     })
-  }
+  }, [update])
 
   useEffect(() => {
     // If all files are selected, check the main checkbox
@@ -88,33 +89,26 @@ const FilesPage = () => {
     setPreChecked(false)
   }, [selectedGroups, totalGroups])
 
-  // TODO päivitä envistä urli
   const uploadFile = (formData: FormData) => {
     fetch(`${process.env.REACT_APP_BACKEND_URL}/files/upload`, {
       method: 'POST',
       body: formData
     })
       .then((response) => response.json())
-      .then((data) => reRenderAfterUpdate(data._id))
+      .then((data) => {
+        console.log('Uploaded: ' + data)
+        // Toggle update state to rerender all files
+        setUpdate((prevState) => !prevState)
+      })
       .catch((error) => console.log(error))
   }
 
-  // Käsittele tiedosto
+  // Upload the selected file(s) from FileUploader
   const filesUploaded = (files: File[]) => {
     files.forEach((file) => {
       const formData = new FormData()
       formData.append('file', file)
       uploadFile(formData)
-    })
-  }
-
-  // TO DO: file uploadin jälkeen pitäisi saada kaikki tiedostot -filegroup uudestaan renderöityä,
-  // jotta file ilmestyisi listaan
-  const reRenderAfterUpdate = (key: string) => {
-    setChildren((currChildren) => {
-      const ind = currChildren.findIndex((group) => group.groupName === 'Kaikki tiedostot')
-      currChildren[ind].key = key
-      return currChildren
     })
   }
 

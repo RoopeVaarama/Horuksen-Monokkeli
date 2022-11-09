@@ -39,11 +39,10 @@ const FileGroup = (props: {
 
   // Files
   useEffect(() => {
-    console.log('Fetch')
     if (groupName === 'Kaikki tiedostot') {
       fetchAllFiles()
     } else {
-      console.log('Ehkä jotain muuta?')
+      console.log('Listojen käsittely jotenkin')
     }
   }, [])
 

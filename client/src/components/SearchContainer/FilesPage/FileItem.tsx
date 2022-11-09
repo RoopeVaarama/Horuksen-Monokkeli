@@ -20,9 +20,9 @@ const FileItem = (props: {
   onToggle: (key: string, selected: boolean) => void
 }) => {
   const { id, author, date, fileName, checked, override, onToggle, groupName } = props
-  const { addFileToSearch, removeFileFromSearch } = useSearchStore()
+  const { addFileToSearch, removeFileFromSearch, fileIDs } = useSearchStore()
 
-  const [fileSelected, setFileSelected] = useState(false)
+  const [fileSelected, setFileSelected] = useState(fileIDs.indexOf(id) >= 0 ? true : false)
 
   const toggle = () => {
     setFileSelected((currently) => !currently)

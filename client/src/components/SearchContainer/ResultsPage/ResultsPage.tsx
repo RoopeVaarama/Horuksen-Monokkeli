@@ -5,11 +5,11 @@ import { useSearchStore } from '../../../store/searchStore'
 import { Alert } from '../../common'
 
 const ResultsPage = () => {
-  const { search, searching, results } = useSearchStore()
+  const { search, searching, results, files } = useSearchStore()
 
   useEffect(() => {
     search()
-  }, [])
+  })
 
   return (
     <Stack
