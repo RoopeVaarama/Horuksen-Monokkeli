@@ -1,8 +1,10 @@
 import { useState, ChangeEvent, FormEvent, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { styled, Typography, Button, Box, TextField } from '@mui/material'
 import { FormattedMessage } from 'react-intl'
 import ErrorMessage from '../ErrorMessage'
+import { UserDto } from '../../types'
+import { useUserStore } from '../../store/userStore'
 
 const errorShortPassword = {
   msg: 'Salasanan minimipituus 8 merkkiä',
@@ -15,11 +17,8 @@ const errorMismatchPasswords = {
 
 const FormContainer = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
-  position: 'fixed',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  marginTop: '25px',
+  marginTop: theme.spacing(4),
+  marginBottom: theme.spacing(2),
   padding: '25px',
   borderRadius: '10px',
   border: 'solid',
@@ -42,9 +41,7 @@ const FormInput = styled(TextField)(() => ({
 }))
 
 const SignInButton = styled(Button)(({ theme }) => ({
-  margin: '10px',
-  variant: 'contained',
-  color: theme.palette.primary.main
+  margin: '10px'
 }))
 
 const SignInLink = styled(Link)(() => ({
@@ -53,13 +50,19 @@ const SignInLink = styled(Link)(() => ({
   justifyContent: 'center'
 }))
 
+const DEFAULT_USER_DTO: UserDto = {
+  username: '',
+  firstName: '',
+  lastName: '',
+  email: '',
+  password: ''
+}
+
 const RegisterContainer = () => {
-  const [registerData, setRegisterData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    repeatPassword: ''
-  })
+  const [registerData, setRegisterData] = useState<UserDto>(DEFAULT_USER_DTO)
+  const [repeatPassword, setRepeatPassword] = useState('')
+  const { register } = useUserStore()
+  const navigate = useNavigate()
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = event.target
@@ -97,10 +100,10 @@ const RegisterContainer = () => {
   // Validate when passwords are changed
   useEffect(() => {
     validatePassword()
-  }, [registerData.password, registerData.repeatPassword])
+  }, [registerData.password, repeatPassword])
 
   const validatePassword = (): void => {
-    const { password, repeatPassword } = registerData
+    const { password } = registerData
     {
       if (password.length > 0 || repeatPassword.length > 0)
         password === repeatPassword && password.length > 7
@@ -111,29 +114,53 @@ const RegisterContainer = () => {
     }
   }
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault()
     showPossibleErrors()
-    // TO DO Varsinainen rekisteröitymisäksöni
-    error.errorPresent ? console.log('Failure') : console.log('Rekisteröityminen OK')
+    const success = await register(registerData)
+    if (success) {
+      setRegisterData(DEFAULT_USER_DTO)
+      setRepeatPassword('')
+      navigate('/signin')
+    }
   }
 
   return (
-    <div>
+    <Box display='flex' width='100%' justifyContent='center'>
       <FormContainer>
         <Typography variant='h6'>
           <FormattedMessage id='register' defaultMessage='Rekisteröidy' />
         </Typography>
         <RegisterForm onSubmit={handleSubmit}>
           <FormInput
-            label={<FormattedMessage id='name' defaultMessage='Nimi' />}
+            color='secondary'
+            label={<FormattedMessage id='username' defaultMessage='Käyttäjätunnus' />}
             type='text'
-            name='name'
-            value={registerData.name}
+            name='username'
+            value={registerData.username}
             onChange={handleChange}
             required
           />
           <FormInput
+            color='secondary'
+            label={<FormattedMessage id='firstName' defaultMessage='Etunimi' />}
+            type='text'
+            name='firstName'
+            value={registerData.firstName}
+            onChange={handleChange}
+            required
+          />
+          <FormInput
+            color='secondary'
+            label={<FormattedMessage id='lastName' defaultMessage='Sukunimi' />}
+            type='text'
+            name='lastName'
+            value={registerData.lastName}
+            onChange={handleChange}
+            required
+          />
+          <FormInput
+            color='secondary'
             label={<FormattedMessage id='email' defaultMessage='Sähköposti' />}
             type='email'
             name='email'
@@ -142,7 +169,8 @@ const RegisterContainer = () => {
             required
           />
           <FormInput
-            label={<FormattedMessage id='password' defaultMessage='Password' />}
+            color='secondary'
+            label={<FormattedMessage id='password' defaultMessage='Salasana' />}
             type='password'
             name='password'
             value={registerData.password}
@@ -151,16 +179,17 @@ const RegisterContainer = () => {
             required
           />
           <FormInput
+            color='secondary'
             label={<FormattedMessage id='repeatPassword' defaultMessage='Salasana uudelleen' />}
             type='password'
             name='repeatPassword'
-            value={registerData.repeatPassword}
-            onChange={handleChange}
+            value={repeatPassword}
+            onChange={(e) => setRepeatPassword(e.target.value)}
             error={formSent && error.errorPresent}
             required
           />
           {formSent && error.errorPresent && <ErrorMessage errorObject={error.errorObject} />}
-          <SignInButton type='submit'>
+          <SignInButton type='submit' variant='contained'>
             {<FormattedMessage id='register' defaultMessage='Rekisteröidy' />}
           </SignInButton>
         </RegisterForm>
@@ -168,7 +197,7 @@ const RegisterContainer = () => {
           {<FormattedMessage id='signIn' defaultMessage='Sisäänkirjautuminen' />}
         </SignInLink>
       </FormContainer>
-    </div>
+    </Box>
   )
 }
 

@@ -12,17 +12,34 @@ import {
 } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
 import { FormattedMessage } from 'react-intl'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import LanguageSelector from './LanguageSelector'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
-import { toolbarRoutes } from '../../../constants'
+import { TOKEN_KEY, toolbarRoutes } from '../../../constants'
+import { useUserStore } from '../../../store/userStore'
 
 const Toolbar = ({ height }: { height: string | number }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false)
   const location = useLocation()
+  const navigate = useNavigate()
   const theme = useTheme()
   const matches = useMediaQuery('(max-width:700px)')
+  const hasToken = Boolean(localStorage.getItem(TOKEN_KEY))
+  const { logout } = useUserStore()
+
+  const handleLogout = () => {
+    logout()
+    navigate('/signin')
+    setIsLoggedIn(false)
+  }
+
+  useEffect(() => {
+    setIsLoggedIn(hasToken)
+    navigate('/signin')
+  }, [hasToken])
+
   return (
     <AppBar position='fixed'>
       <MUIToolbar
@@ -109,6 +126,13 @@ const Toolbar = ({ height }: { height: string | number }) => {
                 </Box>
               )}
               <LanguageSelector />
+              {isLoggedIn && (
+                <MenuItem onClick={() => handleLogout()} sx={{ mt: 1 }}>
+                  <Typography textAlign='center'>
+                    {<FormattedMessage id='logout' defaultMessage='Kirjaudu ulos' />}
+                  </Typography>
+                </MenuItem>
+              )}
             </Menu>
           </Grid>
         </Grid>

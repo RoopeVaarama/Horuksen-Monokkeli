@@ -34,8 +34,14 @@
   "register": "Register",
   "email": "Email",
   "password": "Password",
-  "name": "Name",
+  "username": "Username",
+  "firstName": "First name",
+  "lastName": "Last name",
   "repeatPassword": "Repeat password",
   "shortPassword": "Minimum length 8 characters",
-  "mismatchPassword": "Passwords don't match"
+  "mismatchPassword": "Passwords don't match",
+  "logout": "Log out",
+  "successRegister": "Registered successfully",
+  "successLogin": "Logged in successfully",
+  "successLogout": "Kirjauduttu ulos"
 }
