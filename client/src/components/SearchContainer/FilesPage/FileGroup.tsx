@@ -143,7 +143,7 @@ const FileGroup = (props: { id: string; groupName: string }) => {
 
   useEffect(() => {
     if (upload) {
-      fetchAllFiles()
+      groupName === 'Kaikki tiedostot' ? fetchAllFiles() : fetchFilesInList()
       setUpload(false)
     }
   }, [upload])
