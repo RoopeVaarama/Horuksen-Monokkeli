@@ -1,5 +1,5 @@
 import create from 'zustand'
-//import { fetcher } from '../tools/fetcher'
+import { fetcher } from '../tools/fetcher'
 //import { templatesArrayToSearch } from '../tools/temporaryConverters'
 import { FileMeta, SearchResult, Template, TemplateRow } from '../types'
 
@@ -52,7 +52,7 @@ export const useSearchStore = create<SearchState>((set, get) => ({
     if (!get().searching && get().refreshSearch && get().searchTemplates.length !== 0) {
       set({ searching: true, results: [] })
 
-      // Vaihda tää template-arrayhyn jos/kun haku päivitetään toivotusti
+      // Vaihda tää template-arrayhyn jos/kun haku päivitetään
       const terms: TemplateRow[] = []
       get().searchTemplates.forEach((template) => {
         template.terms.forEach((termSet) => {
@@ -64,31 +64,15 @@ export const useSearchStore = create<SearchState>((set, get) => ({
       const uniqueFileIDS = get().fileIDs.filter((v, i, a) => a.indexOf(v) === i)
 
       try {
-        fetch(`${process.env.REACT_APP_BACKEND_URL}/search/search`, {
+        const data = await fetcher({
           method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json'
-          },
+          path: 'search/search',
           body: JSON.stringify({
             terms: terms,
             files: uniqueFileIDS
           })
         })
-          .then((res) => res.json())
-          .then((data) => {
-            set({ searching: false, refreshSearch: false, results: data.results })
-          })
-
-        /*
-        const data = await fetcher({
-          method: 'POST',
-          path: 'search',
-          id: 'invoice.pdf',
-          body: templatesArrayToSearch(get().searchTemplates)
-        })
-        */
-        //set({ searching: false, refreshSearch: false, results: data })
+        set({ searching: false, refreshSearch: false, results: data.results })
       } catch (e) {
         console.log(e)
         set({ searching: false })
