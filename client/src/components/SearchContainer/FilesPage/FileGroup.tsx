@@ -11,6 +11,7 @@ import {
 import { ExpandLess, ExpandMore } from '@mui/icons-material'
 import FileItem from './FileItem'
 import { useSearchStore } from '../../../store/searchStore'
+import { FormattedMessage } from 'react-intl'
 
 const Sidetext = styled('div')(() => ({
   display: 'flex',
@@ -23,7 +24,7 @@ const FileGroup = (props: {
   checked: boolean
   onChange: (name: string, selected: boolean) => void
 }) => {
-  const { files } = useSearchStore()
+  const { files, openFileGroups, setGroupAsOpen, setGroupAsClosed } = useSearchStore()
   const { groupName, preDeterminedCheck, checked, onChange } = props
 
   const [children, setChildren] = useState<
@@ -96,8 +97,9 @@ const FileGroup = (props: {
     setChosenFiles(countChosen)
   }
 
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(openFileGroups.includes(groupName))
   const toggleCollapse = () => {
+    open ? setGroupAsClosed(groupName) : setGroupAsOpen(groupName)
     setOpen((currState) => !currState)
     setOverride(false)
   }
@@ -159,11 +161,16 @@ const FileGroup = (props: {
           sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
         >
           <Typography id='filegroup-name' variant='subtitle1'>
-            {groupName}
+            {groupName === 'Kaikki tiedostot' ? (
+              <FormattedMessage id='allFiles' defaultMessage='Kaikki tiedostot' />
+            ) : (
+              groupName
+            )}
           </Typography>
           <Sidetext id='filegroup-sub-bar'>
             <Typography id='filegroup-group-info' variant='caption'>
-              {chosenFiles}/{totalFiles} valittu
+              {chosenFiles}/{totalFiles}{' '}
+              {<FormattedMessage id='selected' defaultMessage='valittu' />}
             </Typography>
             {open ? <ExpandLess /> : <ExpandMore />}
           </Sidetext>

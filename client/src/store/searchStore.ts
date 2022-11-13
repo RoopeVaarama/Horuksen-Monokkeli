@@ -5,6 +5,7 @@ import { FileMeta, SearchResult, Template, TemplateRow } from '../types'
 
 interface SearchState {
   searchTemplates: Template[]
+  openFileGroups: string[]
   results: SearchResult[]
   refreshSearch: boolean
   searching: boolean
@@ -16,10 +17,13 @@ interface SearchState {
   search: () => void
   addFileToSearch: (file: FileMeta) => void
   removeFileFromSearch: (fileToRemove: FileMeta) => void
+  setGroupAsOpen: (groupName: string) => void
+  setGroupAsClosed: (groupName: string) => void
 }
 
 export const useSearchStore = create<SearchState>((set, get) => ({
   searchTemplates: [],
+  openFileGroups: [],
   results: [],
   refreshSearch: true,
   searching: false,
@@ -100,6 +104,17 @@ export const useSearchStore = create<SearchState>((set, get) => ({
       files: state.files.filter((file) => file._id != fileToRemove._id),
       fileIDs: state.fileIDs.filter((fileID) => fileID !== fileToRemove._id),
       refreshSearch: true
+    }))
+  },
+  setGroupAsOpen(groupName: string) {
+    set((state) => ({
+      openFileGroups: [...state.openFileGroups, groupName]
+    }))
+    console.log(get().openFileGroups)
+  },
+  setGroupAsClosed(groupName: string) {
+    set((state) => ({
+      openFileGroups: state.openFileGroups.filter((groupname) => groupname !== groupName)
     }))
   }
 }))
