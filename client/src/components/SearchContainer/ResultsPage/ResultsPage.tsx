@@ -5,7 +5,7 @@ import { useSearchStore } from '../../../store/searchStore'
 import { Alert } from '../../common'
 
 const ResultsPage = () => {
-  const { search, searching, results, files } = useSearchStore()
+  const { search, searching, results } = useSearchStore()
 
   useEffect(() => {
     search()

@@ -33,7 +33,6 @@ const FileGroup = (props: { id: string; groupName: string }) => {
     }[]
   >([])
 
-  // Files
   useEffect(() => {
     if (groupName === 'Kaikki tiedostot') {
       fetchAllFiles()

@@ -9,7 +9,7 @@ interface SearchState {
   results: SearchResult[]
   refreshSearch: boolean
   searching: boolean
-  files: FileMeta[]
+  //files: FileMeta[]
   fileIDs: string[]
   addTemplateToSearch: (template: Template) => void
   removeTemplateFromSearch: (id: string) => void
@@ -28,7 +28,7 @@ export const useSearchStore = create<SearchState>((set, get) => ({
   refreshSearch: true,
   searching: false,
   fileIDs: [],
-  files: [],
+  //files: [],
   addTemplateToSearch: (template: Template) => {
     set((state) => ({
       searchTemplates: [...state.searchTemplates, template],
@@ -94,14 +94,14 @@ export const useSearchStore = create<SearchState>((set, get) => ({
   },
   addFileToSearch(file: FileMeta) {
     set((state) => ({
-      files: [...state.files, file],
+      //files: [...state.files, file],
       fileIDs: [...state.fileIDs, file._id],
       refreshSearch: true
     }))
   },
   removeFileFromSearch(fileToRemove: FileMeta) {
     set((state) => ({
-      files: state.files.filter((file) => file._id != fileToRemove._id),
+      //files: state.files.filter((file) => file._id != fileToRemove._id),
       fileIDs: state.fileIDs.filter((fileID) => fileID !== fileToRemove._id),
       refreshSearch: true
     }))

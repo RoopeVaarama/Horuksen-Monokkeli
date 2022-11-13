@@ -66,7 +66,7 @@ const SearchContainer = () => {
   const [completed, setCompleted] = useState<readonly boolean[]>(
     new Array<boolean>(STEPS.length).fill(false)
   )
-  const { searchTemplates, resetSearchParamaters, files } = useSearchStore()
+  const { searchTemplates, resetSearchParamaters, fileIDs } = useSearchStore()
   const { fetching, resetTemplates } = useTemplateStore()
   const { userId } = useUserStore()
 
@@ -101,8 +101,8 @@ const SearchContainer = () => {
   }, [searchTemplates])
 
   useEffect(() => {
-    handleCompletion(files.length > 0)
-  }, [files])
+    handleCompletion(fileIDs.length > 0)
+  }, [fileIDs])
 
   useEffect(() => {
     resetSearchParamaters()
