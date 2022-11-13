@@ -1,22 +1,15 @@
 import { useEffect, useState } from 'react'
-import {
-  Checkbox,
-  FormControlLabel,
-  Grid,
-  InputAdornment,
-  Stack,
-  styled,
-  TextField,
-  Typography
-} from '@mui/material'
+import { Grid, InputAdornment, Stack, styled, TextField } from '@mui/material'
 import { SearchRounded } from '@mui/icons-material'
-import { FormattedMessage } from 'react-intl'
 import StyledPaper from '../../common/StyledPaper/StyledPaper'
 import FileGroup from './FileGroup'
 import FileUploader from './FileUploader'
-import { useSearchStore } from '../../../store/searchStore'
 
-const fileGroups = [{ groupName: 'Kaikki tiedostot' }]
+/**
+ * TO DO:
+ * - uploadin jälkeen re-renderöinti
+ * - togglailuboogie
+ */
 
 const SearchField = styled(TextField)(() => ({
   variant: 'outlined',
@@ -30,64 +23,41 @@ const StyledDiv = styled('div')(() => ({
   width: '100vh'
 }))
 
-//TO DO: ylimääräinen false-true-false -togglailu pois
-
 const FilesPage = () => {
-  const { fileIDs } = useSearchStore()
+  const [children, setChildren] = useState<
+    {
+      key: string
+      groupName: string
+      selected: boolean
+    }[]
+  >([])
 
-  const [boxChecked, setBoxChecked] = useState(false)
-  const [preChecked, setPreChecked] = useState(false)
+  useEffect(() => {
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/files/list`)
+      .then((res) => res.json())
+      .then((data) => {
+        const fileLists = data.map((filelist: any) => {
+          return { key: filelist._id, groupName: filelist.title, selected: false }
+        })
 
-  // Filegroups nyt kovakoodattu, korvaa kun listat on käytössä (myös lkm)
-  const [children, setChildren] = useState(
-    fileGroups.map((file) => {
-      return { key: file.groupName, groupName: file.groupName, selected: false }
-    })
-  )
-
-  const [totalGroups, setTotalGroups] = useState(children.length)
-  const [selectedGroups, setSelectedGroups] = useState(0)
-  const [update, setUpdate] = useState(false)
-
-  const toggleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
-    // Roll selection to sub-components
-    setBoxChecked(event.target.checked)
-    setPreChecked(true)
-  }
-
-  const check = () => {
-    setBoxChecked(true)
-  }
-
-  const uncheck = () => {
-    setBoxChecked(false)
-  }
-
-  // Update the state change to children
-  const listenChanges = (name: string, selected: boolean) => {
-    setChildren((groups) => {
-      groups.forEach((group) => {
-        group.groupName === name && (group.selected = selected)
+        fileLists.unshift({
+          key: 'Kaikki tiedostot',
+          groupName: 'Kaikki tiedostot',
+          selected: false
+        })
+        setChildren(fileLists)
       })
-      return groups
-    })
-    // Update accordingly
-    setTotalGroups(children.length)
-    setSelectedGroups(children.reduce((prev, curr) => prev + (curr.selected ? 1 : 0), 0))
-  }
+      .catch((e) => console.log(e))
+  }, [])
+
+  // CHECKOUT
+  const [update, setUpdate] = useState(false)
 
   useEffect(() => {
     setChildren((prevChildren) => {
       return [...prevChildren]
     })
   }, [update])
-
-  useEffect(() => {
-    // If all files are selected, check the main checkbox
-    selectedGroups === totalGroups ? check() : uncheck()
-    // Checking or unchecking coming from sub-components, don't roll the change back
-    setPreChecked(false)
-  }, [selectedGroups, totalGroups])
 
   const uploadFile = (formData: FormData) => {
     fetch(`${process.env.REACT_APP_BACKEND_URL}/files/upload`, {
@@ -97,7 +67,7 @@ const FilesPage = () => {
       .then((response) => response.json())
       .then((data) => {
         console.log('Uploaded: ' + data)
-        // Toggle update state to rerender all files
+        // Toggle update state to rerender all files??
         setUpdate((prevState) => !prevState)
       })
       .catch((error) => console.log(error))
@@ -115,25 +85,8 @@ const FilesPage = () => {
   return (
     <StyledPaper sx={{ width: 'calc(100% - 48px)' }}>
       <StyledDiv>
-        <UtilityBar container alignItems='center'>
-          <Grid item sx={{ width: 1 / 3 }}>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  name='chooseAll'
-                  checked={boxChecked}
-                  size='small'
-                  onChange={toggleSelectAll}
-                />
-              }
-              label={
-                <Typography variant='subtitle2'>
-                  <FormattedMessage id='chooseAll' defaultMessage='Valitse kaikki' />
-                </Typography>
-              }
-            />
-          </Grid>
-          <Grid item sx={{ width: 2 / 3 }}>
+        <UtilityBar container alignItems='center' justifyContent='center'>
+          <Grid item sx={{ width: 3 / 4 }}>
             <SearchField
               id='filepage-searchbar'
               size='small'
@@ -159,13 +112,7 @@ const FilesPage = () => {
           }}
         >
           {children.map((filegroup) => (
-            <FileGroup
-              key={filegroup.groupName}
-              groupName={filegroup.groupName}
-              preDeterminedCheck={preChecked}
-              checked={boxChecked}
-              onChange={listenChanges}
-            />
+            <FileGroup key={filegroup.key} id={filegroup.key} groupName={filegroup.groupName} />
           ))}
         </Stack>
         <hr />

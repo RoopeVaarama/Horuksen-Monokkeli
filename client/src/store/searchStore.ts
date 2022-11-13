@@ -110,7 +110,6 @@ export const useSearchStore = create<SearchState>((set, get) => ({
     set((state) => ({
       openFileGroups: [...state.openFileGroups, groupName]
     }))
-    console.log(get().openFileGroups)
   },
   setGroupAsClosed(groupName: string) {
     set((state) => ({

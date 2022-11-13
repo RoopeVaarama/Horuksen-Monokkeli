@@ -18,14 +18,9 @@ const Sidetext = styled('div')(() => ({
   alignItems: 'center'
 }))
 
-const FileGroup = (props: {
-  groupName: string
-  preDeterminedCheck: boolean
-  checked: boolean
-  onChange: (name: string, selected: boolean) => void
-}) => {
-  const { files, openFileGroups, setGroupAsOpen, setGroupAsClosed } = useSearchStore()
-  const { groupName, preDeterminedCheck, checked, onChange } = props
+const FileGroup = (props: { id: string; groupName: string }) => {
+  const { fileIDs, openFileGroups, setGroupAsOpen, setGroupAsClosed } = useSearchStore()
+  const { id, groupName } = props
 
   const [children, setChildren] = useState<
     {
@@ -43,7 +38,7 @@ const FileGroup = (props: {
     if (groupName === 'Kaikki tiedostot') {
       fetchAllFiles()
     } else {
-      console.log('Listojen käsittely jotenkin')
+      fetchFilesInList()
     }
   }, [])
 
@@ -51,9 +46,6 @@ const FileGroup = (props: {
     fetch(`${process.env.REACT_APP_BACKEND_URL}/files`)
       .then((response) => response.json())
       .then((data) => {
-        const selectedIDs = files.map((file) => {
-          return file._id
-        })
         const newData = data.map((file: any) => {
           const date = new Date(file.createdAt).toLocaleDateString()
           return {
@@ -62,7 +54,7 @@ const FileGroup = (props: {
             filename: file.filename,
             date: date,
             dateObj: file.createdAt,
-            checked: selectedIDs.includes(file._id)
+            checked: fileIDs.includes(file._id)
           }
         })
         // Sort from newest to oldest
@@ -74,6 +66,26 @@ const FileGroup = (props: {
         })
         setChildren(newData)
       })
+  }
+
+  const fetchFilesInList = () => {
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/files/list/${id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        const files = data.files.map((file: any) => {
+          const date = new Date(file.createdAt).toLocaleDateString()
+          return {
+            id: file._id,
+            author: file.author,
+            filename: file.filename,
+            date: date,
+            dateObj: file.createdAt,
+            checked: fileIDs.includes(file._id)
+          }
+        })
+        setChildren(files)
+      })
+      .catch((e) => console.log(e))
   }
 
   const [override, setOverride] = useState(false)
@@ -128,23 +140,12 @@ const FileGroup = (props: {
     setOverride(false)
   }, [chosenFiles, totalFiles])
 
-  useEffect(() => {
-    onChange(groupName, groupSelected)
-  }, [groupSelected])
-
-  // Roll the select all to files when the group is checked
-  useEffect(() => {
-    if (preDeterminedCheck) {
-      setGroupSelected(checked)
-      setOverride(true)
-    }
-  })
-
   return (
     <Stack id='filegroup-row'>
       <Stack
         id='filegroup-bar'
         direction='row'
+        borderRadius='5px'
         divider={<Divider orientation='vertical' variant='middle' flexItem />}
         sx={{ border: 1 }}
       >
