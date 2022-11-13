@@ -3,8 +3,9 @@ import { SearchResult } from './SearchResult'
 import { TemplateRow } from './TemplateRow'
 import { Template } from './Template'
 import { TemplateVariant } from './TemplateVariant'
-import { UserDto } from './UserDto'
+import { RegisterDto } from './RegisterDto'
 import { LoginDto } from './LoginDto'
+import { User } from './User'
 import { IntlMsg } from './IntlMsg'
 
 export type {
@@ -13,7 +14,8 @@ export type {
   Template,
   TemplateRow,
   TemplateVariant,
-  UserDto,
+  RegisterDto,
   LoginDto,
+  User,
   IntlMsg
 }

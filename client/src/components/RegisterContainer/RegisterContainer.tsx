@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { styled, Typography, Button, Box, TextField } from '@mui/material'
 import { FormattedMessage } from 'react-intl'
 import ErrorMessage from '../ErrorMessage'
-import { UserDto } from '../../types'
+import { RegisterDto } from '../../types'
 import { useUserStore } from '../../store/userStore'
 
 const errorShortPassword = {
@@ -45,12 +45,11 @@ const SignInButton = styled(Button)(({ theme }) => ({
 }))
 
 const SignInLink = styled(Link)(() => ({
-  fontSize: '12px',
-  display: 'flex',
-  justifyContent: 'center'
+  maxWidth: 'max-content',
+  fontSize: '12px'
 }))
 
-const DEFAULT_USER_DTO: UserDto = {
+const DEFAULT_USER_DTO: RegisterDto = {
   username: '',
   firstName: '',
   lastName: '',
@@ -59,7 +58,7 @@ const DEFAULT_USER_DTO: UserDto = {
 }
 
 const RegisterContainer = () => {
-  const [registerData, setRegisterData] = useState<UserDto>(DEFAULT_USER_DTO)
+  const [registerData, setRegisterData] = useState<RegisterDto>(DEFAULT_USER_DTO)
   const [repeatPassword, setRepeatPassword] = useState('')
   const { register } = useUserStore()
   const navigate = useNavigate()
@@ -126,7 +125,7 @@ const RegisterContainer = () => {
   }
 
   return (
-    <Box display='flex' width='100%' justifyContent='center'>
+    <Box display='flex' width='100%' justifyContent='center' textAlign='center'>
       <FormContainer>
         <Typography variant='h6'>
           <FormattedMessage id='register' defaultMessage='Rekisteröidy' />

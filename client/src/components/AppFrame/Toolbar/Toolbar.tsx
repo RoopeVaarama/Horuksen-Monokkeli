@@ -10,6 +10,7 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material'
+import LogoutIcon from '@mui/icons-material/Logout'
 import MenuIcon from '@mui/icons-material/Menu'
 import { FormattedMessage } from 'react-intl'
 import { Link, useNavigate } from 'react-router-dom'
@@ -37,7 +38,6 @@ const Toolbar = ({ height }: { height: string | number }) => {
 
   useEffect(() => {
     setIsLoggedIn(hasToken)
-    navigate('/signin')
   }, [hasToken])
 
   return (
@@ -128,7 +128,8 @@ const Toolbar = ({ height }: { height: string | number }) => {
               <LanguageSelector />
               {isLoggedIn && (
                 <MenuItem onClick={() => handleLogout()} sx={{ mt: 1 }}>
-                  <Typography textAlign='center'>
+                  <LogoutIcon />
+                  <Typography textAlign='center' sx={{ ml: 1 }}>
                     {<FormattedMessage id='logout' defaultMessage='Kirjaudu ulos' />}
                   </Typography>
                 </MenuItem>

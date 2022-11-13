@@ -43,5 +43,7 @@
   "logout": "Log out",
   "successRegister": "Registered successfully",
   "successLogin": "Logged in successfully",
-  "successLogout": "Kirjauduttu ulos"
+  "successLogout": "Kirjauduttu ulos",
+  "dropPdfHere": "Drop PDF file here or",
+  "selectFile": "Select File"
 }

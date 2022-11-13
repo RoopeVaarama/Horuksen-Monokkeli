@@ -34,9 +34,8 @@ const SignInButton = styled(Button)(({ theme }) => ({
 }))
 
 const RegisterLink = styled(Link)(({ theme }) => ({
+  maxWidth: 'max-content',
   fontSize: '12px',
-  display: 'flex',
-  justifyContent: 'center',
   fontColor: theme.palette.primary
 }))
 
@@ -68,7 +67,7 @@ const SignInContainer = () => {
   }
 
   return (
-    <Box display='flex' width='100%' justifyContent='center'>
+    <Box display='flex' width='100%' justifyContent='center' textAlign='center'>
       <FormContainer>
         <Typography variant='h6'>
           <FormattedMessage id='signIn' defaultMessage='Kirjautuminen' />

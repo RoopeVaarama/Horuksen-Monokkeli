@@ -17,6 +17,7 @@ const AuthContainer = ({ restricted }: { restricted: boolean }) => {
       navigate('/signin')
     } else if (!restricted && token) {
       setAccess(false)
+      console.log('sds', restricted, token, location?.pathname)
       navigate('/')
     }
   }, [location?.pathname])

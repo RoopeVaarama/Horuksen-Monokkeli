@@ -10,6 +10,7 @@ const AsyncPageNotFoundContainer = lazy(() => import('./components/PageNotFoundC
 const AsyncSignInContainer = lazy(() => import('./components/SignInContainer'))
 const AsyncRegisterContainer = lazy(() => import('./components/RegisterContainer'))
 const AsyncTemplatesContainer = lazy(() => import('./components/TemplatesContainer'))
+const AsyncFilesContainer = lazy(() => import('./components/FilesContainer'))
 
 function App() {
   return (
@@ -24,14 +25,7 @@ function App() {
         <Routes>
           <Route element={<AuthContainer restricted />}>
             <Route path='/' element={<AsyncSearchContainer />} />
-            <Route
-              path='/files'
-              element={
-                <div id='filesPlaceholder'>
-                  <FormattedMessage id='files' defaultMessage='Tiedostot' />
-                </div>
-              }
-            />
+            <Route path='/files' element={<AsyncFilesContainer />} />
             <Route
               path='/profile'
               element={

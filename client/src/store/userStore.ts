@@ -2,35 +2,37 @@ import { AxiosError } from 'axios'
 import create from 'zustand'
 import { TOKEN_KEY } from '../constants'
 import { fetcher } from '../tools/fetcher'
-import { IntlMsg, LoginDto, UserDto } from '../types'
+import { IntlMsg, LoginDto, RegisterDto, User } from '../types'
 
 interface UserState {
   userId: string
+  authedUser: User | null
   fetching: boolean
   errorMsg: string | null
   successMsg: IntlMsg | null
   resetMsg: () => void
-  register: (userDto: UserDto) => Promise<boolean>
+  register: (registerDto: RegisterDto) => Promise<boolean>
   login: (loginDto: LoginDto) => Promise<boolean>
   logout: () => void
 }
 
 export const useUserStore = create<UserState>((set, get) => ({
   userId: '6355493fe42ec670363d1210',
+  authedUser: null,
   fetching: false,
   errorMsg: null,
   successMsg: null,
   resetMsg: () => {
     set({ errorMsg: null, successMsg: null })
   },
-  register: async (userDto: UserDto) => {
+  register: async (registerDto: RegisterDto) => {
     if (get().fetching) return false
     set({ fetching: true })
     try {
       await fetcher({
         method: 'POST',
         path: 'user',
-        body: userDto
+        body: registerDto
       })
       set({
         fetching: false,
@@ -58,6 +60,7 @@ export const useUserStore = create<UserState>((set, get) => ({
       if (token) {
         localStorage.setItem(TOKEN_KEY, token)
         set({
+          authedUser: data,
           fetching: false,
           successMsg: { intlKey: 'successLogin', defaultMessage: 'Kirjauduttu sisään' }
         })
