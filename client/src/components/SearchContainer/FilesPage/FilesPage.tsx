@@ -4,12 +4,7 @@ import { SearchRounded } from '@mui/icons-material'
 import StyledPaper from '../../common/StyledPaper/StyledPaper'
 import FileGroup from './FileGroup'
 import FileUploader from './FileUploader'
-
-/**
- * TO DO:
- * - uploadin jälkeen re-renderöinti
- * - togglailuboogie
- */
+import { useSearchStore } from '../../../store/searchStore'
 
 const SearchField = styled(TextField)(() => ({
   variant: 'outlined',
@@ -24,6 +19,8 @@ const StyledDiv = styled('div')(() => ({
 }))
 
 const FilesPage = () => {
+  const { setUpload } = useSearchStore()
+
   const [children, setChildren] = useState<
     {
       key: string
@@ -32,6 +29,7 @@ const FilesPage = () => {
     }[]
   >([])
 
+  // Fetch the file groups
   useEffect(() => {
     fetch(`${process.env.REACT_APP_BACKEND_URL}/files/list`)
       .then((res) => res.json())
@@ -39,7 +37,7 @@ const FilesPage = () => {
         const fileLists = data.map((filelist: any) => {
           return { key: filelist._id, groupName: filelist.title, selected: false }
         })
-
+        // Always add one filegroup containing all files as the first one on the list
         fileLists.unshift({
           key: 'Kaikki tiedostot',
           groupName: 'Kaikki tiedostot',
@@ -47,18 +45,10 @@ const FilesPage = () => {
         })
         setChildren(fileLists)
       })
-      .catch((e) => console.log(e))
+      .catch((e) => console.log(e)) //TODO?
   }, [])
 
-  // CHECKOUT
-  const [update, setUpdate] = useState(false)
-
-  useEffect(() => {
-    setChildren((prevChildren) => {
-      return [...prevChildren]
-    })
-  }, [update])
-
+  // Upload file(s) to the database
   const uploadFile = (formData: FormData) => {
     fetch(`${process.env.REACT_APP_BACKEND_URL}/files/upload`, {
       method: 'POST',
@@ -66,14 +56,12 @@ const FilesPage = () => {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log('Uploaded: ' + data)
-        // Toggle update state to rerender all files??
-        setUpdate((prevState) => !prevState)
+        setUpload(true)
       })
       .catch((error) => console.log(error))
   }
 
-  // Upload the selected file(s) from FileUploader
+  // Get the selected file(s) from FileUploader
   const filesUploaded = (files: File[]) => {
     files.forEach((file) => {
       const formData = new FormData()

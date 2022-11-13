@@ -9,8 +9,8 @@ interface SearchState {
   results: SearchResult[]
   refreshSearch: boolean
   searching: boolean
-  //files: FileMeta[]
   fileIDs: string[]
+  upload: boolean
   addTemplateToSearch: (template: Template) => void
   removeTemplateFromSearch: (id: string) => void
   resetSearchParamaters: () => void
@@ -19,6 +19,7 @@ interface SearchState {
   removeFileFromSearch: (fileToRemove: FileMeta) => void
   setGroupAsOpen: (groupName: string) => void
   setGroupAsClosed: (groupName: string) => void
+  setUpload: (status: boolean) => void
 }
 
 export const useSearchStore = create<SearchState>((set, get) => ({
@@ -28,7 +29,7 @@ export const useSearchStore = create<SearchState>((set, get) => ({
   refreshSearch: true,
   searching: false,
   fileIDs: [],
-  //files: [],
+  upload: false,
   addTemplateToSearch: (template: Template) => {
     set((state) => ({
       searchTemplates: [...state.searchTemplates, template],
@@ -59,7 +60,9 @@ export const useSearchStore = create<SearchState>((set, get) => ({
         })
       })
 
-      // Muutettu sprint reviewin demoa varten
+      // Filter duplicates
+      const uniqueFileIDS = get().fileIDs.filter((v, i, a) => a.indexOf(v) === i)
+
       try {
         fetch(`${process.env.REACT_APP_BACKEND_URL}/search/search`, {
           method: 'POST',
@@ -69,7 +72,7 @@ export const useSearchStore = create<SearchState>((set, get) => ({
           },
           body: JSON.stringify({
             terms: terms,
-            files: get().fileIDs
+            files: uniqueFileIDS
           })
         })
           .then((res) => res.json())
@@ -94,14 +97,12 @@ export const useSearchStore = create<SearchState>((set, get) => ({
   },
   addFileToSearch(file: FileMeta) {
     set((state) => ({
-      //files: [...state.files, file],
       fileIDs: [...state.fileIDs, file._id],
       refreshSearch: true
     }))
   },
   removeFileFromSearch(fileToRemove: FileMeta) {
     set((state) => ({
-      //files: state.files.filter((file) => file._id != fileToRemove._id),
       fileIDs: state.fileIDs.filter((fileID) => fileID !== fileToRemove._id),
       refreshSearch: true
     }))
@@ -115,5 +116,8 @@ export const useSearchStore = create<SearchState>((set, get) => ({
     set((state) => ({
       openFileGroups: state.openFileGroups.filter((groupname) => groupname !== groupName)
     }))
+  },
+  setUpload(status: boolean) {
+    set({ upload: status })
   }
 }))

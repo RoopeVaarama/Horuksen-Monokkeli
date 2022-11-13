@@ -19,7 +19,8 @@ const Sidetext = styled('div')(() => ({
 }))
 
 const FileGroup = (props: { id: string; groupName: string }) => {
-  const { fileIDs, openFileGroups, setGroupAsOpen, setGroupAsClosed } = useSearchStore()
+  const { fileIDs, openFileGroups, setGroupAsOpen, setGroupAsClosed, upload, setUpload } =
+    useSearchStore()
   const { id, groupName } = props
 
   const [children, setChildren] = useState<
@@ -33,6 +34,7 @@ const FileGroup = (props: { id: string; groupName: string }) => {
     }[]
   >([])
 
+  // Initial fetch to get the files in the group
   useEffect(() => {
     if (groupName === 'Kaikki tiedostot') {
       fetchAllFiles()
@@ -138,6 +140,13 @@ const FileGroup = (props: { id: string; groupName: string }) => {
     // Checking or unchecking is coming from sub-components, don't roll the change back
     setOverride(false)
   }, [chosenFiles, totalFiles])
+
+  useEffect(() => {
+    if (upload) {
+      fetchAllFiles()
+      setUpload(false)
+    }
+  }, [upload])
 
   return (
     <Stack id='filegroup-row'>
