@@ -10,11 +10,9 @@ const FileUploader = (props: { fileUploaded: (files: File[]) => void }) => {
     fileInput.current?.click()
   }
 
-  // Käsittele tiedosto
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files !== null) {
       const selectedFiles = Array.from(event.target.files)
-      console.log(selectedFiles)
       fileUploaded(selectedFiles)
     }
   }
