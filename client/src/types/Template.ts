@@ -1,11 +1,8 @@
-import { LocationOnPage } from './LocationOnPage'
-import { RelativePosition } from './RelativePosition'
+import { TemplateRow } from './TemplateRow'
 
 export interface Template {
-  id: number
-  keyword: string
-  relativePosition: RelativePosition['value']
-  locationOnPage: LocationOnPage['value']
-  onlyKeyword: boolean
-  fontSizeDependent: boolean
+  author: string
+  title: string
+  terms: TemplateRow[]
+  _id?: string
 }

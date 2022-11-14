@@ -4,6 +4,8 @@ services:
     image: horuksen-monokkeli/frontend
     build: 
       context: ./client/
+      args:
+        - REACT_APP_BACKEND_URL
     ports:
       - "3000:80"
     restart: unless-stopped
