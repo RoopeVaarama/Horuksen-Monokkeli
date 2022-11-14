@@ -19,4 +19,4 @@ import { FileMeta, FileMetaSchema } from '../file/schemas/filemeta.schema';
   controllers: [SearchController],
   exports: [SearchService, ParseService],
 })
-export class SearchModule {}
+export class SearchModule { }
