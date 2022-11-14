@@ -45,7 +45,7 @@ const FilesPage = () => {
         })
         setChildren(fileLists)
       })
-      .catch((e) => console.log(e)) //TODO?
+      .catch((e) => console.log(e))
   }, [])
 
   // Upload file(s) to the database

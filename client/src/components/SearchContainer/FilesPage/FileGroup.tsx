@@ -111,6 +111,7 @@ const FileGroup = (props: { id: string; groupName: string }) => {
   }
 
   const [open, setOpen] = useState(openFileGroups.includes(groupName))
+
   const toggleCollapse = () => {
     open ? setGroupAsClosed(groupName) : setGroupAsOpen(groupName)
     setOpen((currState) => !currState)
@@ -136,7 +137,7 @@ const FileGroup = (props: { id: string; groupName: string }) => {
 
   useEffect(() => {
     // If all files are selected, check the main checkbox
-    chosenFiles === totalFiles ? check() : uncheck()
+    totalFiles > 0 && (chosenFiles === totalFiles ? check() : uncheck())
     // Checking or unchecking is coming from sub-components, don't roll the change back
     setOverride(false)
   }, [chosenFiles, totalFiles])
