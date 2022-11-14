@@ -66,7 +66,7 @@ const SearchContainer = () => {
   const [completed, setCompleted] = useState<readonly boolean[]>(
     new Array<boolean>(STEPS.length).fill(false)
   )
-  const { searchTemplates, resetSearchParamaters } = useSearchStore()
+  const { searchTemplates, resetSearchParamaters, fileIDs } = useSearchStore()
   const { fetching, resetTemplates } = useTemplateStore()
   const { userId } = useUserStore()
 
@@ -101,6 +101,10 @@ const SearchContainer = () => {
   }, [searchTemplates])
 
   useEffect(() => {
+    handleCompletion(fileIDs.length > 0)
+  }, [fileIDs])
+
+  useEffect(() => {
     resetSearchParamaters()
     resetTemplates(userId)
   }, [])
@@ -125,12 +129,7 @@ const SearchContainer = () => {
       <Stack width='100%' display='flex' alignItems='center'>
         {activeStep === 0 &&
           (fetching ? <CircularProgress color='secondary' /> : <TemplatesPage />)}
-        {activeStep === 1 && (
-          <FilesPage
-            isComplete={completed[activeStep]}
-            onComplete={() => handleCompletion(!completed[activeStep])}
-          />
-        )}
+        {activeStep === 1 && <FilesPage />}
         {activeStep === 2 && <ResultsPage />}
       </Stack>
     </Stack>
