@@ -8,3 +8,11 @@ export const TemplateStub = (): Template => {
     terms: [TermStub()],
   };
 };
+
+export const UpdatedTemplateStub = (): Template => {
+  return {
+    title: 'Updated test template',
+    author: null,
+    terms: [TermStub()],
+  };
+};
