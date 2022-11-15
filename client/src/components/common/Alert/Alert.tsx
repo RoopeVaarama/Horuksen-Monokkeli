@@ -29,12 +29,12 @@ const Alert = ({
       </Stack>
       <Stack direction='row' spacing={1}>
         {onCancel && (
-          <Button onClick={() => onCancel()}>
+          <Button className='cancelBtn' onClick={() => onCancel()}>
             <FormattedMessage id='cancel' defaultMessage='Peruuta' />
           </Button>
         )}
         {onSave && (
-          <Button variant='contained' onClick={() => onSave()}>
+          <Button className='saveBtn' variant='contained' onClick={() => onSave()}>
             <FormattedMessage id='save' defaultMessage='Tallenna' />
           </Button>
         )}
