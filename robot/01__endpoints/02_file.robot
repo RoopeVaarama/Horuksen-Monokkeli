@@ -6,8 +6,14 @@ Library    JSONLibrary
 
 *** Variables ***
 ${new_file_id}    # Just to ignore IDE errors, handled by Set Suite Variable
-
+${AUTH_TOKEN}
+${headers}
 *** Test Cases ***
+
+Set Variables
+    ${headers}=    Create Dictionary    Authorization    Bearer ${AUTH_TOKEN}
+    Set Suite Variable    ${headers}
+    Set Headers    ${headers}
 
 POST New file
     [Documentation]    Upload test pdf to server
@@ -15,7 +21,7 @@ POST New file
     ${file_tuple}    Evaluate    ('invoice.pdf', $file_1, 'application/pdf')
     ${files}=   Create Dictionary  file    ${file_tuple}
 
-    ${resp}=    RequestsLibrary.POST    ${BACKEND_URL}files/upload    files=${files}
+    ${resp}=    RequestsLibrary.POST    ${BACKEND_URL}files/upload    files=${files}    headers=${headers}
     ${json}=    Set Variable    ${resp.json()}
     ${values}=    Get Value From Json    ${json}    $._id
 
