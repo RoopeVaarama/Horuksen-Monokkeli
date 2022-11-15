@@ -6,13 +6,13 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
 import { UserModule } from '../user/user.module';
 @Module({
-    imports: [
-        PassportModule.register({ defaultStrategy: 'jwt' }),
-        JwtModule.register({ secret: "secret" }),
-        UserModule
-    ],
-    providers: [AuthService, JwtStrategy],
-    controllers: [AuthController],
-    exports: [AuthService]
+  imports: [
+    PassportModule.register({ defaultStrategy: 'jwt' }),
+    JwtModule.register({ secret: 'secret' }),
+    UserModule,
+  ],
+  providers: [AuthService, JwtStrategy],
+  controllers: [AuthController],
+  exports: [AuthService],
 })
-export class AuthModule { }
+export class AuthModule {}
