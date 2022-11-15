@@ -1,7 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { getModelToken } from '@nestjs/mongoose';
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import { Connection, connect, Model } from 'mongoose';
 import { TemplateController } from '../template.controller';
 import { TemplateService } from '../template.service';
 import { Template, TemplateSchema } from '../schemas/template.schema';
@@ -10,9 +7,6 @@ import { TemplateStub } from '../test/stubs/template.schema.stub';
 describe('TemplateController', () => {
   let templateController: TemplateController;
   let templateService: TemplateService;
-  let mongod: MongoMemoryServer;
-  let mongoConnection: Connection;
-  let templateModel: Model<Template>;
 
   // Setup testing environment before running any tests
   beforeAll(async () => {
@@ -40,36 +34,12 @@ describe('TemplateController', () => {
       }),
     };
 
-    mongod = await MongoMemoryServer.create();
-    const uri = mongod.getUri();
-    mongoConnection = (await connect(uri)).connection;
-    templateModel = mongoConnection.model(Template.name, TemplateSchema);
     const app: TestingModule = await Test.createTestingModule({
       controllers: [TemplateController],
-      providers: [
-        TemplateService,
-        MockTemplateService,
-        { provide: getModelToken(Template.name), useValue: templateModel },
-      ],
+      providers: [TemplateService, MockTemplateService],
     }).compile();
     templateController = app.get<TemplateController>(TemplateController);
     templateService = app.get<TemplateService>(TemplateService);
-  });
-
-  // Clean-up and close DB memory server after all tests
-  afterAll(async () => {
-    await mongoConnection.dropDatabase();
-    await mongoConnection.close();
-    await mongod.stop();
-  });
-
-  // Clear DB collections after each test
-  afterEach(async () => {
-    const collections = mongoConnection.collections;
-    for (const key in collections) {
-      const collection = collections[key];
-      await collection.deleteMany({});
-    }
   });
 
   describe('Create Template', () => {
