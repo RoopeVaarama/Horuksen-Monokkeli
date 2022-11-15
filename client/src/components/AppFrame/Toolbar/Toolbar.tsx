@@ -24,7 +24,7 @@ const Toolbar = ({ height }: { height: string | number }) => {
   const theme = useTheme()
   const matches = useMediaQuery('(max-width:700px)')
   return (
-    <AppBar position='fixed'>
+    <AppBar position='fixed' id='app-bar'>
       <MUIToolbar
         variant='dense'
         sx={{ minHeight: height, maxHeight: height, padding: `${theme.spacing(0, 3)}!important` }}
@@ -48,6 +48,7 @@ const Toolbar = ({ height }: { height: string | number }) => {
               <Grid item display={matches ? 'none' : 'block'}>
                 {toolbarRoutes.map((route) => (
                   <Link
+                    id={'nav-route-' + route.intlId}
                     key={route.intlId}
                     to={route.link}
                     style={{
@@ -77,6 +78,7 @@ const Toolbar = ({ height }: { height: string | number }) => {
             </IconButton>
             <Menu
               sx={{ mt: '45px', 'a.Mui-disabled': { color: theme.palette.primary.main } }}
+              id='app-bar-dropdown-menu'
               transitionDuration={200}
               anchorEl={anchorEl}
               keepMounted
@@ -95,6 +97,7 @@ const Toolbar = ({ height }: { height: string | number }) => {
                 <Box display={matches ? 'block' : 'none'} mb={1}>
                   {toolbarRoutes.map((route) => (
                     <MenuItem
+                      id={'nav-route-' + route.intlId}
                       key={route.intlId}
                       component={Link}
                       to={route.link}
@@ -108,7 +111,7 @@ const Toolbar = ({ height }: { height: string | number }) => {
                   ))}
                 </Box>
               )}
-              <LanguageSelector />
+              <LanguageSelector id='app-bar-lang-selector' />
             </Menu>
           </Grid>
         </Grid>
