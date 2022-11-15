@@ -4,12 +4,12 @@ import { HttpException } from '@nestjs/common';
 
 @Injectable()
 export class ParseService {
-  async parsePdf(file: string): Promise<PDFExtractResult> {
+  async parsePdf(filePath: string): Promise<PDFExtractResult> {
     const pdfExtract = new PDFExtract();
     const options: PDFExtractOptions = {};
     let extractedPDF;
     try {
-      extractedPDF = await pdfExtract.extract(file, options);
+      extractedPDF = await pdfExtract.extract(filePath, options);
     } catch (err) {
       if (err.name == 'InvalidPDFException') {
         throw new HttpException(

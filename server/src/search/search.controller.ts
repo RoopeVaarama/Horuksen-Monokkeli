@@ -20,11 +20,12 @@ export class SearchController {
     private readonly fileService: FileService,
   ) {}
 
+  //This should not be needed as front-end doesn't need to parse files. --Juhana
   // extract the contents of a pdf
-  @Get('/parse/:file')
+  /*@Get('/parse/:file')
   async parse(@Param('file') file: string): Promise<PDFExtractResult> {
     return await this.parseService.parsePdf(`test_pdfs/${file}`);
-  }
+  }*/
 
   // Search with template id and a string array of file id's
   @Post('/template_search/:tid')
