@@ -22,6 +22,7 @@ import { ListService } from './list.service';
 import { FileMeta, FileMetaDocument } from './schemas/filemeta.schema';
 import { FileList } from './schemas/filelist.schema';
 import { Model } from 'mongoose';
+import { ParseService } from 'src/search/parse.service';
 
 @ApiTags('files')
 @Controller('/files')
@@ -29,6 +30,7 @@ export class FileController {
   constructor(
     private readonly fileService: FileService,
     private readonly listService: ListService,
+    private readonly parseService: ParseService,
   ) {}
 
   @Post('/upload')
@@ -54,7 +56,16 @@ export class FileController {
     )
     file: Express.Multer.File,
   ): Promise<FileMeta> {
-    return await this.fileService.createFileMeta(file);
+    const fileMetaToReturn = await this.fileService.createFileMeta(file);
+    try {
+      await this.parseService.parsePdf(fileMetaToReturn.filepath);
+    } catch (err) {
+      await this.fileService.deleteFile(
+        (await this.fileService.getFileId(fileMetaToReturn.filepath)).at(0)._id,
+      );
+      throw new HttpException('No content in PDF. File not uploaded.', 204);
+    }
+    return fileMetaToReturn;
   }
 
   @Get('/')

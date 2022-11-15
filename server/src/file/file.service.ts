@@ -17,6 +17,10 @@ export class FileService {
     return true;
   }
 
+  async getFileId(filePath: string) {
+    return await this.fileMetaModel.find({ filepath: filePath }).exec();
+  }
+
   // file could use a type definition
   async createFileMeta(file: Express.Multer.File): Promise<FileMeta> {
     const filemeta = new FileMeta();
