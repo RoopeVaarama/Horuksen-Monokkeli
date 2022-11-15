@@ -2,12 +2,13 @@ import { useContext } from 'react'
 import { IntlContext } from '../../../TranslationProvider/TranslationProvider'
 import { ToggleButton, ToggleButtonGroup } from '@mui/material'
 
-const LanguageSelector = () => {
+const LanguageSelector = ({ id }: { id?: string }) => {
   const intlContext = useContext(IntlContext)
   return (
     <>
       {intlContext && (
         <ToggleButtonGroup
+          id={id}
           sx={{ '.MuiButtonBase-root': { borderRadius: '0px' } }}
           color='primary'
           value={intlContext.locale}

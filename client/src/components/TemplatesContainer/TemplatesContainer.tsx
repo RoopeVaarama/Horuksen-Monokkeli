@@ -70,12 +70,13 @@ const TemplatesContainer = () => {
             />
           )}
           <Stack spacing={1} width='100%' display='flex'>
-            <Box display='flex' justifyContent='space-between'>
+            <Box display='flex' justifyContent='space-between' className='templatesListheader'>
               <Typography variant='h6'>
                 <FormattedMessage id='templates' defaultMessage='Templatet' />
               </Typography>
               {!templateDraft && (
                 <Button
+                  id='newTemplateBtn'
                   onClick={handleCreateTemplateDraft}
                   startIcon={<AddIcon />}
                   sx={{ maxWidth: 'max-content', alignSelf: 'center' }}
