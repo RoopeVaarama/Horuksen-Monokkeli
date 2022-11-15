@@ -7,7 +7,7 @@ export class ParseService {
   async parsePdf(filePath: string): Promise<PDFExtractResult> {
     const pdfExtract = new PDFExtract();
     const options: PDFExtractOptions = {};
-    let extractedPDF;
+    let extractedPDF: PDFExtractResult;
     try {
       extractedPDF = await pdfExtract.extract(filePath, options);
     } catch (err) {
@@ -38,15 +38,10 @@ export class ParseService {
   }
 
   doesDocumentHaveText(data: PDFExtractResult) {
-    let contentInTotal = 0;
     for (let pageIndex = 0; pageIndex < data.pages.length; ++pageIndex) {
       const page = data.pages[pageIndex];
-      contentInTotal += page.content.length;
+      if (page.content.length > 0) return true;
     }
-
-    if (contentInTotal == 0) {
-      return false;
-    }
-    return true;
+    return false;
   }
 }
