@@ -40,6 +40,11 @@ POST Login user
 
     [Teardown]    Output Schema
 
+GET Token Validation
+    GET    /auth/validateToken/${AUTH_TOKEN}
+    Integer    response status    200
+    [Teardown]    Output Schema
+
 GET Hello World endpoint
     GET    /
     Output Schema    response body
