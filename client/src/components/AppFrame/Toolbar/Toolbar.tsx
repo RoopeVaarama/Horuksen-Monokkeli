@@ -39,7 +39,7 @@ const Toolbar = ({ height }: { height: string | number }) => {
                   textDecoration: 'none'
                 }}
               >
-                <Typography variant='h6' sx={{ minWidth: 'max-content' }}>
+                <Typography id='appTitle' variant='h6' sx={{ minWidth: 'max-content' }}>
                   <FormattedMessage id='appTitle' defaultMessage='Horuksen monokkeli' />
                 </Typography>
               </Link>
