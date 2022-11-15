@@ -35,7 +35,7 @@ export class SearchController {
     for (let i = 0; i < files.length; ++i) {
       const fileId = files[i];
       const file = await this.fileService.getFileMeta(fileId);
-      const contents = await this.parseService.parsePdf(`test_pdfs/${file.filename}`);
+      const contents = await this.parseService.parsePdf(file.filepath);
       if (contents == null) break;
       const fileResults = await this.service.search(contents, template.terms, fileId);
       results = [...results, ...fileResults];
@@ -59,7 +59,7 @@ export class SearchController {
     for (let i = 0; i < searchRequest.files.length; ++i) {
       const fileId = searchRequest.files[i];
       const file = await this.fileService.getFileMeta(fileId);
-      const contents = await this.parseService.parsePdf(`test_pdfs/${file.filename}`);
+      const contents = await this.parseService.parsePdf(file.filepath);
       if (contents == null) break;
       const results = await this.service.search(contents, search.terms, fileId);
       search.results = [...search.results, ...results];

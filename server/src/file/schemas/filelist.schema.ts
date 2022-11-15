@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import * as mongoose from 'mongoose';
 import { FileMeta } from './filemeta.schema';
-import { User } from '../../users/schemas/user.schema';
+import { User } from '../../user/user.schema';
 
 export type FileListDocument = FileList & mongoose.Document;
 

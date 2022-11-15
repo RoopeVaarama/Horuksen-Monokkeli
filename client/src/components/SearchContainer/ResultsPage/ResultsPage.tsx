@@ -9,7 +9,7 @@ const ResultsPage = () => {
 
   useEffect(() => {
     search()
-  }, [])
+  })
 
   return (
     <Stack
