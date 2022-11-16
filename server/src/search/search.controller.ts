@@ -9,6 +9,8 @@ import { Template } from '../template/schemas/template.schema';
 import { Search } from './schemas/search.schema';
 import { SearchRequest } from './schemas/search-request.schema';
 import { FileService } from '../file/file.service';
+import { TemplateSearchRequest } from './schemas/template-search-request';
+import { Term } from '../template/schemas/term.schema';
 
 @ApiTags('search')
 @Controller('search')
@@ -26,23 +28,31 @@ export class SearchController {
     return await this.parseService.parsePdf(`test_pdfs/${file}`);
   }
 
-  // Search with template id and a string array of file id's
-  @Post('/template_search/:tid')
-  @ApiCreatedResponse({ status: 200, description: 'Search completed', type: Template })
-  async multifileSearchWithId(@Body() files: string[], @Param('tid') tid: string): Promise<Search> {
-    const template = await this.templateService.getTemplateById(tid);
+  // Performs a search with the received TemplateSearchRequest-object
+  @Post('/template_search')
+  @ApiCreatedResponse({ status: 200, description: 'Search completed', type: TemplateSearchRequest })
+  async multifileSearchWithId(@Body() request: TemplateSearchRequest): Promise<Search> {
     let results: Result[] = [];
-    for (let i = 0; i < files.length; ++i) {
-      const fileId = files[i];
+    let terms: Term[] = [];
+    const templates: Template[] = [];
+
+    for (let i = 0; i < request.templates.length; ++i) {
+      templates.push(await this.templateService.getTemplateById(request.templates[i]));
+      terms = [...terms, ...templates[i].terms];
+    }
+
+    for (let i = 0; i < request.files.length; ++i) {
+      const fileId = request.files[i];
       const file = await this.fileService.getFileMeta(fileId);
       const contents = await this.parseService.parsePdf(file.filepath);
       if (contents == null) break;
-      const fileResults = await this.service.search(contents, template.terms, fileId);
+      const fileResults = await this.service.search(contents, terms, fileId);
       results = [...results, ...fileResults];
     }
+
     const search = new Search();
-    search.files = files;
-    search.terms = template.terms;
+    search.files = request.files;
+    search.terms = terms;
     search.results = results;
     return search;
   }
@@ -56,6 +66,7 @@ export class SearchController {
     search.files = searchRequest.files;
     search.terms = searchRequest.terms;
     search.results = [];
+
     for (let i = 0; i < searchRequest.files.length; ++i) {
       const fileId = searchRequest.files[i];
       const file = await this.fileService.getFileMeta(fileId);
@@ -64,6 +75,7 @@ export class SearchController {
       const results = await this.service.search(contents, search.terms, fileId);
       search.results = [...search.results, ...results];
     }
+
     return search;
   }
 }
