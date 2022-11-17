@@ -45,6 +45,7 @@ export class FileService {
   async getFilesByIds(fileIds: string[]): Promise<FileMeta[]> {
     const metasToReturn: FileMeta[] = [];
     for (let i = 0; i < fileIds.length; i++) {
+      await this.canFileBeFound(fileIds.at(i));
       let fileMetaToPush: FileMeta;
       try {
         fileMetaToPush = await this.fileMetaModel.findById(fileIds.at(i));

@@ -71,8 +71,9 @@ export class ListService {
     return doc;
   }
 
-  async updateFileList(id: string, list: FileList): Promise<FileList> {
-    const updated = await this.fileListModel.findOneAndUpdate({ _id: id }, { ...list }).exec();
+  async updateFileList(listId: string, list: FileList): Promise<FileList> {
+    await this.canListBeFound(listId);
+    const updated = await this.fileListModel.findOneAndUpdate({ _id: listId }, { ...list }).exec();
     return await this.fileListModel.findById(updated._id).exec();
   }
 

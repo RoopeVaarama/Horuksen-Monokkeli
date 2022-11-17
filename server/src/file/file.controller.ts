@@ -16,13 +16,21 @@ import {
   FileTypeValidator,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiConsumes, ApiResponse, ApiTags, ApiBody, ApiNotFoundResponse } from '@nestjs/swagger';
+import {
+  ApiConsumes,
+  ApiResponse,
+  ApiTags,
+  ApiBody,
+  ApiNotFoundResponse,
+  ApiOperation,
+} from '@nestjs/swagger';
 import { FileService } from './file.service';
 import { ListService } from './list.service';
 import { FileMeta, FileMetaDocument } from './schemas/filemeta.schema';
 import { FileList } from './schemas/filelist.schema';
 import { Model } from 'mongoose';
 import { ParseService } from 'src/search/parse.service';
+import { deprecate } from 'util';
 
 @ApiTags('files')
 @Controller('/files')
@@ -78,7 +86,7 @@ export class FileController {
   @ApiResponse({ status: 200, description: 'File deleted', type: Boolean })
   @ApiNotFoundResponse({
     status: 404,
-    description: 'File not found',
+    description: 'File not found. No file with given ID could be found.',
   })
   async deleteFile(@Param('id') id: string) {
     return await this.fileService.deleteFile(id);
@@ -86,6 +94,7 @@ export class FileController {
 
   //TODO: remove once fron-end doesn't use anymore
   @Get('/get')
+  @ApiOperation({ summary: 'THIS METHOD IS DEPRICATED AND WILL BE DELETED' })
   @ApiResponse({ status: 200, description: 'All filenames returned', type: [String] })
   async getFilenames(): Promise<string[]> {
     return await this.fileService.getAllFiles();
@@ -109,7 +118,7 @@ export class FileController {
     type: FileList,
   })
   async createFileList(@Body() list: FileList): Promise<FileList> {
-    for (let i = 0; i <= list.files.length; ++i) {
+    for (let i = 0; i < list.files.length; ++i) {
       await this.fileService.canFileBeFound(list.files.at(i).toString());
     }
     return await this.listService.createFileList(list);
@@ -129,7 +138,17 @@ export class FileController {
 
   @Patch('/list/:id')
   @ApiResponse({ status: 200, description: 'List updated succasfully', type: FileList })
+  @ApiResponse({
+    status: 404,
+    description:
+      'File not found. One or more files could not be found. FileList not updated.' +
+      '\n OR \n List not found. No FileList with ID could be found. FileList not updated.',
+    type: FileList,
+  })
   async updateFileList(@Param('id') id: string, @Body() list: FileList) {
+    for (let i = 0; i < list.files.length; ++i) {
+      await this.fileService.canFileBeFound(list.files.at(i).toString());
+    }
     return await this.listService.updateFileList(id, list);
   }
 
