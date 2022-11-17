@@ -74,9 +74,10 @@ const TemplateItemRow = ({
   }
 
   return (
-    <Box position='relative'>
+    <Box className='templateRow' position='relative'>
       <ListItemButton
         onClick={() => setOpen(!open)}
+        className='templateRowCollapse'
         divider
         disableRipple
         sx={{
@@ -105,6 +106,7 @@ const TemplateItemRow = ({
                   <FormattedMessage id='relativePosition' defaultMessage='Suhteellinen sijainti' />
                 </InputLabel>
                 <Select
+                  className='relativePositionSelect'
                   labelId='relativePositionLabel'
                   color='secondary'
                   size='small'
@@ -122,7 +124,7 @@ const TemplateItemRow = ({
                   }
                 >
                   {directions.map((dir) => (
-                    <MenuItem key={dir.intlId} value={dir.value}>
+                    <MenuItem key={dir.intlId} value={dir.value} id={'direction-' + dir.intlId}>
                       <FormattedMessage id={dir.intlId} defaultMessage={dir.defaultMessage} />
                     </MenuItem>
                   ))}
@@ -142,6 +144,7 @@ const TemplateItemRow = ({
               disabled={!isDraft}
               control={
                 <Checkbox
+                  className='TemplateRowKeyOnlySelector'
                   color='secondary'
                   onChange={(e) => handleUpdateKeyOnly(e.target.checked)}
                 />

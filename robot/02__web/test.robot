@@ -7,8 +7,8 @@ Start Context
 
 Check Title
     New Page    ${FRONTEND_URL}
-    Get Text    xpath=//h6[@class='MuiTypography-root MuiTypography-h6 css-d49kju']    ==    Horuksen monokkeli
+    Get Text    xpath=//h6[@id='appTitle']    ==    Horuksen monokkeli
 
 Check Navigation
     New Page    ${FRONTEND_URL}
-    Get Text    xpath=//a[contains(text(),'Uusi haku')]    ==    UUSI HAKU
+    Get Text    xpath=(//a[@id='nav-route-newSearch'])[1]    ==    UUSI HAKU
