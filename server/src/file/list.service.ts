@@ -19,6 +19,8 @@ export class ListService {
   }
 
   async createFileList(list: FileList): Promise<FileList> {
+    //TODO: retrieve author id(?)
+    list.author = 'Author added in code';
     return await new this.fileListModel(list).save();
   }
 
