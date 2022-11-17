@@ -4,6 +4,7 @@ export const TermStub = (): Term => {
   return {
     key: 'STUB',
     keyOnly: false,
+    levenDistance: 0,
     direction: 1,
     allowedOffset: 10,
     valueMatch: '.*',
