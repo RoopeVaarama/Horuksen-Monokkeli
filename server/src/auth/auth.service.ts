@@ -25,7 +25,8 @@ export class AuthService {
         if (user) {
             //Valid user
             const sessionExpiry = "168h"; //https://github.com/auth0/node-jsonwebtoken#jwtsignpayload-secretorprivatekey-options-callback
-            const payload = { username: data.username };
+            //@ts-ignore
+            const payload = { username: data.username, id: user._id };
             const accessToken = this.jwtService.sign(
                 payload,
                 { expiresIn: sessionExpiry });
