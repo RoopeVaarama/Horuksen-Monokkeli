@@ -24,8 +24,8 @@ import { FormattedMessage } from 'react-intl'
 import { useTemplateStore } from '../../../store/templateStore'
 import TemplateItemRow from './TemplateItemRow'
 import { useSearchStore } from '../../../store/searchStore'
-import { useUserStore } from '../../../store/userStore'
 import { titleAlreadyExists } from '../../../tools/validation'
+import { getUid } from '../../../tools/auth'
 
 const BUTTON_WIDTH = '48px'
 const DB_BUTTON_WIDTH = '88px'
@@ -41,7 +41,6 @@ const TemplateItem = ({ template, variant }: { template: Template; variant: Temp
     createTemplateDraft
   } = useTemplateStore()
   const { addTemplateToSearch, removeTemplateFromSearch } = useSearchStore()
-  const { userId } = useUserStore()
   const [open, setOpen] = useState(true)
   const [textFieldError, setTextFieldError] = useState(false)
 
@@ -57,8 +56,13 @@ const TemplateItem = ({ template, variant }: { template: Template; variant: Temp
     }
   }
   const handleEdit = () => {
-    window.scrollTo(0, 0)
-    createTemplateDraft(userId, template)
+    const uid = getUid()
+    if (uid) {
+      window.scrollTo(0, 0)
+      createTemplateDraft(uid, template)
+    } else {
+      console.error('ERR: no user id')
+    }
   }
   const handleUpdateTitle = (newTitle: string) => {
     if (newTitle && !titleAlreadyExists(templates, newTitle, template._id)) {

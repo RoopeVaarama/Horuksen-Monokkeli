@@ -1,12 +1,10 @@
 import { AxiosError } from 'axios'
 import create from 'zustand'
-import { TOKEN_KEY } from '../constants'
+import { removeToken, setToken, setUid } from '../tools/auth'
 import { fetcher } from '../tools/fetcher'
-import { IntlMsg, LoginDto, RegisterDto, User } from '../types'
+import { IntlMsg, LoginDto, RegisterDto } from '../types'
 
 interface UserState {
-  userId: string
-  authedUser: User | null
   fetching: boolean
   errorMsg: string | null
   successMsg: IntlMsg | null
@@ -17,8 +15,6 @@ interface UserState {
 }
 
 export const useUserStore = create<UserState>((set, get) => ({
-  userId: '6355493fe42ec670363d1210',
-  authedUser: null,
   fetching: false,
   errorMsg: null,
   successMsg: null,
@@ -57,16 +53,17 @@ export const useUserStore = create<UserState>((set, get) => ({
         body: loginDto
       })
       const token = data?.token
-      if (token) {
-        localStorage.setItem(TOKEN_KEY, token)
+      const uid = data?.user._id
+      if (token && uid) {
+        setToken(token)
+        setUid(uid)
         set({
-          authedUser: data,
           fetching: false,
           successMsg: { intlKey: 'successLogin', defaultMessage: 'Kirjauduttu sisään' }
         })
         return true
       } else {
-        set({ fetching: false })
+        set({ fetching: false, errorMsg: 'ERR: no token or user id' })
         return false
       }
     } catch (e) {
@@ -78,7 +75,7 @@ export const useUserStore = create<UserState>((set, get) => ({
     }
   },
   logout: () => {
-    localStorage.removeItem(TOKEN_KEY)
+    removeToken()
     set({
       successMsg: { intlKey: 'successLogout', defaultMessage: 'Kirjauduttu ulos' }
     })

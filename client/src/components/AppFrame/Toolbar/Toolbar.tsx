@@ -17,8 +17,9 @@ import { Link, useNavigate } from 'react-router-dom'
 import LanguageSelector from './LanguageSelector'
 import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
-import { TOKEN_KEY, toolbarRoutes } from '../../../constants'
+import { toolbarRoutes } from '../../../constants'
 import { useUserStore } from '../../../store/userStore'
+import { getToken } from '../../../tools/auth'
 
 const Toolbar = ({ height }: { height: string | number }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
@@ -27,7 +28,7 @@ const Toolbar = ({ height }: { height: string | number }) => {
   const navigate = useNavigate()
   const theme = useTheme()
   const matches = useMediaQuery('(max-width:700px)')
-  const hasToken = Boolean(localStorage.getItem(TOKEN_KEY))
+  const hasToken = Boolean(getToken())
   const { logout } = useUserStore()
 
   const handleLogout = () => {

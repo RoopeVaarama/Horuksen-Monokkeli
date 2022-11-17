@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { TOKEN_KEY } from '../constants'
+import { getToken } from './auth'
 
 export const fetcher = async ({
   method,
@@ -19,7 +19,7 @@ export const fetcher = async ({
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${localStorage.getItem(TOKEN_KEY)}`
+      Authorization: `Bearer ${getToken()}`
     },
     data: body
   }

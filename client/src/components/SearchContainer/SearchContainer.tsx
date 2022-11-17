@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { FormattedMessage } from 'react-intl'
 import { useSearchStore } from '../../store/searchStore'
 import { useTemplateStore } from '../../store/templateStore'
-import { useUserStore } from '../../store/userStore'
+import { getUid } from '../../tools/auth'
 import FilesPage from './FilesPage'
 import ResultsPage from './ResultsPage'
 import TemplatesPage from './TemplatesPage'
@@ -68,7 +68,6 @@ const SearchContainer = () => {
   )
   const { searchTemplates, resetSearchParamaters, fileIDs } = useSearchStore()
   const { fetching, resetTemplates } = useTemplateStore()
-  const { userId } = useUserStore()
 
   const handleStep = (step: number) => () => {
     setActiveStep(step)
@@ -106,7 +105,10 @@ const SearchContainer = () => {
 
   useEffect(() => {
     resetSearchParamaters()
-    resetTemplates(userId)
+    const uid = getUid()
+    if (uid) {
+      resetTemplates(uid)
+    }
   }, [])
 
   return (

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { Outlet, useLocation } from 'react-router-dom'
-import { TOKEN_KEY } from '../../constants'
+import { getToken } from '../../tools/auth'
 
 const AuthContainer = ({ restricted }: { restricted: boolean }) => {
   const [access, setAccess] = useState(false)
@@ -9,7 +9,7 @@ const AuthContainer = ({ restricted }: { restricted: boolean }) => {
   const location = useLocation()
 
   useEffect(() => {
-    const token = localStorage.getItem(TOKEN_KEY)
+    const token = getToken()
     if ((restricted && token) || (!restricted && !token)) {
       setAccess(true)
     } else if (restricted && !token) {
@@ -17,7 +17,6 @@ const AuthContainer = ({ restricted }: { restricted: boolean }) => {
       navigate('/signin')
     } else if (!restricted && token) {
       setAccess(false)
-      console.log('sds', restricted, token, location?.pathname)
       navigate('/')
     }
   }, [location?.pathname])
