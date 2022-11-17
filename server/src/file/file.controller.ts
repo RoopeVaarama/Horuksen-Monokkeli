@@ -15,7 +15,15 @@ import {
   FileTypeValidator,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiConsumes, ApiResponse, ApiTags, ApiBody, ApiNotFoundResponse } from '@nestjs/swagger';
+import {
+  ApiConsumes,
+  ApiOkResponse,
+  ApiResponse,
+  ApiTags,
+  ApiBody,
+  ApiNotFoundResponse,
+  ApiBadRequestResponse,
+} from '@nestjs/swagger';
 import { FileService } from './file.service';
 import { ListService } from './list.service';
 import { FileMeta, FileMetaDocument } from './schemas/filemeta.schema';
@@ -33,6 +41,9 @@ export class FileController {
   ) {}
 
   @Get('/read/:id')
+  @ApiOkResponse({ description: 'File read succesfully', type: StreamableFile })
+  @ApiBadRequestResponse({ description: 'Invalid request parameters' })
+  @ApiNotFoundResponse({ description: 'Resource not found' })
   async read(
     @Param('id') id: string,
     @Res({ passthrough: true }) res: Response,
