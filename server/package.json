@@ -36,6 +36,7 @@
     "class-validator": "^0.13.2",
     "concurrently": "^7.4.0",
     "dotenv": "^16.0.2",
+    "fastest-levenshtein": "^1.0.16",
     "mongodb-memory-server": "^8.10.0",
     "mongoose": "^6.6.1",
     "multer": "^1.4.5-lts.1",
