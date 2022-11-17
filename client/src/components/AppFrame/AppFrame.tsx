@@ -33,7 +33,10 @@ const Content = styled('div')(({ theme }) => ({
   minWidth: '320px',
   boxSizing: 'border-box',
   backgroundColor: theme.palette.background.default,
-  padding: theme.spacing(2, 3)
+  padding: theme.spacing(2, 1),
+  [theme.breakpoints.up('sm')]: {
+    padding: theme.spacing(2, 3)
+  }
 }))
 
 const AppFrame = ({ children }: { children: JSX.Element }) => {

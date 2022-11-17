@@ -1,6 +1,8 @@
-import { LocationOnPage } from './LocationOnPage'
-import { RelativePosition } from './RelativePosition'
+import { FileMeta } from './FileMeta'
+import { Direction } from './Direction'
 import { SearchResult } from './SearchResult'
+import { TemplateRow } from './TemplateRow'
 import { Template } from './Template'
+import { TemplateVariant } from './TemplateVariant'
 
-export type { LocationOnPage, RelativePosition, SearchResult, Template }
+export type { FileMeta, Direction, SearchResult, Template, TemplateRow, TemplateVariant }

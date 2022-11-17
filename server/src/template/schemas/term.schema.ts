@@ -5,7 +5,7 @@ import { IsBoolean, IsNotEmpty, IsNumber, IsString, Max, Min } from 'class-valid
 
 export type TermDocument = Term & Document;
 
-@Schema({ _id: false })
+@Schema()
 export class Term {
   @Prop({ type: String, required: true })
   @ApiProperty({ type: String, default: 'keyword' })

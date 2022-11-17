@@ -8,6 +8,7 @@ const AsyncSearchContainer = lazy(() => import('./components/SearchContainer'))
 const AsyncPageNotFoundContainer = lazy(() => import('./components/PageNotFoundContainer'))
 const AsyncSignInContainer = lazy(() => import('./components/SignInContainer'))
 const AsyncRegisterContainer = lazy(() => import('./components/RegisterContainer'))
+const AsyncTemplatesContainer = lazy(() => import('./components/TemplatesContainer'))
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
               </div>
             }
           />
+          <Route path='/templates' element={<AsyncTemplatesContainer />} />
           <Route path='/signin' element={<AsyncSignInContainer />} />
           <Route path='/register' element={<AsyncRegisterContainer />} />
           <Route path='*' element={<AsyncPageNotFoundContainer />} />
