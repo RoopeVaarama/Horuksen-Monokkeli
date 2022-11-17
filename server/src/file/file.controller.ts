@@ -135,8 +135,13 @@ export class FileController {
 
   @Delete('/list/:id')
   @ApiResponse({ status: 200, description: 'List deleted succesfully', type: Boolean })
-  async deleteFileList(@Param('id') id: string) {
-    return await this.listService.deleteFileList(id);
+  @ApiResponse({
+    status: 404,
+    description: 'List not found. No list with given id could be found.',
+    type: Boolean,
+  })
+  async deleteFileList(@Param('id') listId: string) {
+    return await this.listService.deleteFileList(listId);
   }
 
   @Patch('/list/files/:listId')

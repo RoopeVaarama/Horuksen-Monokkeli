@@ -76,8 +76,9 @@ export class ListService {
     return await this.fileListModel.findById(updated._id).exec();
   }
 
-  async deleteFileList(id: string): Promise<boolean> {
-    const deleteResponse = await this.fileListModel.deleteOne({ _id: id }).exec();
+  async deleteFileList(listId: string): Promise<boolean> {
+    await this.canListBeFound(listId);
+    const deleteResponse = await this.fileListModel.deleteOne({ _id: listId }).exec();
     return deleteResponse.acknowledged;
   }
 
