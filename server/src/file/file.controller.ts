@@ -42,6 +42,7 @@ export class FileController {
   ) {}
 
   @Post('/upload')
+  @ApiOperation({ summary: 'Uploads single .pdf file.' })
   @UseInterceptors(FileInterceptor('file'))
   @ApiResponse({ status: 201, description: 'File successfully uploaded', type: Object })
   @ApiConsumes('multipart/form-data')
@@ -77,12 +78,14 @@ export class FileController {
   }
 
   @Get('/')
+  @ApiOperation({ summary: 'Returns all FileMetas.' })
   @ApiResponse({ status: 200, description: 'All files returned', type: [FileMeta] })
   async getFiles(): Promise<FileMeta[]> {
     return await this.fileService.getFiles();
   }
 
   @Delete('/:id')
+  @ApiOperation({ summary: 'Deletes file matching given ID.' })
   @ApiResponse({ status: 200, description: 'File deleted', type: Boolean })
   @ApiNotFoundResponse({
     status: 404,
@@ -94,7 +97,7 @@ export class FileController {
 
   //TODO: remove once fron-end doesn't use anymore
   @Get('/get')
-  @ApiOperation({ summary: 'THIS METHOD IS DEPRICATED AND WILL BE DELETED' })
+  @ApiOperation({ summary: 'DEPRICATED AND WILL BE DELETED. Returns all filenames.' })
   @ApiResponse({ status: 200, description: 'All filenames returned', type: [String] })
   async getFilenames(): Promise<string[]> {
     return await this.fileService.getAllFiles();
@@ -111,6 +114,7 @@ export class FileController {
   // > Either return an error code, or pass without creating duplicates
 
   @Post('/list')
+  @ApiOperation({ summary: 'Creates single FileList with given name and (optinal) files.' })
   @ApiResponse({ status: 201, description: 'List created succesfully', type: FileList })
   @ApiResponse({
     status: 404,
@@ -125,18 +129,21 @@ export class FileController {
   }
 
   @Get('/list')
+  @ApiOperation({ summary: 'Returns all FileLists' })
   @ApiResponse({ status: 200, description: 'Lists retrieved succesfully', type: [FileList] })
   async getAllLists(): Promise<FileList[]> {
     return await this.listService.getAll();
   }
 
   @Get('/list/:id')
+  @ApiOperation({ summary: 'Returns FileList matching given ID.' })
   @ApiResponse({ status: 200, description: 'List retrieved succesfully', type: FileList })
   async getOneList(@Param('id') id: string): Promise<FileList> {
     return await this.listService.getOne(id);
   }
 
   @Patch('/list/:id')
+  @ApiOperation({ summary: 'Upadtes (overwrites) FileList matching given ID.' })
   @ApiResponse({ status: 200, description: 'List updated succasfully', type: FileList })
   @ApiResponse({
     status: 404,
@@ -153,6 +160,9 @@ export class FileController {
   }
 
   @Delete('/list/:id')
+  @ApiOperation({
+    summary: 'Deletes FileList matching given ID. Does not delete files inside list.',
+  })
   @ApiResponse({ status: 200, description: 'List deleted succesfully', type: Boolean })
   @ApiResponse({
     status: 404,
@@ -164,6 +174,7 @@ export class FileController {
   }
 
   @Patch('/list/files/:listId')
+  @ApiOperation({ summary: 'Adds given files to FileList matching given ID.' })
   @ApiResponse({ status: 200, description: 'Files added to list', type: Boolean })
   async addFilesTtoList(
     @Param('listId') listId: string,
@@ -174,6 +185,7 @@ export class FileController {
     return await this.listService.addFilesToFileList(listId, metas);
   }
   @Delete('/list/files/:listId')
+  @ApiOperation({ summary: 'Deletes given files from FileList matching given ID.' })
   @ApiResponse({ status: 200, description: 'Files deleted from list', type: Boolean })
   async deleteFilesFromFileList(
     @Param('listId') listId: string,
