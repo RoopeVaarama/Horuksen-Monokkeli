@@ -1,3 +1,4 @@
+import { FileMeta } from './FileMeta'
 import { Direction } from './Direction'
 import { SearchResult } from './SearchResult'
 import { TemplateRow } from './TemplateRow'
@@ -9,6 +10,7 @@ import { User } from './User'
 import { IntlMsg } from './IntlMsg'
 
 export type {
+  FileMeta,
   Direction,
   SearchResult,
   Template,
