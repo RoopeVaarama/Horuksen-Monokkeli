@@ -10,7 +10,6 @@ import {
   UseInterceptors,
   Res,
   StreamableFile,
-  Header,
   HttpException,
   ParseFilePipe,
   FileTypeValidator,
@@ -21,7 +20,9 @@ import { FileService } from './file.service';
 import { ListService } from './list.service';
 import { FileMeta, FileMetaDocument } from './schemas/filemeta.schema';
 import { FileList } from './schemas/filelist.schema';
-import { Model } from 'mongoose';
+import { createReadStream } from 'fs';
+import { join } from 'path';
+import { Response } from 'express';
 
 @ApiTags('files')
 @Controller('/files')
@@ -30,6 +31,20 @@ export class FileController {
     private readonly fileService: FileService,
     private readonly listService: ListService,
   ) {}
+
+  @Get('/read/:id')
+  async read(
+    @Param('id') id: string,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<StreamableFile> {
+    const meta = await this.fileService.getFileMeta(id);
+    const file = createReadStream(join(process.cwd(), meta.filepath));
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `filename="${meta.filename}"`,
+    });
+    return new StreamableFile(file);
+  }
 
   @Post('/upload')
   @UseInterceptors(FileInterceptor('file'))
