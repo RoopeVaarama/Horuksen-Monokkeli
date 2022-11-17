@@ -103,7 +103,15 @@ export class FileController {
 
   @Post('/list')
   @ApiResponse({ status: 201, description: 'List created succesfully', type: FileList })
+  @ApiResponse({
+    status: 404,
+    description: 'File not found. One or more files could not be found. FileList not created.',
+    type: FileList,
+  })
   async createFileList(@Body() list: FileList): Promise<FileList> {
+    for (let i = 0; i <= list.files.length; ++i) {
+      await this.fileService.canFileBeFound(list.files.at(i).toString());
+    }
     return await this.listService.createFileList(list);
   }
 
