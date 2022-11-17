@@ -5,8 +5,12 @@ Library    JSONLibrary
 
 *** Variables ***
 ${new_template_id}    # Just to ignore IDE errors, handled by Set Suite Variable
-
+${AUTH_TOKEN}
 *** Test Cases ***
+
+Set Headers
+    ${headers}=    Create Dictionary    Authorization    Bearer ${AUTH_TOKEN}
+    Set Headers    ${headers}
  
 POST New Template
     ${template_json} =    Load Json From File    ${CURDIR}/json/template.json

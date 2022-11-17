@@ -7,10 +7,7 @@ import { User } from '../user/user.schema';
 
 @Injectable()
 export class AuthService {
-    constructor(
-        private readonly userService: UserService,
-        private readonly jwtService: JwtService
-    ) { }
+  constructor(private readonly userService: UserService, private readonly jwtService: JwtService) {}
 
     async login(data: LoginDto): Promise<any | { status: number }> {
         let user: User;
@@ -39,28 +36,28 @@ export class AuthService {
             }
         }
         return
-    }
+  }
 
-    async validateToken(token: string): Promise<any> {
-        //console.log(`auth.service _ token val: ${token}`)
-        return await this.jwtService.verifyAsync(token);
-    }
+  async validateToken(token: string): Promise<any> {
+    //console.log(`auth.service _ token val: ${token}`)
+    return await this.jwtService.verifyAsync(token);
+  }
 
-    async validateUser(data: LoginDto): Promise<any> {
-        const { username, password } = data;
+  async validateUser(data: LoginDto): Promise<any> {
+    const { username, password } = data;
 
-        let user = await this.userService.findValidateByUsername(username);
-        if (!(await this.userService.validatePassword(user, password))) {
-            throw new UnauthorizedException();
-        }
-        return user;
+    const user = await this.userService.findValidateByUsername(username);
+    if (!(await this.userService.validatePassword(user, password))) {
+      throw new UnauthorizedException();
     }
+    return user;
+  }
 
-    async validate(payload: JwtPayload): Promise<any> {
-        //console.log(`auth.service _ payload val: ${payload.username}`)
-        // Validate if token passed along with HTTP request
-        // is associated with any registered account in the database
-        //console.log(payload);
-        return await this.userService.findValidateByUsername(payload.username);
-    }
+  async validate(payload: JwtPayload): Promise<any> {
+    //console.log(`auth.service _ payload val: ${payload.username}`)
+    // Validate if token passed along with HTTP request
+    // is associated with any registered account in the database
+    //console.log(payload);
+    return await this.userService.findValidateByUsername(payload.username);
+  }
 }
