@@ -43,5 +43,6 @@
   "templates": "Templates",
   "templateTitle": "Template title",
   "unsavedChanges": "You have unchanged changes.",
-  "uploadFiles": "Upload files"
+  "uploadFiles": "Upload files",
+  "usersLists": "User's lists"
 }
