@@ -84,6 +84,7 @@ export class FileController {
     return await this.fileService.deleteFile(id);
   }
 
+  //TODO: remove once fron-end doesn't use anymore
   @Get('/get')
   @ApiResponse({ status: 200, description: 'All filenames returned', type: [String] })
   async getFilenames(): Promise<string[]> {
