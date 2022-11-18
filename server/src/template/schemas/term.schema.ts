@@ -20,6 +20,11 @@ export class Term {
   @IsNotEmpty()
   keyOnly: boolean;
 
+  @Prop({ type: Number, required: false, default: 0 })
+  @ApiProperty({ type: Number, required: false, default: 0 })
+  @IsNumber()
+  levenDistance: number;
+
   @Prop({ type: Number, default: 0, min: 0, max: 3 })
   @ApiProperty({ type: Number, required: false, default: 0, minimum: 0, maximum: 3 })
   @IsNumber()
@@ -37,8 +42,8 @@ export class Term {
   @IsString()
   valueMatch: string;
 
-  @Prop({ type: String, required: false, default: '.*' })
-  @ApiProperty({ type: String, required: false, default: '.*' })
+  @Prop({ type: String, required: false, default: '' })
+  @ApiProperty({ type: String, required: false, default: '' })
   @IsString()
   valuePrune: string;
 
