@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios'
 import create from 'zustand'
-import { removeToken, setToken, setUid } from '../tools/auth'
+import { getToken, removeToken, setToken, setUid } from '../tools/auth'
 import { fetcher } from '../tools/fetcher'
 import { IntlMsg, LoginDto, RegisterDto } from '../types'
 
@@ -12,6 +12,7 @@ interface UserState {
   register: (registerDto: RegisterDto) => Promise<boolean>
   login: (loginDto: LoginDto) => Promise<boolean>
   logout: () => void
+  validateToken: () => Promise<boolean>
 }
 
 export const useUserStore = create<UserState>((set, get) => ({
@@ -79,5 +80,25 @@ export const useUserStore = create<UserState>((set, get) => ({
     set({
       successMsg: { intlKey: 'successLogout', defaultMessage: 'Kirjauduttu ulos' }
     })
+  },
+  validateToken: async () => {
+    const token = getToken()
+    if (!token) {
+      return false
+    }
+    try {
+      await fetcher({
+        method: 'GET',
+        path: 'auth/validateToken',
+        id: token
+      })
+      return true
+    } catch (e) {
+      removeToken()
+      if (e instanceof AxiosError && e.response?.data.description) {
+        set({ errorMsg: e.response?.data.description })
+      }
+      return false
+    }
   }
 }))
