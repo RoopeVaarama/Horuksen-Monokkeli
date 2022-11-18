@@ -8,6 +8,7 @@ import {
 } from 'pdf.js-extract';
 import { Result } from './schemas/result.schema';
 import { Term } from '../template/schemas/term.schema';
+import { distance } from 'fastest-levenshtein';
 
 enum Direction {
   Right,
@@ -16,14 +17,16 @@ enum Direction {
   Above,
 }
 
+const ignoredValues: string[] = ['', ' '];
+
 @Injectable()
 export class SearchService {
-  // Only finds exact matches
   async search(contents: PDFExtractResult, terms: Term[], fileId: string): Promise<Result[]> {
     const pageArray = contents.pages;
     let pageIndex: number;
     let i: number;
     const results: Result[] = [];
+
     for (i = 0; i < terms.length; ++i) {
       for (pageIndex = 0; pageIndex < pageArray.length; ++pageIndex) {
         const page = pageArray[pageIndex];
@@ -37,7 +40,7 @@ export class SearchService {
         for (entryIndex = 0; entryIndex < contentArray.length; ++entryIndex) {
           const entry = contentArray[entryIndex];
           if (max == 0) break;
-          if (this.keyMatch(terms[i].key, entry.str)) {
+          if (this.keyMatch(terms[i].key, entry.str, terms[i].levenDistance)) {
             if (ignore > 0) {
               --ignore;
               continue;
@@ -48,11 +51,11 @@ export class SearchService {
             result.termIndex = i;
             result.key_x = entry.x;
             result.key_y = entry.y;
-            result.key = terms[i].key;
+            result.key = entry.str;
             let res: PDFExtractText = null;
             if (!terms[i].keyOnly) res = this.findValue(terms[i], page, entry.x, entry.y);
             if (res != null) {
-              result.value = res.str;
+              result.value = this.pruneValue(res.str, terms[i].valuePrune);
               result.val_x = res.x;
               result.val_y = res.y;
             }
@@ -65,7 +68,7 @@ export class SearchService {
     return results;
   }
 
-  // Returns the closest value in the desired direction within margin
+  // Returns the closest matching value in the desired direction within allowed offset
   findValue(terms: Term, page: PDFExtractPage, key_x: number, key_y: number) {
     const contentArray = page.content;
     const candidates: PDFExtractText[] = [];
@@ -73,7 +76,7 @@ export class SearchService {
 
     for (entryIndex = 0; entryIndex < contentArray.length; ++entryIndex) {
       const val = contentArray[entryIndex];
-      if (val.str != ' ' && val.str != '') {
+      if (!ignoredValues.includes(val.str)) {
         switch (terms.direction) {
           case Direction.Right: {
             if (this.inMargin(val.y, key_y, terms.allowedOffset) && val.x > key_x)
@@ -153,13 +156,21 @@ export class SearchService {
     return null;
   }
 
-  // TODO some partial match logic for keys?
-  keyMatch(key: string, entry: string) {
-    return key == entry;
+  // Levenshtein key matching
+  keyMatch(key: string, entry: string, leven: number) {
+    if (leven == 0) return key == entry;
+    if (Math.abs(key.length - entry.length) > leven) return false;
+    if (distance(key, entry) > leven) return false;
+    return true;
   }
 
   valueMatch(value: string, regex: string): boolean {
     const reg = new RegExp(regex);
     return reg.test(value);
+  }
+
+  pruneValue(value: string, prune: string): string {
+    if (prune == '') return value;
+    return value.replace(prune, '');
   }
 }

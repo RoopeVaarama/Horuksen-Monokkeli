@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import mongoose, { Document } from 'mongoose';
 import { IsArray, IsNotEmpty, IsString, ValidateNested } from 'class-validator';
-import { User } from '../../users/schemas/user.schema';
+import { User } from '../../user/user.schema';
 import { Term, TermSchema } from './term.schema';
 import { Type } from 'class-transformer';
 

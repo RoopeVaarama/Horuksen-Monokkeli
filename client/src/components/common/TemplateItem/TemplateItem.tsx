@@ -74,7 +74,8 @@ const TemplateItem = ({ template, variant }: { template: Template; variant: Temp
 
   return (
     <StyledPaper
-      id={`templateItem-${template.title}`}
+      id={`templateItem-${template._id}`}
+      className='templateItem'
       sx={{
         position: 'relative',
         width: `calc(100% - ${variant === 'noEdit' ? DB_BUTTON_WIDTH : BUTTON_WIDTH})`,
@@ -183,10 +184,16 @@ const TemplateItem = ({ template, variant }: { template: Template; variant: Temp
             }
           }}
         >
-          {variant === 'searchOption' && <AddCircleIcon color='primary' />}
-          {variant === 'searchSelected' && <RemoveCircleIcon color='primary' />}
-          {variant === 'noEdit' && <DeleteIcon color='primary' />}
-          {variant === 'draft' && <CancelIcon color='primary' />}
+          {variant === 'searchOption' && (
+            <AddCircleIcon id={'addTemplateToSearch-' + template._id} color='primary' />
+          )}
+          {variant === 'searchSelected' && (
+            <RemoveCircleIcon id={'removeTemplateFromSearch-' + template._id} color='primary' />
+          )}
+          {variant === 'noEdit' && (
+            <DeleteIcon id={'deleteTemplate-' + template._id} color='primary' />
+          )}
+          {variant === 'draft' && <CancelIcon id={'cancelEdit-' + template._id} color='primary' />}
         </IconButton>
         {variant === 'noEdit' && (
           <IconButton
