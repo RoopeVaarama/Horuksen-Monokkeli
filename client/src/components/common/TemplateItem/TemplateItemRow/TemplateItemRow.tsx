@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import DeleteIcon from '@mui/icons-material/Delete'
 import ExpandLess from '@mui/icons-material/ExpandLess'
 import ExpandMore from '@mui/icons-material/ExpandMore'
+import SearchIcon from '@mui/icons-material/Search'
 import {
   Collapse,
   Divider,
@@ -20,10 +21,14 @@ import {
   SelectChangeEvent,
   Box,
   FormControlLabel,
-  Checkbox
+  Checkbox,
+  InputAdornment,
+  Menu,
+  Typography,
+  TextFieldProps
 } from '@mui/material'
 import { FormattedMessage } from 'react-intl'
-import { directions } from '../../../../constants'
+import { directions, regexOptions } from '../../../../constants'
 import { Direction, TemplateRow, TemplateVariant } from '../../../../types'
 import { useTemplateStore } from '../../../../store/templateStore'
 
@@ -37,8 +42,10 @@ const TemplateItemRow = ({
   variant: TemplateVariant
 }) => {
   const theme = useTheme()
+  const valueMatchInputRef = useRef<TextFieldProps>()
   const [open, setOpen] = useState(true)
   const [textFieldError, setTextFieldError] = useState(false)
+  const [valueMatchAnchorEl, setValueMatchAnchorEl] = useState<null | HTMLElement>(null)
   const {
     deleteTemplateDraftRow,
     updateTemplateDraftKey,
@@ -161,9 +168,62 @@ const TemplateItemRow = ({
                       templateRow.localId
                     )
                 }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position='end'>
+                      {isDraft && (
+                        <IconButton
+                          edge='end'
+                          color='primary'
+                          onClick={(e) => setValueMatchAnchorEl(e.currentTarget)}
+                          disabled={!isDraft}
+                        >
+                          <SearchIcon />
+                        </IconButton>
+                      )}
+                    </InputAdornment>
+                  )
+                }}
+                InputLabelProps={{ shrink: true }}
+                inputRef={valueMatchInputRef}
                 disabled={!isDraft}
                 label={<FormattedMessage id='valueMatch' defaultMessage='Regex' />}
               />
+              <Menu
+                transitionDuration={200}
+                anchorEl={valueMatchAnchorEl}
+                keepMounted
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'right'
+                }}
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right'
+                }}
+                open={Boolean(valueMatchAnchorEl)}
+                onClose={() => setValueMatchAnchorEl(null)}
+              >
+                {regexOptions.map((option) => (
+                  <MenuItem
+                    id={'value-match-option-' + option}
+                    key={option.label}
+                    onClick={() => {
+                      if (valueMatchInputRef.current) {
+                        valueMatchInputRef.current.value = option.value
+                      }
+                      updateTemplateDraftValueMatch(
+                        option.value,
+                        templateRow._id,
+                        templateRow.localId
+                      )
+                      setValueMatchAnchorEl(null)
+                    }}
+                  >
+                    <Typography textAlign='center'>{option.label}</Typography>
+                  </MenuItem>
+                ))}
+              </Menu>
             </Grid>
             <Grid item xs={12}>
               <TextField
@@ -180,6 +240,7 @@ const TemplateItemRow = ({
                     )
                 }}
                 disabled={!isDraft}
+                InputLabelProps={{ shrink: true }}
                 label={<FormattedMessage id='valuePrune' defaultMessage='Karsi merkit' />}
               />
             </Grid>
@@ -201,6 +262,7 @@ const TemplateItemRow = ({
                     )
                 }}
                 disabled={!isDraft}
+                InputLabelProps={{ shrink: true }}
                 label={
                   <FormattedMessage id='levenDistance' defaultMessage='Levenshteinin etäisyys' />
                 }
@@ -222,6 +284,7 @@ const TemplateItemRow = ({
                     )
                 }}
                 disabled={!isDraft}
+                InputLabelProps={{ shrink: true }}
                 label={<FormattedMessage id='ignoreFirst' defaultMessage='Ohita ensimmäiset' />}
               />
             </Grid>
@@ -241,6 +304,7 @@ const TemplateItemRow = ({
                     )
                 }}
                 disabled={!isDraft}
+                InputLabelProps={{ shrink: true }}
                 label={<FormattedMessage id='maxPerPage' defaultMessage='Max per sivu' />}
               />
             </Grid>

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { Outlet, useLocation } from 'react-router-dom'
 import { useUserStore } from '../../store/userStore'
-import { getToken, removeToken } from '../../tools/auth'
+import { getToken, removeAuth } from '../../tools/auth'
 
 const AuthContainer = ({ restricted }: { restricted: boolean }) => {
   const [access, setAccess] = useState(false)
@@ -27,7 +27,7 @@ const AuthContainer = ({ restricted }: { restricted: boolean }) => {
     const hasValidToken = await validateToken()
     if (!hasValidToken) {
       navigate('/signin')
-      removeToken()
+      removeAuth()
     }
   }
 

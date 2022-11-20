@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios'
 import create from 'zustand'
-import { getToken, removeToken, setToken, setUid } from '../tools/auth'
+import { getToken, removeAuth, setAuthedUser, setToken } from '../tools/auth'
 import { fetcher } from '../tools/fetcher'
 import { IntlMsg, LoginDto, RegisterDto } from '../types'
 
@@ -54,10 +54,10 @@ export const useUserStore = create<UserState>((set, get) => ({
         body: loginDto
       })
       const token = data?.token
-      const uid = data?.user._id
-      if (token && uid) {
+      const user = data?.user
+      if (token && user) {
         setToken(token)
-        setUid(uid)
+        setAuthedUser(user)
         set({
           fetching: false,
           successMsg: { intlKey: 'successLogin', defaultMessage: 'Kirjauduttu sisään' }
@@ -76,7 +76,7 @@ export const useUserStore = create<UserState>((set, get) => ({
     }
   },
   logout: () => {
-    removeToken()
+    removeAuth()
     set({
       successMsg: { intlKey: 'successLogout', defaultMessage: 'Kirjauduttu ulos' }
     })
@@ -94,7 +94,7 @@ export const useUserStore = create<UserState>((set, get) => ({
       })
       return true
     } catch (e) {
-      removeToken()
+      removeAuth()
       if (e instanceof AxiosError && e.response?.data.description) {
         set({ errorMsg: e.response?.data.description })
       }

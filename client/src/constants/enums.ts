@@ -1,3 +1,3 @@
 export const TOKEN_KEY = 'token'
 export const LOCALE_KEY = 'locale'
-export const UID_KEY = 'userId'
+export const AUTHED_USER_KEY = 'authedUser'
