@@ -10,7 +10,6 @@ import {
   UseInterceptors,
   Res,
   StreamableFile,
-  Header,
   HttpException,
   ParseFilePipe,
   FileTypeValidator,
@@ -18,11 +17,13 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiConsumes,
+  ApiOkResponse,
   ApiResponse,
   ApiTags,
   ApiBody,
   ApiNotFoundResponse,
   ApiOperation,
+  ApiBadRequestResponse,
 } from '@nestjs/swagger';
 import { FileService } from './file.service';
 import { ListService } from './list.service';
@@ -31,6 +32,9 @@ import { FileList } from './schemas/filelist.schema';
 import { Model } from 'mongoose';
 import { ParseService } from 'src/search/parse.service';
 import { deprecate } from 'util';
+import { createReadStream } from 'fs';
+import { join } from 'path';
+import { Response } from 'express';
 
 @ApiTags('files')
 @Controller('/files')
@@ -40,6 +44,23 @@ export class FileController {
     private readonly listService: ListService,
     private readonly parseService: ParseService,
   ) {}
+
+  @Get('/read/:id')
+  @ApiOkResponse({ description: 'File read succesfully', type: StreamableFile })
+  @ApiBadRequestResponse({ description: 'Invalid request parameters' })
+  @ApiNotFoundResponse({ description: 'Resource not found' })
+  async read(
+    @Param('id') id: string,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<StreamableFile> {
+    const meta = await this.fileService.getFileMeta(id);
+    const file = createReadStream(join(process.cwd(), meta.filepath));
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `filename="${meta.filename}"`,
+    });
+    return new StreamableFile(file);
+  }
 
   @Post('/upload')
   @ApiOperation({ summary: 'Uploads single .pdf file.' })
