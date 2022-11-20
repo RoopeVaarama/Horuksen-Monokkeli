@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import DeleteIcon from '@mui/icons-material/Delete'
 import ExpandLess from '@mui/icons-material/ExpandLess'
 import ExpandMore from '@mui/icons-material/ExpandMore'
+import SearchIcon from '@mui/icons-material/Search'
 import {
   Collapse,
   Divider,
@@ -20,10 +21,14 @@ import {
   SelectChangeEvent,
   Box,
   FormControlLabel,
-  Checkbox
+  Checkbox,
+  InputAdornment,
+  Menu,
+  Typography,
+  TextFieldProps
 } from '@mui/material'
 import { FormattedMessage } from 'react-intl'
-import { directions } from '../../../../constants'
+import { directions, regexOptions } from '../../../../constants'
 import { Direction, TemplateRow, TemplateVariant } from '../../../../types'
 import { useTemplateStore } from '../../../../store/templateStore'
 
@@ -37,13 +42,21 @@ const TemplateItemRow = ({
   variant: TemplateVariant
 }) => {
   const theme = useTheme()
+  const valueMatchInputRef = useRef<TextFieldProps>()
   const [open, setOpen] = useState(true)
   const [textFieldError, setTextFieldError] = useState(false)
+  const [valueMatchAnchorEl, setValueMatchAnchorEl] = useState<null | HTMLElement>(null)
   const {
     deleteTemplateDraftRow,
     updateTemplateDraftKey,
     updateTemplateDraftDirection,
-    updateTemplateDraftKeyOnly
+    updateTemplateDraftKeyOnly,
+    updateTemplateDraftAllowedOffset,
+    updateTemplateDraftLevenDist,
+    updateTemplateDraftValueMatch,
+    updateTemplateDraftValuePrune,
+    updateTemplateDraftIgnoreFirst,
+    updateTemplateDraftMaxPerPage
   } = useTemplateStore()
   const isDraft = variant === 'draft'
 
@@ -60,16 +73,6 @@ const TemplateItemRow = ({
         setTextFieldError(true)
       }
       updateTemplateDraftKey(newKey, templateRow._id, templateRow.localId)
-    }
-  }
-  const handleUpdateDirection = (newDirection: Direction['value']) => {
-    if (isDraft) {
-      updateTemplateDraftDirection(newDirection, templateRow._id, templateRow.localId)
-    }
-  }
-  const handleUpdateKeyOnly = (newState: boolean) => {
-    if (isDraft) {
-      updateTemplateDraftKeyOnly(newState, templateRow._id, templateRow.localId)
     }
   }
 
@@ -92,16 +95,12 @@ const TemplateItemRow = ({
       </ListItemButton>
       <Collapse in={open} sx={{ backgroundColor: alpha(theme.palette.secondary.light, 0.1) }}>
         <Grid container p={2} columnSpacing={4} rowSpacing={2}>
-          <Grid
-            container
-            item
-            xs={12}
-            sm={6}
-            rowSpacing={2}
-            sx={{ 'label.Mui-focused': { color: theme.palette.secondary.main } }}
-          >
+          <Grid container item xs={12} sm={6} rowSpacing={2}>
             <Grid item xs={12}>
-              <FormControl fullWidth>
+              <FormControl
+                fullWidth
+                sx={{ 'label.Mui-focused': { color: theme.palette.secondary.main } }}
+              >
                 <InputLabel id='relativePositionLabel'>
                   <FormattedMessage id='relativePosition' defaultMessage='Suhteellinen sijainti' />
                 </InputLabel>
@@ -113,7 +112,12 @@ const TemplateItemRow = ({
                   value={templateRow.direction}
                   disabled={!isDraft}
                   onChange={(e: SelectChangeEvent<Direction['value']>) => {
-                    if (typeof e.target.value !== 'string') handleUpdateDirection(e.target.value)
+                    if (typeof e.target.value !== 'string' && isDraft)
+                      updateTemplateDraftDirection(
+                        e.target.value,
+                        templateRow._id,
+                        templateRow.localId
+                      )
                   }}
                   IconComponent={ExpandMore}
                   label={
@@ -131,26 +135,207 @@ const TemplateItemRow = ({
                 </Select>
               </FormControl>
             </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                color='secondary'
+                size='small'
+                type='number'
+                defaultValue={templateRow.allowedOffset}
+                onBlur={(e) => {
+                  if (isDraft)
+                    updateTemplateDraftAllowedOffset(
+                      Number(e.target.value),
+                      templateRow._id,
+                      templateRow.localId
+                    )
+                }}
+                disabled={!isDraft}
+                label={<FormattedMessage id='allowedOffset' defaultMessage='Sallittu offset' />}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                color='secondary'
+                size='small'
+                defaultValue={templateRow.valueMatch}
+                onBlur={(e) => {
+                  if (isDraft)
+                    updateTemplateDraftValueMatch(
+                      e.target.value,
+                      templateRow._id,
+                      templateRow.localId
+                    )
+                }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position='end'>
+                      {isDraft && (
+                        <IconButton
+                          edge='end'
+                          color='primary'
+                          onClick={(e) => setValueMatchAnchorEl(e.currentTarget)}
+                          disabled={!isDraft}
+                        >
+                          <SearchIcon />
+                        </IconButton>
+                      )}
+                    </InputAdornment>
+                  )
+                }}
+                InputLabelProps={{ shrink: true }}
+                inputRef={valueMatchInputRef}
+                disabled={!isDraft}
+                label={<FormattedMessage id='valueMatch' defaultMessage='Regex' />}
+              />
+              <Menu
+                transitionDuration={200}
+                anchorEl={valueMatchAnchorEl}
+                keepMounted
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'right'
+                }}
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right'
+                }}
+                open={Boolean(valueMatchAnchorEl)}
+                onClose={() => setValueMatchAnchorEl(null)}
+              >
+                {regexOptions.map((option) => (
+                  <MenuItem
+                    id={'value-match-option-' + option}
+                    key={option.label}
+                    onClick={() => {
+                      if (valueMatchInputRef.current) {
+                        valueMatchInputRef.current.value = option.value
+                      }
+                      updateTemplateDraftValueMatch(
+                        option.value,
+                        templateRow._id,
+                        templateRow.localId
+                      )
+                      setValueMatchAnchorEl(null)
+                    }}
+                  >
+                    <Typography textAlign='center'>{option.label}</Typography>
+                  </MenuItem>
+                ))}
+              </Menu>
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                color='secondary'
+                size='small'
+                defaultValue={templateRow.valuePrune}
+                onBlur={(e) => {
+                  if (isDraft)
+                    updateTemplateDraftValuePrune(
+                      e.target.value,
+                      templateRow._id,
+                      templateRow.localId
+                    )
+                }}
+                disabled={!isDraft}
+                InputLabelProps={{ shrink: true }}
+                label={<FormattedMessage id='valuePrune' defaultMessage='Karsi merkit' />}
+              />
+            </Grid>
           </Grid>
-          <Grid container item xs={12} sm={6} direction='column'>
-            <FormControlLabel
-              sx={{
-                maxWidth: 'max-content',
-                '.MuiTypography-root': { fontSize: '14px' },
-                '.MuiButtonBase-root': { p: '4px', mr: '4px' },
-                mr: [3, 0]
-              }}
-              checked={templateRow.keyOnly}
-              disabled={!isDraft}
-              control={
-                <Checkbox
-                  className='TemplateRowKeyOnlySelector'
-                  color='secondary'
-                  onChange={(e) => handleUpdateKeyOnly(e.target.checked)}
-                />
-              }
-              label={<FormattedMessage id='onlyTheKeyword' defaultMessage='Vain avainsana' />}
-            />
+          <Grid container item xs={12} sm={6} rowSpacing={2}>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                color='secondary'
+                size='small'
+                type='number'
+                defaultValue={templateRow.levenDistance}
+                onBlur={(e) => {
+                  if (isDraft)
+                    updateTemplateDraftLevenDist(
+                      Number(e.target.value),
+                      templateRow._id,
+                      templateRow.localId
+                    )
+                }}
+                disabled={!isDraft}
+                InputLabelProps={{ shrink: true }}
+                label={
+                  <FormattedMessage id='levenDistance' defaultMessage='Levenshteinin etäisyys' />
+                }
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                color='secondary'
+                size='small'
+                type='number'
+                defaultValue={templateRow.ignoreFirst}
+                onBlur={(e) => {
+                  if (isDraft)
+                    updateTemplateDraftIgnoreFirst(
+                      Number(e.target.value),
+                      templateRow._id,
+                      templateRow.localId
+                    )
+                }}
+                disabled={!isDraft}
+                InputLabelProps={{ shrink: true }}
+                label={<FormattedMessage id='ignoreFirst' defaultMessage='Ohita ensimmäiset' />}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                color='secondary'
+                size='small'
+                type='number'
+                defaultValue={templateRow.maxPerPage}
+                onBlur={(e) => {
+                  if (isDraft)
+                    updateTemplateDraftMaxPerPage(
+                      Number(e.target.value),
+                      templateRow._id,
+                      templateRow.localId
+                    )
+                }}
+                disabled={!isDraft}
+                InputLabelProps={{ shrink: true }}
+                label={<FormattedMessage id='maxPerPage' defaultMessage='Max per sivu' />}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <FormControlLabel
+                sx={{
+                  maxWidth: 'max-content',
+                  pl: 1,
+                  '.MuiTypography-root': { fontSize: '14px' },
+                  '.MuiButtonBase-root': { p: '4px', mr: '4px' },
+                  mr: [3, 0]
+                }}
+                checked={templateRow.keyOnly}
+                disabled={!isDraft}
+                control={
+                  <Checkbox
+                    className='TemplateRowKeyOnlySelector'
+                    color='secondary'
+                    onChange={(e) => {
+                      if (isDraft)
+                        updateTemplateDraftKeyOnly(
+                          e.target.checked,
+                          templateRow._id,
+                          templateRow.localId
+                        )
+                    }}
+                  />
+                }
+                label={<FormattedMessage id='onlyTheKeyword' defaultMessage='Vain avainsana' />}
+              />
+            </Grid>
           </Grid>
         </Grid>
         <Divider sx={{ borderColor: theme.palette.grey[300] }} />

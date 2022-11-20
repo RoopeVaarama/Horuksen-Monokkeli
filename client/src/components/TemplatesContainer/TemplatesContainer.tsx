@@ -5,8 +5,8 @@ import { FormattedMessage } from 'react-intl'
 import { useTemplateStore } from '../../store/templateStore'
 import { useEffect } from 'react'
 import Alert from '../common/Alert'
-import { useUserStore } from '../../store/userStore'
 import { Template } from '../../types'
+import { getUid } from '../../tools/auth'
 
 /**
  * Page container for url /templates
@@ -24,7 +24,6 @@ const TemplatesContainer = () => {
     createTemplate,
     updateTemplate
   } = useTemplateStore()
-  const { userId } = useUserStore()
 
   const filteredTemplates = (oldTemplates: Template[]) => {
     if (templateDraft?._id) {
@@ -34,7 +33,10 @@ const TemplatesContainer = () => {
     }
   }
   const handleCreateTemplateDraft = () => {
-    createTemplateDraft(userId)
+    const uid = getUid()
+    if (uid) {
+      createTemplateDraft(uid)
+    }
   }
   const handleDeleteTemplateDraft = () => {
     deleteTemplateDraft()
@@ -48,7 +50,10 @@ const TemplatesContainer = () => {
   }
 
   useEffect(() => {
-    resetTemplates(userId)
+    const uid = getUid()
+    if (uid) {
+      resetTemplates(uid)
+    }
   }, [])
 
   return (

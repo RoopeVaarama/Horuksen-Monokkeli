@@ -1,17 +1,18 @@
 import { useState, ChangeEvent, FormEvent } from 'react'
 import { styled, Typography, Button, Box, TextField } from '@mui/material'
 import { FormattedMessage } from 'react-intl'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { LoginDto } from '../../types'
+import { useUserStore } from '../../store/userStore'
 
 const FormContainer = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
-  position: 'fixed',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
+  marginTop: theme.spacing(4),
+  marginBottom: theme.spacing(2),
   padding: '25px',
   borderRadius: '10px',
-  border: 'solid'
+  border: 'solid',
+  alignItems: 'center'
 }))
 
 const SignInForm = styled('form')(({ theme }) => ({
@@ -29,23 +30,24 @@ const FormInput = styled(TextField)(() => ({
 }))
 
 const SignInButton = styled(Button)(({ theme }) => ({
-  margin: '10px',
-  variant: 'contained',
-  color: theme.palette.primary.dark
+  margin: '10px'
 }))
 
 const RegisterLink = styled(Link)(({ theme }) => ({
+  maxWidth: 'max-content',
   fontSize: '12px',
-  display: 'flex',
-  justifyContent: 'center',
   fontColor: theme.palette.primary
 }))
 
+const DEFAULT_LOGIN_DTO: LoginDto = {
+  username: '',
+  password: ''
+}
+
 const SignInContainer = () => {
-  const [credentials, setCredentials] = useState({
-    email: '',
-    password: ''
-  })
+  const [credentials, setCredentials] = useState<LoginDto>(DEFAULT_LOGIN_DTO)
+  const { login } = useUserStore()
+  const navigate = useNavigate()
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = event.target
@@ -55,28 +57,32 @@ const SignInContainer = () => {
     }))
   }
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault()
-    console.log('Submitted: ' + credentials.email + ': ' + credentials.password)
-    // TO DO Varsinainen kirjautumisäksöni
+    const success = await login(credentials)
+    if (success) {
+      setCredentials(DEFAULT_LOGIN_DTO)
+      navigate('/')
+    }
   }
 
   return (
-    <div>
+    <Box display='flex' width='100%' justifyContent='center' textAlign='center'>
       <FormContainer>
         <Typography variant='h6'>
           <FormattedMessage id='signIn' defaultMessage='Kirjautuminen' />
         </Typography>
         <SignInForm onSubmit={handleSubmit}>
           <FormInput
-            label={<FormattedMessage id='email' defaultMessage='Sähköposti' />}
-            type='email'
-            name='email'
-            value={credentials.email}
+            color='secondary'
+            label={<FormattedMessage id='username' defaultMessage='Käyttäjätunnus' />}
+            name='username'
+            value={credentials.username}
             onChange={handleChange}
             required
           />
           <FormInput
+            color='secondary'
             label={<FormattedMessage id='password' defaultMessage='Salasana' />}
             type='password'
             name='password'
@@ -84,7 +90,7 @@ const SignInContainer = () => {
             onChange={handleChange}
             required
           />
-          <SignInButton type='submit'>
+          <SignInButton type='submit' variant='contained'>
             <FormattedMessage id='signIn' defaultMessage='Kirjaudu sisään' />
           </SignInButton>
         </SignInForm>
@@ -92,7 +98,7 @@ const SignInContainer = () => {
           <FormattedMessage id='register' defaultMessage='Rekisteröidy' />
         </RegisterLink>
       </FormContainer>
-    </div>
+    </Box>
   )
 }
 

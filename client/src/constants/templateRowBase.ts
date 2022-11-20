@@ -6,6 +6,7 @@ export const templateRowBase: TemplateRow = {
   keyOnly: false,
   direction: 0,
   allowedOffset: 10,
+  levenDistance: 0,
   valueMatch: '.*',
   valuePrune: '.*',
   ignoreFirst: 0,

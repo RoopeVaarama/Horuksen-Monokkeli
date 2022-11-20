@@ -15,11 +15,15 @@ const Alert = ({
     <Stack
       direction='row'
       spacing={2}
-      p={1}
+      p='8px'
       borderRadius={1}
       alignItems='center'
       justifyContent='space-between'
-      sx={{ backgroundColor: 'rgb(229, 246, 253)', height: '40px', width: '100%' }}
+      sx={{
+        backgroundColor: 'rgb(229, 246, 253)',
+        height: '40px',
+        width: 'calc(100% - 16px)'
+      }}
     >
       <Stack direction='row' spacing={1}>
         <InfoOutlinedIcon color='secondary' />
