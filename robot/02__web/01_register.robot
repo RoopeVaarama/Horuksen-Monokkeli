@@ -1,4 +1,5 @@
 *** Settings ***
+Documentation    New user registration, login and register page translations
 Library    Browser    auto_closing_level=Suite
 Resource    ../resources.robot
 
