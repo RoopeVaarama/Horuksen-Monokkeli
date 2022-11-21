@@ -126,12 +126,13 @@ const RegisterContainer = () => {
 
   return (
     <Box display='flex' width='100%' justifyContent='center' textAlign='center'>
-      <FormContainer>
+      <FormContainer id='registerFormContainer'>
         <Typography variant='h6'>
           <FormattedMessage id='register' defaultMessage='Rekisteröidy' />
         </Typography>
-        <RegisterForm onSubmit={handleSubmit}>
+        <RegisterForm id='registerForm' onSubmit={handleSubmit}>
           <FormInput
+            id='userNameInput'
             color='secondary'
             label={<FormattedMessage id='username' defaultMessage='Käyttäjätunnus' />}
             type='text'
@@ -192,7 +193,7 @@ const RegisterContainer = () => {
             {<FormattedMessage id='register' defaultMessage='Rekisteröidy' />}
           </SignInButton>
         </RegisterForm>
-        <SignInLink to='../signin'>
+        <SignInLink id='signInLink' to='../signin'>
           {<FormattedMessage id='signIn' defaultMessage='Sisäänkirjautuminen' />}
         </SignInLink>
       </FormContainer>
