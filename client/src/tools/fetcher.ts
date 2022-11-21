@@ -1,17 +1,16 @@
 import axios from 'axios'
+import { getToken } from './auth'
 
 export const fetcher = async ({
   method,
   path,
   id,
-  body,
-  token
+  body
 }: {
   method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
   path: string
   id?: string
   body?: any
-  token?: string
 }) => {
   const urlEnding = id ? `${path}/${id}` : path
   const options = {
@@ -19,14 +18,11 @@ export const fetcher = async ({
     method: method,
     headers: {
       Accept: 'application/json',
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${getToken()}`
     },
     data: body
   }
-  try {
-    const response = await axios(options)
-    return response.data
-  } catch (e) {
-    console.log(e)
-  }
+  const response = await axios(options)
+  return response.data
 }

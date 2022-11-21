@@ -1,4 +1,5 @@
 import { styled } from '@mui/material'
+import NotificationContainer from '../NotificationContainer'
 import Toolbar from './Toolbar'
 
 const TOOLBAR_HEIGHT = '60px'
@@ -39,11 +40,12 @@ const Content = styled('div')(({ theme }) => ({
   }
 }))
 
-const AppFrame = ({ children }: { children: JSX.Element }) => {
+const AppFrame = ({ children }: { children: JSX.Element | JSX.Element[] }) => {
   return (
     <Root>
       <Wrapper>
         <Toolbar height={TOOLBAR_HEIGHT} />
+        <NotificationContainer />
         <Content>{children}</Content>
       </Wrapper>
     </Root>

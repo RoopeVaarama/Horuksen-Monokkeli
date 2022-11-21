@@ -9,7 +9,7 @@ export type FileListDocument = FileList & mongoose.Document;
 @Schema({ timestamps: {} })
 export class FileList {
   @Prop({ type: String, required: true }) // Should title be unique?
-  @ApiProperty()
+  @ApiProperty({ description: 'Name of the file list. Is displayed to user.' })
   title: string;
 
   /*
@@ -18,12 +18,11 @@ export class FileList {
   author: User;
   */
 
-  @Prop({ type: String, default: 'Placeholder' })
-  @ApiProperty()
+  @Prop({ type: String, default: 'Placeholder', required: false })
   author: string;
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'FileMeta' }] })
-  @ApiProperty()
+  @ApiProperty({ description: "Array of file ID's that this list holds." })
   files: FileMeta[];
 }
 

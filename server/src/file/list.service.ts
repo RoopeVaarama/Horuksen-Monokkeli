@@ -19,6 +19,8 @@ export class ListService {
   }
 
   async createFileList(list: FileList): Promise<FileList> {
+    //TODO: retrieve author id(?)
+    list.author = 'Author added in code';
     return await new this.fileListModel(list).save();
   }
 
@@ -69,13 +71,15 @@ export class ListService {
     return doc;
   }
 
-  async updateFileList(id: string, list: FileList): Promise<FileList> {
-    const updated = await this.fileListModel.findOneAndUpdate({ _id: id }, { ...list }).exec();
+  async updateFileList(listId: string, list: FileList): Promise<FileList> {
+    await this.canListBeFound(listId);
+    const updated = await this.fileListModel.findOneAndUpdate({ _id: listId }, { ...list }).exec();
     return await this.fileListModel.findById(updated._id).exec();
   }
 
-  async deleteFileList(id: string): Promise<boolean> {
-    const deleteResponse = await this.fileListModel.deleteOne({ _id: id }).exec();
+  async deleteFileList(listId: string): Promise<boolean> {
+    await this.canListBeFound(listId);
+    const deleteResponse = await this.fileListModel.deleteOne({ _id: listId }).exec();
     return deleteResponse.acknowledged;
   }
 

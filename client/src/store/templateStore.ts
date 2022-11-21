@@ -6,6 +6,33 @@ import { Direction, Template, TemplateRow } from '../types'
 
 const BASE_PATH = 'template'
 
+interface NewValue {
+  [key: string]: any
+}
+
+const updateDraftRow = (
+  newValue: NewValue,
+  templateDraft: Template | null,
+  id?: string,
+  localId?: number
+) => {
+  return templateDraft
+    ? {
+        ...templateDraft,
+        terms: templateDraft.terms.map((row) => {
+          if (
+            (row._id !== undefined && row._id === id) ||
+            (row.localId !== undefined && row.localId === localId)
+          ) {
+            return Object.assign(row, newValue)
+          } else {
+            return Object.assign({}, row)
+          }
+        })
+      }
+    : null
+}
+
 interface TemplateState {
   latestTemplateRowId: number
   draftIsEdit: boolean
@@ -17,13 +44,19 @@ interface TemplateState {
   addTemplateDraftRow: () => void
   deleteTemplateDraftRow: (id?: string, localId?: number) => void
   updateTemplateDraftTitle: (newTitle: string) => void
-  updateTemplateDraftKey: (newKey: string, id?: string, localId?: number) => void
+  updateTemplateDraftKey: (key: string, id?: string, localId?: number) => void
   updateTemplateDraftDirection: (
-    newDirection: Direction['value'],
+    direction: Direction['value'],
     id?: string,
     localId?: number
   ) => void
-  updateTemplateDraftKeyOnly: (newState: boolean, id?: string, localId?: number) => void
+  updateTemplateDraftKeyOnly: (keyOnly: boolean, id?: string, localId?: number) => void
+  updateTemplateDraftAllowedOffset: (allowedOffset: number, id?: string, localId?: number) => void
+  updateTemplateDraftLevenDist: (levenDistance: number, id?: string, localId?: number) => void
+  updateTemplateDraftValueMatch: (valueMatch: string, id?: string, localId?: number) => void
+  updateTemplateDraftValuePrune: (valuePrune: string, id?: string, localId?: number) => void
+  updateTemplateDraftIgnoreFirst: (ignoreFirst: number, id?: string, localId?: number) => void
+  updateTemplateDraftMaxPerPage: (maxPerPage: number, id?: string, localId?: number) => void
   resetTemplates: (userId: string) => void
   deleteTemplate: (id: string) => void
   createTemplate: () => void
@@ -40,8 +73,9 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
   templates: [],
   fetching: false,
   createTemplateDraft: (userId: string, baseTemplate?: Template) => {
+    const newDraft = JSON.parse(JSON.stringify(baseTemplate ?? templateBase))
     set(() => ({
-      templateDraft: baseTemplate ?? { ...templateBase, author: userId },
+      templateDraft: { ...newDraft, author: userId },
       draftIsEdit: Boolean(baseTemplate)
     }))
   },
@@ -52,13 +86,14 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
     }))
   },
   addTemplateDraftRow: () => {
+    const newDraftRow = JSON.parse(JSON.stringify(templateRowBase))
     set((state) => ({
       templateDraft: state.templateDraft
         ? {
             ...state.templateDraft,
             terms: [
               ...state.templateDraft.terms,
-              { ...templateRowBase, localId: state.latestTemplateRowId + 1 }
+              { ...newDraftRow, localId: state.latestTemplateRowId + 1 }
             ]
           }
         : null,
@@ -87,65 +122,51 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
       templateDraft: state.templateDraft ? { ...state.templateDraft, title: newTitle } : null
     }))
   },
-  updateTemplateDraftKey: (newKey: string, id?: string, localId?: number) => {
+  updateTemplateDraftKey: (key: string, id?: string, localId?: number) => {
     set((state) => ({
-      templateDraft: state.templateDraft
-        ? {
-            ...state.templateDraft,
-            terms: state.templateDraft.terms.map((row) => {
-              if (
-                (row._id !== undefined && row._id === id) ||
-                (row.localId !== undefined && row.localId === localId)
-              ) {
-                return { ...row, key: newKey }
-              } else {
-                return row
-              }
-            })
-          }
-        : null
+      templateDraft: updateDraftRow({ key }, state.templateDraft, id, localId)
     }))
   },
-  updateTemplateDraftDirection: (
-    newDirection: Direction['value'],
-    id?: string,
-    localId?: number
-  ) => {
+  updateTemplateDraftDirection: (direction: Direction['value'], id?: string, localId?: number) => {
     set((state) => ({
-      templateDraft: state.templateDraft
-        ? {
-            ...state.templateDraft,
-            terms: state.templateDraft.terms.map((row) => {
-              if (
-                (row._id !== undefined && row._id === id) ||
-                (row.localId !== undefined && row.localId === localId)
-              ) {
-                return { ...row, direction: newDirection }
-              } else {
-                return row
-              }
-            })
-          }
-        : null
+      templateDraft: updateDraftRow({ direction }, state.templateDraft, id, localId)
     }))
   },
-  updateTemplateDraftKeyOnly: (newState: boolean, id?: string, localId?: number) => {
+  updateTemplateDraftKeyOnly: (keyOnly: boolean, id?: string, localId?: number) => {
     set((state) => ({
-      templateDraft: state.templateDraft
-        ? {
-            ...state.templateDraft,
-            terms: state.templateDraft.terms.map((row) => {
-              if (
-                (row._id !== undefined && row._id === id) ||
-                (row.localId !== undefined && row.localId === localId)
-              ) {
-                return { ...row, keyOnly: newState }
-              } else {
-                return row
-              }
-            })
-          }
-        : null
+      templateDraft: updateDraftRow({ keyOnly }, state.templateDraft, id, localId)
+    }))
+  },
+  updateTemplateDraftAllowedOffset: (allowedOffset: number, id?: string, localId?: number) => {
+    set((state) => ({
+      templateDraft: updateDraftRow({ allowedOffset }, state.templateDraft, id, localId)
+    }))
+  },
+  updateTemplateDraftLevenDist: (levenDistance: number, id?: string, localId?: number) => {
+    set((state) => ({
+      templateDraft: updateDraftRow({ levenDistance }, state.templateDraft, id, localId)
+    }))
+  },
+  updateTemplateDraftValueMatch: (valueMatch: string, id?: string, localId?: number) => {
+    const newValueMatch = valueMatch || templateRowBase.valueMatch
+    set((state) => ({
+      templateDraft: updateDraftRow({ valueMatch: newValueMatch }, state.templateDraft, id, localId)
+    }))
+  },
+  updateTemplateDraftValuePrune: (valuePrune: string, id?: string, localId?: number) => {
+    const newValuePrune = valuePrune || templateRowBase.valuePrune
+    set((state) => ({
+      templateDraft: updateDraftRow({ valuePrune: newValuePrune }, state.templateDraft, id, localId)
+    }))
+  },
+  updateTemplateDraftIgnoreFirst: (ignoreFirst: number, id?: string, localId?: number) => {
+    set((state) => ({
+      templateDraft: updateDraftRow({ ignoreFirst }, state.templateDraft, id, localId)
+    }))
+  },
+  updateTemplateDraftMaxPerPage: (maxPerPage: number, id?: string, localId?: number) => {
+    set((state) => ({
+      templateDraft: updateDraftRow({ maxPerPage }, state.templateDraft, id, localId)
     }))
   },
   resetTemplates: async (userId: string) => {

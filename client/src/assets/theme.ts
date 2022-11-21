@@ -20,6 +20,9 @@ export const theme = createTheme({
       main: '#0F9A60',
       light: '#2AD18B',
       dark: '#01804B'
+    },
+    text: {
+      disabled: 'rgba(0, 0, 0, 0.7)'
     }
   }
 })

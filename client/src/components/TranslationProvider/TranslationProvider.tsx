@@ -1,5 +1,6 @@
-import { useState, createContext } from 'react'
+import { useState, createContext, useEffect } from 'react'
 import { IntlProvider } from 'react-intl'
+import { LOCALE_KEY } from '../../constants'
 import * as locale_en from '../../translation/en.json'
 
 export interface Locales {
@@ -25,6 +26,7 @@ const TranslationProvider = ({ children }: { children: JSX.Element }) => {
 
   const changeLanguage = (newLocale: string) => {
     setLocale(newLocale)
+    localStorage.setItem(LOCALE_KEY, newLocale)
   }
 
   const changeMessages = (lang: string) => {
@@ -37,6 +39,13 @@ const TranslationProvider = ({ children }: { children: JSX.Element }) => {
         return undefined
     }
   }
+
+  useEffect(() => {
+    const oldLocale = localStorage.getItem(LOCALE_KEY)
+    if (oldLocale) {
+      changeLanguage(oldLocale)
+    }
+  }, [])
 
   return (
     <IntlContext.Provider value={{ locale, locales: LOCALES, changeLanguage }}>

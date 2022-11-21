@@ -17,6 +17,10 @@ export class FileService {
     return true;
   }
 
+  async getFileId(filePath: string) {
+    return await this.fileMetaModel.find({ filepath: filePath }).exec();
+  }
+
   // file could use a type definition
   async createFileMeta(file: Express.Multer.File): Promise<FileMeta> {
     const filemeta = new FileMeta();
@@ -41,6 +45,7 @@ export class FileService {
   async getFilesByIds(fileIds: string[]): Promise<FileMeta[]> {
     const metasToReturn: FileMeta[] = [];
     for (let i = 0; i < fileIds.length; i++) {
+      await this.canFileBeFound(fileIds.at(i));
       let fileMetaToPush: FileMeta;
       try {
         fileMetaToPush = await this.fileMetaModel.findById(fileIds.at(i));
@@ -56,7 +61,12 @@ export class FileService {
     await this.canFileBeFound(id);
     const fileToRemove = (await this.fileMetaModel.findById(id)).filepath;
 
-    unlinkSync(fileToRemove);
+    try {
+      unlinkSync(fileToRemove);
+    } catch (err) {
+      //File doesn't exist for some magical reason, but meta still needs to
+      //be removed, continuing...
+    }
     const deleteResponse = await this.fileMetaModel.deleteOne({ _id: id }).exec();
     return deleteResponse.acknowledged;
   }
