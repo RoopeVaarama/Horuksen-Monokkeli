@@ -54,12 +54,6 @@ const FilesPage = () => {
             fileLists.push({ key: filelist._id, groupName: filelist.title, selected: false })
           })
         }
-        // Always add one filegroup containing all files as the first one on the list
-        fileLists.unshift({
-          key: 'Kaikki tiedostot',
-          groupName: 'Kaikki tiedostot',
-          selected: false
-        })
         setChildren(fileLists)
       })
       .catch((e) => console.log(e))
@@ -76,7 +70,7 @@ const FilesPage = () => {
       }
     })
       .then((response) => response.json())
-      .then((data) => {
+      .then(() => {
         setUpload(true)
       })
       .catch((error) => console.log(error))
@@ -90,8 +84,6 @@ const FilesPage = () => {
       uploadFile(formData)
     })
   }
-
-  //TODO kokeile tätä
 
   const updateSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setKeyword(event.target.value)

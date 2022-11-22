@@ -23,7 +23,7 @@ const Sidetext = styled('div')(() => ({
 const FileGroup = (props: { id: string; groupName: string }) => {
   const { fileIDs, openFileGroups, setGroupAsOpen, setGroupAsClosed, upload, setUpload } =
     useSearchStore()
-  const { keyword, refreshSearch, searchActive, setSearchInactive } = useFilesearchStore()
+  const { keyword, refreshSearch, searchActive } = useFilesearchStore()
   const { id, groupName } = props
 
   const [allFiles, setAllFiles] = useState<
@@ -237,7 +237,6 @@ const FileGroup = (props: { id: string; groupName: string }) => {
               author={file.author}
               date={file.date}
               fileName={file.filename}
-              groupName={groupName}
               checked={groupSelected}
               override={override}
               onToggle={onItemToggle}
