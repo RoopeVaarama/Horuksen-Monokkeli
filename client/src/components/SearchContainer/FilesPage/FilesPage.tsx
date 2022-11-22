@@ -5,6 +5,8 @@ import StyledPaper from '../../common/StyledPaper/StyledPaper'
 import FileGroup from './FileGroup'
 import FileUploader from './FileUploader'
 import { useSearchStore } from '../../../store/searchStore'
+//import { fetcher } from '../../../tools/fetcher'
+import { getToken } from '../../../tools/auth'
 
 const SearchField = styled(TextField)(() => ({
   variant: 'outlined',
@@ -31,12 +33,19 @@ const FilesPage = () => {
 
   // Fetch the file groups
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/files/list`)
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/files/list`, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`
+      }
+    })
       .then((res) => res.json())
       .then((data) => {
-        const fileLists = data.map((filelist: any) => {
-          return { key: filelist._id, groupName: filelist.title, selected: false }
-        })
+        const fileLists = []
+        if (data.length > 0) {
+          data.map((filelist: any) => {
+            fileLists.push({ key: filelist._id, groupName: filelist.title, selected: false })
+          })
+        }
         // Always add one filegroup containing all files as the first one on the list
         fileLists.unshift({
           key: 'Kaikki tiedostot',
@@ -49,10 +58,14 @@ const FilesPage = () => {
   }, [])
 
   // Upload file(s) to the database
-  const uploadFile = (formData: FormData) => {
+  const uploadFile = async (formData: FormData) => {
+    // Use fetch instead of fetcher to enable FormData content
     fetch(`${process.env.REACT_APP_BACKEND_URL}/files/upload`, {
       method: 'POST',
-      body: formData
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${getToken()}`
+      }
     })
       .then((response) => response.json())
       .then((data) => {
