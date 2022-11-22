@@ -59,5 +59,6 @@
   "templateTitle": "Template title",
   "unsavedChanges": "You have unchanged changes.",
   "uploadFiles": "Upload files",
-  "noAuthedUser": "Login information was not found from local storage. Log out and back in again."
+  "noAuthedUser": "Login information was not found from local storage. Log out and back in again.",
+  "usersLists": "User's lists"
 }
