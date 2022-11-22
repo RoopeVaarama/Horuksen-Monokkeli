@@ -13,6 +13,7 @@ import FileItem from './FileItem'
 import { useSearchStore } from '../../../store/searchStore'
 import { useFilesearchStore } from '../../../store/filesearchStore'
 import { FormattedMessage } from 'react-intl'
+import { getToken } from '../../../tools/auth'
 
 const Sidetext = styled('div')(() => ({
   display: 'flex',
@@ -57,7 +58,11 @@ const FileGroup = (props: { id: string; groupName: string }) => {
   }, [])
 
   const fetchAllFiles = () => {
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/files`)
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/files`, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`
+      }
+    })
       .then((response) => response.json())
       .then((data) => {
         const newData = data.map((file: any) => {
@@ -84,7 +89,11 @@ const FileGroup = (props: { id: string; groupName: string }) => {
   }
 
   const fetchFilesInList = () => {
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/files/list/${id}`)
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/files/list/${id}`, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`
+      }
+    })
       .then((res) => res.json())
       .then((data) => {
         const files = data.files.map((file: any) => {

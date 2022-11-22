@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Button, Stack, Divider, ListItemButton, Checkbox, Typography, styled } from '@mui/material'
 import { FormattedMessage } from 'react-intl'
 import { useSearchStore } from '../../../store/searchStore'
+import { getToken } from '../../../tools/auth'
 
 const Sidetext = styled('div')(() => ({
   display: 'flex',
@@ -27,6 +28,21 @@ const FileItem = (props: {
   const toggle = () => {
     setFileSelected((currently) => !currently)
   }
+
+  const openFile = () => {
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/files/read/${id}`, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`
+      }
+    })
+      .then((res) => res.blob())
+      .then((myBlob) => {
+        const objectURL = URL.createObjectURL(myBlob)
+        window.open(objectURL, '_blank', 'noopener, noreferrer')
+      })
+      .catch((e) => console.log(e))
+  }
+
   useEffect(() => {
     onToggle(id, fileSelected)
     fileSelected
@@ -60,7 +76,7 @@ const FileItem = (props: {
           <FormattedMessage id='added' defaultMessage='Lisätty '></FormattedMessage>
           {date}
         </Typography>
-        <Button id='fileitem-open-button'>
+        <Button id='fileitem-open-button' onClick={openFile}>
           <FormattedMessage id='open' defaultMessage='Avaa' />
         </Button>
       </Sidetext>
