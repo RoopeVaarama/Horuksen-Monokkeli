@@ -1,7 +1,7 @@
 import create from 'zustand'
 import { fetcher } from '../tools/fetcher'
 //import { templatesArrayToSearch } from '../tools/temporaryConverters'
-import { FileMeta, SearchResult, Template, TemplateRow } from '../types'
+import { FileMeta, SearchResult, Template } from '../types'
 
 interface SearchState {
   searchTemplates: Template[]
@@ -52,12 +52,10 @@ export const useSearchStore = create<SearchState>((set, get) => ({
     if (!get().searching && get().refreshSearch && get().searchTemplates.length !== 0) {
       set({ searching: true, results: [] })
 
-      // Vaihda tää template-arrayhyn jos/kun haku päivitetään
-      const terms: TemplateRow[] = []
+      // Get template IDs
+      const templateIDs: string[] = []
       get().searchTemplates.forEach((template) => {
-        template.terms.forEach((termSet) => {
-          terms.push(termSet)
-        })
+        template._id !== undefined && templateIDs.push(template._id)
       })
 
       // Filter duplicates
@@ -66,9 +64,9 @@ export const useSearchStore = create<SearchState>((set, get) => ({
       try {
         const data = await fetcher({
           method: 'POST',
-          path: 'search/search',
+          path: 'search/template_search',
           body: JSON.stringify({
-            terms: terms,
+            templates: templateIDs,
             files: uniqueFileIDS
           })
         })
