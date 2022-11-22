@@ -11,6 +11,7 @@ import {
 import { ExpandLess, ExpandMore } from '@mui/icons-material'
 import FileItem from './FileItem'
 import { useSearchStore } from '../../../store/searchStore'
+import { useFilesearchStore } from '../../../store/filesearchStore'
 import { FormattedMessage } from 'react-intl'
 import { getToken } from '../../../tools/auth'
 
@@ -22,7 +23,19 @@ const Sidetext = styled('div')(() => ({
 const FileGroup = (props: { id: string; groupName: string }) => {
   const { fileIDs, openFileGroups, setGroupAsOpen, setGroupAsClosed, upload, setUpload } =
     useSearchStore()
+  const { keyword, refreshSearch, searchActive, setSearchInactive } = useFilesearchStore()
   const { id, groupName } = props
+
+  const [allFiles, setAllFiles] = useState<
+    {
+      id: string
+      author: string
+      filename: string
+      date: string
+      dateObj: Date
+      checked: boolean
+    }[]
+  >([])
 
   const [children, setChildren] = useState<
     {
@@ -70,6 +83,7 @@ const FileGroup = (props: { id: string; groupName: string }) => {
         ) {
           return a.dateObj > b.dateObj ? -1 : 1
         })
+        setAllFiles(newData)
         setChildren(newData)
       })
   }
@@ -144,6 +158,15 @@ const FileGroup = (props: { id: string; groupName: string }) => {
     return children.reduce((prev, curr) => prev + (curr.checked ? 1 : 0), 0)
   }
 
+  const filterSearch = () => {
+    const filteredFiles = allFiles.filter((file) => {
+      return file.filename.includes(keyword)
+    })
+    setChildren(filteredFiles)
+    setOpen(true)
+    updateGroup()
+  }
+
   useEffect(() => {
     // If all files are selected, check the main checkbox
     totalFiles > 0 && (chosenFiles === totalFiles ? check() : uncheck())
@@ -157,6 +180,16 @@ const FileGroup = (props: { id: string; groupName: string }) => {
       setUpload(false)
     }
   }, [upload])
+
+  useEffect(() => {
+    updateGroup()
+  }, [children])
+
+  useEffect(() => {
+    if (groupName === 'Kaikki tiedostot') {
+      searchActive ? filterSearch() : fetchAllFiles()
+    }
+  }, [refreshSearch, searchActive])
 
   return (
     <Stack id='filegroup-row'>

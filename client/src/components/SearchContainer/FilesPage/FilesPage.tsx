@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Grid, InputAdornment, Stack, styled, TextField } from '@mui/material'
+import { Grid, InputAdornment, Stack, styled, TextField, Typography } from '@mui/material'
 import { SearchRounded } from '@mui/icons-material'
 import StyledPaper from '../../common/StyledPaper/StyledPaper'
 import FileGroup from './FileGroup'
@@ -7,10 +7,13 @@ import FileUploader from './FileUploader'
 import { useSearchStore } from '../../../store/searchStore'
 //import { fetcher } from '../../../tools/fetcher'
 import { getToken } from '../../../tools/auth'
+import { useFilesearchStore } from '../../../store/filesearchStore'
+import { FormattedMessage } from 'react-intl'
 
 const SearchField = styled(TextField)(() => ({
   variant: 'outlined',
-  width: '100%'
+  width: '100%',
+  label: 'Etsi tiedostoja..'
 }))
 const UtilityBar = styled(Grid)(() => ({
   padding: '15px'
@@ -22,6 +25,8 @@ const StyledDiv = styled('div')(() => ({
 
 const FilesPage = () => {
   const { setUpload } = useSearchStore()
+  const { keyword, refresh, setKeyword, setSearchActive, setSearchInactive, searchActive } =
+    useFilesearchStore()
 
   const [children, setChildren] = useState<
     {
@@ -47,11 +52,11 @@ const FilesPage = () => {
           })
         }
         // Always add one filegroup containing all files as the first one on the list
-        fileLists.unshift({
+        /*fileLists.unshift({
           key: 'Kaikki tiedostot',
           groupName: 'Kaikki tiedostot',
           selected: false
-        })
+        })*/
         setChildren(fileLists)
       })
       .catch((e) => console.log(e))
@@ -83,6 +88,22 @@ const FilesPage = () => {
     })
   }
 
+  //TODO kokeile tätä
+
+  const updateSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setKeyword(event.target.value)
+    if (event.target.value === '') {
+      setSearchInactive()
+    }
+  }
+
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter' && keyword !== '') {
+      setSearchActive()
+      refresh()
+    }
+  }
+
   return (
     <StyledPaper sx={{ width: 'calc(100% - 48px)' }}>
       <StyledDiv>
@@ -91,6 +112,7 @@ const FilesPage = () => {
             <SearchField
               id='filepage-searchbar'
               size='small'
+              placeholder='Etsi tiedostoja' // TODO intl
               InputProps={{
                 startAdornment: (
                   <InputAdornment position='start'>
@@ -98,6 +120,8 @@ const FilesPage = () => {
                   </InputAdornment>
                 )
               }}
+              onChange={updateSearch}
+              onKeyDown={handleKeyPress}
             />
           </Grid>
         </UtilityBar>
@@ -112,9 +136,18 @@ const FilesPage = () => {
             my: 2
           }}
         >
-          {children.map((filegroup) => (
-            <FileGroup key={filegroup.key} id={filegroup.key} groupName={filegroup.groupName} />
-          ))}
+          <FileGroup id='Kaikki tiedostot' groupName='Kaikki tiedostot' />
+          {children.length > 0 && !searchActive && <hr />}
+          {children.length > 0 && !searchActive && (
+            <Typography>
+              <FormattedMessage id='usersLists' defaultMessage='Käyttäjän omat listat' />
+            </Typography>
+          )}
+
+          {!searchActive &&
+            children.map((filegroup) => (
+              <FileGroup key={filegroup.key} id={filegroup.key} groupName={filegroup.groupName} />
+            ))}
         </Stack>
         <hr />
         <Stack direction='row' marginBottom='10px' sx={{ justifyContent: 'space-evenly' }}>

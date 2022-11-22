@@ -10,11 +10,15 @@ const ProfileContainer = () => {
   const [error, setError] = useState<boolean>(false)
   const intl = useIntl()
 
-  const renderField = (title: string, value: string) => {
+  const renderField = (title: string, value: string, fieldId: string) => {
     return (
       <Stack>
-        <Typography sx={{ fontSize: '14px', fontWeight: 600 }}>{title}</Typography>
-        <Typography sx={{ fontSize: '14px', fontWeight: 500 }}>{value}</Typography>
+        <Typography id={fieldId + 'Label'} sx={{ fontSize: '14px', fontWeight: 600 }}>
+          {title}
+        </Typography>
+        <Typography id={fieldId + 'Value'} sx={{ fontSize: '14px', fontWeight: 500 }}>
+          {value}
+        </Typography>
       </Stack>
     )
   }
@@ -39,25 +43,29 @@ const ProfileContainer = () => {
             <Grid item xs={12} sm={6}>
               {renderField(
                 intl.formatMessage({ id: 'username', defaultMessage: 'Käyttäjätunnus' }),
-                authedUser.username
+                authedUser.username,
+                'userName'
               )}
             </Grid>
             <Grid item xs={12} sm={6}>
               {renderField(
                 intl.formatMessage({ id: 'email', defaultMessage: 'Sähköposti' }),
-                authedUser.email
+                authedUser.email,
+                'userEmail'
               )}
             </Grid>
             <Grid item xs={12} sm={6}>
               {renderField(
                 intl.formatMessage({ id: 'firstName', defaultMessage: 'Etunimi' }),
-                authedUser.firstName
+                authedUser.firstName,
+                'userFirstName'
               )}
             </Grid>
             <Grid item xs={12} sm={6}>
               {renderField(
                 intl.formatMessage({ id: 'lastName', defaultMessage: 'Sukunimi' }),
-                authedUser.lastName
+                authedUser.lastName,
+                'userLastName'
               )}
             </Grid>
           </Grid>
