@@ -5,7 +5,6 @@ import StyledPaper from '../../common/StyledPaper/StyledPaper'
 import FileGroup from './FileGroup'
 import FileUploader from './FileUploader'
 import { useSearchStore } from '../../../store/searchStore'
-//import { fetcher } from '../../../tools/fetcher'
 import { getToken } from '../../../tools/auth'
 import { useFilesearchStore } from '../../../store/filesearchStore'
 import { FormattedMessage } from 'react-intl'
@@ -45,18 +44,22 @@ const FilesPage = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        const fileLists = []
+        const fileLists: {
+          key: string
+          groupName: string
+          selected: boolean
+        }[] = []
         if (data.length > 0) {
           data.map((filelist: any) => {
             fileLists.push({ key: filelist._id, groupName: filelist.title, selected: false })
           })
         }
         // Always add one filegroup containing all files as the first one on the list
-        /*fileLists.unshift({
+        fileLists.unshift({
           key: 'Kaikki tiedostot',
           groupName: 'Kaikki tiedostot',
           selected: false
-        })*/
+        })
         setChildren(fileLists)
       })
       .catch((e) => console.log(e))
