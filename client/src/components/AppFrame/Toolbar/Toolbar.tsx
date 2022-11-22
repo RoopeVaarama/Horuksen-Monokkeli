@@ -87,6 +87,7 @@ const Toolbar = ({ height }: { height: string | number }) => {
           </Grid>
           <Grid item>
             <IconButton
+              id='dropdownMenuButton'
               size='large'
               color='inherit'
               aria-label='menu'
@@ -129,7 +130,7 @@ const Toolbar = ({ height }: { height: string | number }) => {
                   ))}
                 </Box>
               )}
-              <LanguageSelector />
+              <LanguageSelector id='languageSelectorDropdownMenu' />
               {isLoggedIn && (
                 <MenuItem onClick={() => handleLogout()} sx={{ mt: 1 }}>
                   <LogoutIcon />

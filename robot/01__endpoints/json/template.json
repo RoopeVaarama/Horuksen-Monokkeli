@@ -4,6 +4,7 @@
       {
         "key": "Robot Term 1",
         "keyOnly": false,
+        "levenDistance": 0,
         "direction": 0,
         "allowedOffset": 10,
         "valueMatch": ".*",
@@ -14,6 +15,7 @@
       {
         "key": "Robot Term 2",
         "keyOnly": false,
+        "levenDistance": 0,
         "direction": 3,
         "allowedOffset": 10,
         "valueMatch": ".*",

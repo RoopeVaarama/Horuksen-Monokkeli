@@ -68,12 +68,13 @@ const SignInContainer = () => {
 
   return (
     <Box display='flex' width='100%' justifyContent='center' textAlign='center'>
-      <FormContainer>
+      <FormContainer id='signInForm'>
         <Typography variant='h6'>
           <FormattedMessage id='signIn' defaultMessage='Kirjautuminen' />
         </Typography>
         <SignInForm onSubmit={handleSubmit}>
           <FormInput
+            id='userNameInput'
             color='secondary'
             label={<FormattedMessage id='username' defaultMessage='Käyttäjätunnus' />}
             name='username'
@@ -82,6 +83,7 @@ const SignInContainer = () => {
             required
           />
           <FormInput
+            id='passwordInput'
             color='secondary'
             label={<FormattedMessage id='password' defaultMessage='Salasana' />}
             type='password'
@@ -90,11 +92,11 @@ const SignInContainer = () => {
             onChange={handleChange}
             required
           />
-          <SignInButton type='submit' variant='contained'>
+          <SignInButton id='signInButton' type='submit' variant='contained'>
             <FormattedMessage id='signIn' defaultMessage='Kirjaudu sisään' />
           </SignInButton>
         </SignInForm>
-        <RegisterLink to='../register'>
+        <RegisterLink id='registerFormLink' to='../register'>
           <FormattedMessage id='register' defaultMessage='Rekisteröidy' />
         </RegisterLink>
       </FormContainer>
