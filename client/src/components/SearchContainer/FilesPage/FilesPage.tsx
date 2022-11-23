@@ -1,6 +1,15 @@
 import { useEffect, useState } from 'react'
-import { Grid, InputAdornment, Stack, styled, TextField, Typography } from '@mui/material'
+import {
+  Grid,
+  IconButton,
+  InputAdornment,
+  Stack,
+  styled,
+  TextField,
+  Typography
+} from '@mui/material'
 import { SearchRounded } from '@mui/icons-material'
+import CloseIcon from '@mui/icons-material/Close'
 import StyledPaper from '../../common/StyledPaper/StyledPaper'
 import FileGroup from './FileGroup'
 import FileUploader from './FileUploader'
@@ -99,6 +108,11 @@ const FilesPage = () => {
     }
   }
 
+  const resetSearch = () => {
+    setKeyword('')
+    setSearchInactive()
+  }
+
   return (
     <StyledPaper sx={{ width: 'calc(100% - 48px)' }}>
       <StyledDiv>
@@ -107,16 +121,23 @@ const FilesPage = () => {
             <SearchField
               id='filepage-searchbar'
               size='small'
-              placeholder='Etsi tiedostoja' // TODO intl
               InputProps={{
                 startAdornment: (
                   <InputAdornment position='start'>
                     <SearchRounded />
                   </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position='end'>
+                    <IconButton onClick={resetSearch}>
+                      <CloseIcon />
+                    </IconButton>
+                  </InputAdornment>
                 )
               }}
               onChange={updateSearch}
               onKeyDown={handleKeyPress}
+              value={keyword}
             />
           </Grid>
         </UtilityBar>
