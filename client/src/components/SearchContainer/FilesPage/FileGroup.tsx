@@ -14,6 +14,7 @@ import { useSearchStore } from '../../../store/searchStore'
 import { useFilesearchStore } from '../../../store/filesearchStore'
 import { FormattedMessage } from 'react-intl'
 import { getToken } from '../../../tools/auth'
+import { FileMeta } from '../../../types'
 
 const Sidetext = styled('div')(() => ({
   display: 'flex',
@@ -65,7 +66,7 @@ const FileGroup = (props: { id: string; groupName: string }) => {
     })
       .then((response) => response.json())
       .then((data) => {
-        const newData = data.map((file: any) => {
+        const newData = data.map((file: FileMeta) => {
           const date = new Date(file.createdAt).toLocaleDateString()
           return {
             id: file._id,
@@ -96,7 +97,7 @@ const FileGroup = (props: { id: string; groupName: string }) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        const files = data.files.map((file: any) => {
+        const files = data.files.map((file: FileMeta) => {
           const date = new Date(file.createdAt).toLocaleDateString()
           return {
             id: file._id,

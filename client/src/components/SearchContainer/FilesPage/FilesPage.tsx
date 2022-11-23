@@ -17,11 +17,11 @@ import { useSearchStore } from '../../../store/searchStore'
 import { getToken } from '../../../tools/auth'
 import { useFilesearchStore } from '../../../store/filesearchStore'
 import { FormattedMessage } from 'react-intl'
+import { FileList } from '../../../types'
 
 const SearchField = styled(TextField)(() => ({
   variant: 'outlined',
-  width: '100%',
-  label: 'Etsi tiedostoja..'
+  width: '100%'
 }))
 const UtilityBar = styled(Grid)(() => ({
   padding: '15px'
@@ -59,7 +59,7 @@ const FilesPage = () => {
           selected: boolean
         }[] = []
         if (data.length > 0) {
-          data.map((filelist: any) => {
+          data.map((filelist: FileList) => {
             fileLists.push({ key: filelist._id, groupName: filelist.title, selected: false })
           })
         }
