@@ -27,6 +27,7 @@ export class ListService {
       await (await this.fileListModel.findById(listId)).populate('files')
     ).files;
     let metasToAdd: FileMeta[] = [];
+    //TODO
     //A little bit purkkaviritelmä and O(m*n)
     //If someone has idea for better solution, feel free to modify
     outer: for (let newMeta = 0; newMeta < metas.length; newMeta++) {
@@ -37,12 +38,12 @@ export class ListService {
       }
       metasToAdd.push(metas.at(newMeta));
     }
-    const filter = { _id: listId };
     metasToAdd = metasToAdd.concat(currentMetas);
-    const update = { files: metasToAdd };
-    const doc = await this.fileListModel.findByIdAndUpdate(filter, update, {
-      new: true,
-    });
+    const doc = await this.fileListModel.findByIdAndUpdate(
+      { _id: listId },
+      { files: metasToAdd },
+      { new: true },
+    );
     return doc;
   }
 
@@ -51,6 +52,7 @@ export class ListService {
       await (await this.fileListModel.findById(listId)).populate('files')
     ).files;
     const metasToAdd: FileMeta[] = [];
+    //TODO
     //A little bit purkkaviritelmä and O(m*n)
     //If someone has idea for better solution, feel free to modify
     outer: for (let existingMeta = 0; existingMeta < currentMetas.length; existingMeta++) {
@@ -61,18 +63,22 @@ export class ListService {
       }
       metasToAdd.push(currentMetas.at(existingMeta));
     }
-    const filter = { _id: listId };
-    const update = { files: metasToAdd };
-    const doc = await this.fileListModel.findByIdAndUpdate(filter, update, {
-      new: true,
-    });
+    const doc = await this.fileListModel.findByIdAndUpdate(
+      { _id: listId },
+      { files: metasToAdd },
+      { new: true },
+    );
     return doc;
   }
 
   async updateFileList(listId: string, list: FileList): Promise<FileList> {
     await this.canListBeFound(listId);
-    const updated = await this.fileListModel.findOneAndUpdate({ _id: listId }, { ...list }).exec();
-    return await this.fileListModel.findById(updated._id).exec();
+
+    return await this.fileListModel.findOneAndUpdate(
+      { _id: listId }, //which list to update
+      { title: list.title, files: list.files }, //only changes these 2 values
+      { new: true }, //returns the updated version instead of old one
+    );
   }
 
   async deleteFileList(listId: string): Promise<boolean> {
