@@ -133,10 +133,12 @@ export class FileController {
     description: 'File not found. One or more files could not be found. FileList not created.',
     type: FileList,
   })
-  async createFileList(@Body() list: FileList): Promise<FileList> {
+  async createFileList(@Body() list: FileList, @Req() request: Request): Promise<FileList> {
     for (let i = 0; i < list.files.length; ++i) {
       await this.fileService.canFileBeFound(list.files.at(i).toString());
     }
+    const userId = request.user['_id'].toString();
+    list.author = userId;
     return await this.listService.createFileList(list);
   }
 
