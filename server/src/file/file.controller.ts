@@ -119,19 +119,7 @@ export class FileController {
     return await this.fileService.deleteFile(id);
   }
 
-  //TODO: remove once fron-end doesn't use anymore
-  @Get('/get')
-  @ApiOperation({ summary: 'DEPRICATED AND WILL BE DELETED. Returns all filenames.' })
-  @ApiResponse({ status: 200, description: 'All filenames returned', type: [String] })
-  async getFilenames(): Promise<string[]> {
-    return await this.fileService.getAllFiles();
-  }
-
   // FileList methods =========================================================
-
-  // TODO: Currently passing bad ObjectId relations causes a server error (500)
-  // > Implement relation existance checking for create & update methods
-  // > Implement graceful error handling, raise bad request error
 
   // TODO: Mongo cannot automatically check for duplicate relations
   // > Duplication check in services, check during create & update
