@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { FileService } from './file.service';
@@ -16,6 +16,20 @@ export class ListService {
       throw new HttpException('List not found', 404);
     }
     return true;
+  }
+
+  async doesUserOwnFileList(userId: string, fileListId: string): Promise<boolean> {
+    let fileList;
+    try {
+      fileList = await this.fileListModel.findById(fileListId);
+    } catch (err) {
+      throw new HttpException('FileList not found', 404);
+    }
+
+    if (fileList.author == userId) {
+      return true;
+    }
+    return false;
   }
 
   async createFileList(list: FileList): Promise<FileList> {
@@ -81,19 +95,21 @@ export class ListService {
     );
   }
 
-  async deleteFileList(listId: string): Promise<boolean> {
+  async deleteFileList(listId: string, userId: string): Promise<boolean> {
+    if (!(await this.doesUserOwnFileList(userId, listId))) throw new UnauthorizedException();
     await this.canListBeFound(listId);
     const deleteResponse = await this.fileListModel.deleteOne({ _id: listId }).exec();
     return deleteResponse.acknowledged;
   }
 
-  async getAll(): Promise<FileList[]> {
-    const data = await this.fileListModel.find().populate('files');
+  async getAll(userId: string): Promise<FileList[]> {
+    const data = await this.fileListModel.find({ author: userId }).populate('files');
     return data;
   }
 
-  async getOne(id: string): Promise<FileList> {
-    const data = await (await this.fileListModel.findById(id)).populate('files');
+  async getOne(fileListId: string, userId: string): Promise<FileList> {
+    if (!(await this.doesUserOwnFileList(userId, fileListId))) throw new UnauthorizedException();
+    const data = await (await this.fileListModel.findById(fileListId)).populate('files');
     return data;
   }
 }

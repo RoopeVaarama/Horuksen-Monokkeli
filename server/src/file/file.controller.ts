@@ -14,6 +14,7 @@ import {
   ParseFilePipe,
   FileTypeValidator,
   Req,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
@@ -53,8 +54,10 @@ export class FileController {
   async read(
     @Param('id') id: string,
     @Res({ passthrough: true }) res: Response,
+    @Req() request: Request,
   ): Promise<StreamableFile> {
-    const meta = await this.fileService.getFileMeta(id);
+    const userId = request.user['_id'].toString();
+    const meta = await this.fileService.getFileMeta(id, userId);
     const file = createReadStream(join(process.cwd(), meta.filepath));
     res.set({
       'Content-Type': 'application/pdf',
@@ -104,8 +107,9 @@ export class FileController {
   @Get('/')
   @ApiOperation({ summary: 'Returns all FileMetas.' })
   @ApiResponse({ status: 200, description: 'All files returned', type: [FileMeta] })
-  async getFiles(): Promise<FileMeta[]> {
-    return await this.fileService.getFiles();
+  async getFiles(@Req() request: Request): Promise<FileMeta[]> {
+    const userId = request.user['_id'].toString();
+    return await this.fileService.getFiles(userId);
   }
 
   @Delete('/:id')
@@ -115,7 +119,9 @@ export class FileController {
     status: 404,
     description: 'File not found. No file with given ID could be found.',
   })
-  async deleteFile(@Param('id') id: string) {
+  async deleteFile(@Param('id') id: string, @Req() request: Request) {
+    const userId = request.user['_id'].toString();
+    if (!(await this.fileService.doesUserOwnFile(userId, id))) throw new UnauthorizedException();
     return await this.fileService.deleteFile(id);
   }
 
@@ -125,6 +131,7 @@ export class FileController {
   // > Duplication check in services, check during create & update
   // > Either return an error code, or pass without creating duplicates
 
+  //TODO: When creating list, make sure other peoples files can't be added to it
   @Post('/list')
   @ApiOperation({ summary: 'Creates single FileList with given name and (optinal) files.' })
   @ApiResponse({ status: 201, description: 'List created succesfully', type: FileList })
@@ -145,15 +152,17 @@ export class FileController {
   @Get('/list')
   @ApiOperation({ summary: 'Returns all FileLists' })
   @ApiResponse({ status: 200, description: 'Lists retrieved succesfully', type: [FileList] })
-  async getAllLists(): Promise<FileList[]> {
-    return await this.listService.getAll();
+  async getAllLists(@Req() request: Request): Promise<FileList[]> {
+    const userId = request.user['_id'].toString();
+    return await this.listService.getAll(userId);
   }
 
   @Get('/list/:id')
   @ApiOperation({ summary: 'Returns FileList matching given ID.' })
   @ApiResponse({ status: 200, description: 'List retrieved succesfully', type: FileList })
-  async getOneList(@Param('id') id: string): Promise<FileList> {
-    return await this.listService.getOne(id);
+  async getOneList(@Param('id') id: string, @Req() request: Request): Promise<FileList> {
+    const userId = request.user['_id'].toString();
+    return await this.listService.getOne(id, userId);
   }
 
   @Patch('/list/:id')
@@ -166,9 +175,13 @@ export class FileController {
       '\n OR \n List not found. No FileList with ID could be found. FileList not updated.',
     type: FileList,
   })
-  async updateFileList(@Param('id') id: string, @Body() list: FileList) {
+  async updateFileList(@Param('id') id: string, @Body() list: FileList, @Req() request: Request) {
+    const userId = request.user['_id'].toString();
     for (let i = 0; i < list.files.length; ++i) {
-      await this.fileService.canFileBeFound(list.files.at(i).toString());
+      //Also checks if file exists at the same time
+      if (!(await this.fileService.doesUserOwnFile(userId, list.files.at(i).toString()))) {
+        throw new UnauthorizedException();
+      }
     }
     return await this.listService.updateFileList(id, list);
   }
@@ -183,8 +196,9 @@ export class FileController {
     description: 'List not found. No list with given id could be found.',
     type: Boolean,
   })
-  async deleteFileList(@Param('id') listId: string) {
-    return await this.listService.deleteFileList(listId);
+  async deleteFileList(@Param('id') listId: string, @Req() request: Request) {
+    const userId = request.user['_id'].toString();
+    return await this.listService.deleteFileList(listId, userId);
   }
 
   @Patch('/list/files/:listId')
@@ -193,20 +207,27 @@ export class FileController {
   async addFilesTtoList(
     @Param('listId') listId: string,
     @Body() fileIds: string[],
+    @Req() request: Request,
   ): Promise<FileList> {
-    await this.listService.canListBeFound(listId);
-    const metas: FileMeta[] = await this.fileService.getFilesByIds(fileIds);
+    const userId = request.user['_id'].toString();
+    if (!(await this.listService.doesUserOwnFileList(userId, listId))) {
+      throw new UnauthorizedException();
+    }
+    const metas: FileMeta[] = await this.fileService.getFilesByIds(fileIds, userId);
     return await this.listService.addFilesToFileList(listId, metas);
   }
+
   @Delete('/list/files/:listId')
   @ApiOperation({ summary: 'Deletes given files from FileList matching given ID.' })
   @ApiResponse({ status: 200, description: 'Files deleted from list', type: Boolean })
   async deleteFilesFromFileList(
     @Param('listId') listId: string,
     @Body() fileIds: string[],
+    @Req() request: Request,
   ): Promise<FileList> {
+    const userId = request.user['_id'].toString();
     await this.listService.canListBeFound(listId);
-    const metas: FileMeta[] = await this.fileService.getFilesByIds(fileIds);
+    const metas: FileMeta[] = await this.fileService.getFilesByIds(fileIds, userId);
     return await this.listService.removeFilesFromFileList(listId, metas);
   }
 }

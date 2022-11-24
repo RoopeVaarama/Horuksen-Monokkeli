@@ -1,4 +1,10 @@
-import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { existsSync, opendirSync, readdir, unlinkSync } from 'fs';
@@ -21,6 +27,20 @@ export class FileService {
     return await this.fileMetaModel.find({ filepath: filePath }).exec();
   }
 
+  async doesUserOwnFile(userId: string, fileId: string): Promise<boolean> {
+    let fileMeta;
+    try {
+      fileMeta = await this.fileMetaModel.findById(fileId);
+    } catch (err) {
+      throw new HttpException('File not found', 404);
+    }
+
+    if (fileMeta.author == userId) {
+      return true;
+    }
+    return false;
+  }
+
   // file could use a type definition
   async createFileMeta(file: Express.Multer.File, userId: string): Promise<FileMeta> {
     const filemeta = new FileMeta();
@@ -30,24 +50,26 @@ export class FileService {
     return await new this.fileMetaModel(filemeta).save();
   }
 
-  async getFileMeta(id): Promise<FileMeta> {
-    if (!Types.ObjectId.isValid(id)) throw new BadRequestException('Invalid id');
-    const file = await this.fileMetaModel.findById(id).exec();
+  async getFileMeta(fileId: string, userId: string): Promise<FileMeta> {
+    if (!(await this.doesUserOwnFile(userId, fileId))) throw new UnauthorizedException();
+    if (!Types.ObjectId.isValid(fileId)) throw new BadRequestException('Invalid id');
+    const file = await this.fileMetaModel.findById(fileId).exec();
     if (!file) throw new NotFoundException('No file matching the id exists');
     return file;
   }
 
-  async getFiles(): Promise<FileMeta[]> {
-    const files = await this.fileMetaModel.find().select({ filepath: 0 }).exec(); // filepath is excluded from returned objects
+  async getFiles(userId: string): Promise<FileMeta[]> {
+    const files = await this.fileMetaModel.find({ author: userId }).select({ filepath: 0 }).exec(); // filepath is excluded from returned objects
     return files;
   }
 
-  async getFilesByIds(fileIds: string[]): Promise<FileMeta[]> {
+  async getFilesByIds(fileIds: string[], userId: string): Promise<FileMeta[]> {
     const metasToReturn: FileMeta[] = [];
     for (let i = 0; i < fileIds.length; i++) {
       await this.canFileBeFound(fileIds.at(i));
       let fileMetaToPush: FileMeta;
       try {
+        if (!(await this.doesUserOwnFile(userId, fileIds.at(i)))) throw new UnauthorizedException();
         fileMetaToPush = await this.fileMetaModel.findById(fileIds.at(i));
       } catch (err) {
         continue;
