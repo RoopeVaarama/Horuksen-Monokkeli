@@ -13,6 +13,7 @@ import {
   HttpException,
   ParseFilePipe,
   FileTypeValidator,
+  Req,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
@@ -34,7 +35,7 @@ import { ParseService } from 'src/search/parse.service';
 import { deprecate } from 'util';
 import { createReadStream } from 'fs';
 import { join } from 'path';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 
 @ApiTags('files')
 @Controller('/files')
@@ -85,8 +86,10 @@ export class FileController {
       }),
     )
     file: Express.Multer.File,
+    @Req() request: Request,
   ): Promise<FileMeta> {
-    const fileMetaToReturn = await this.fileService.createFileMeta(file);
+    const userId = request.user['_id'].toString();
+    const fileMetaToReturn = await this.fileService.createFileMeta(file, userId);
     try {
       await this.parseService.parsePdf(fileMetaToReturn.filepath);
     } catch (err) {

@@ -22,11 +22,11 @@ export class FileService {
   }
 
   // file could use a type definition
-  async createFileMeta(file: Express.Multer.File): Promise<FileMeta> {
+  async createFileMeta(file: Express.Multer.File, userId: string): Promise<FileMeta> {
     const filemeta = new FileMeta();
     filemeta.filename = file.originalname;
     filemeta.filepath = file.destination + '/' + file.filename;
-    filemeta.author = 'placeholder';
+    filemeta.author = userId;
     return await new this.fileMetaModel(filemeta).save();
   }
 
