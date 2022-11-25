@@ -6,6 +6,7 @@ import { TemplateService } from '../template.service';
 import { Template, TemplateDocument, TemplateSchema } from '../schemas/template.schema';
 import { TemplateStub, UpdatedTemplateStub } from '../test/stubs/template.schema.stub';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { User } from '../../user/user.schema';
 
 describe('TemplateController', () => {
   let templateService: TemplateService;
@@ -46,7 +47,7 @@ describe('TemplateController', () => {
     }
   });
 
-  describe('Create Template', () => {
+  describe('Template Service Methods', () => {
     it('Should save & return new document', async () => {
       const createdTemplate = await templateService.createTemplate(TemplateStub());
       expect(createdTemplate.title).toBe(TemplateStub().title); // Check for param property
@@ -95,7 +96,7 @@ describe('TemplateController', () => {
 
     it('Should delete document by ID and return true', async () => {
       const created = (await templateService.createTemplate(TemplateStub())) as TemplateDocument;
-      await expect(templateService.getTemplateById(created._id)).resolves.toBeTruthy();
+      await expect(templateService.deleteTemplate(created._id)).resolves.toBeTruthy();
     });
 
     it('getTemplateById Should throw BadRequest for Invalid ID', async () => {
@@ -145,6 +146,43 @@ describe('TemplateController', () => {
       await expect(templateService.deleteTemplate(created._id)).rejects.toThrow(errMsg);
     });
 
+    it('', async () => {
+      const user = {
+        _id: new Types.ObjectId('6380c7d7ca85580f1d5b69eb'),
+      } as any;
+      const stubWithUser = TemplateStub();
+      stubWithUser.author = user._id;
+      const created = (await templateService.createTemplate(stubWithUser)) as TemplateDocument;
+      const getByUid = (await templateService.getTemplatesByUserId(user._id)) as TemplateDocument[];
+      expect(getByUid).toHaveLength(1);
+      expect(getByUid[0].title).toBe(created.title);
+      expect(JSON.stringify(getByUid[0].author)).toBe(JSON.stringify(created.author));
+      expect(getByUid[0].terms).toHaveLength(created.terms.length);
+      expect(JSON.stringify(getByUid[0]._id)).toBe(JSON.stringify(created._id));
+      expect(getByUid[0]).toHaveProperty('createdAt');
+      expect(getByUid[0]).toHaveProperty('updatedAt');
+    });
+
+    it('getTemplateById Should throw BadRequest for Invalid ID', async () => {
+      const errMsg = 'Invalid user id';
+      await expect(templateService.getTemplatesByUserId('abc')).rejects.toThrow(
+        BadRequestException,
+      );
+      await expect(templateService.getTemplatesByUserId('abc')).rejects.toThrow(errMsg);
+    });
+
+    it('getTemplateById Should throw NotFound for no matches', async () => {
+      const user = {
+        _id: new Types.ObjectId('6380c7d7ca85580f1d5b69eb'),
+      } as any;
+      const errMsg = 'No templates matching the user id exist';
+      const created = (await templateService.createTemplate(TemplateStub())) as TemplateDocument;
+      await templateService.deleteTemplate(created._id);
+      await expect(templateService.getTemplatesByUserId(user._id)).rejects.toThrow(
+        NotFoundException,
+      );
+      await expect(templateService.getTemplatesByUserId(user._id)).rejects.toThrow(errMsg);
+    });
     // TODO: Get by UID, unless method is retired
   });
 });

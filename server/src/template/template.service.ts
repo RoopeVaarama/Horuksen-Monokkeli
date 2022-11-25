@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
+import { User } from 'src/user/user.schema';
 import { Template, TemplateDocument } from './schemas/template.schema';
 
 @Injectable()
@@ -13,8 +14,6 @@ export class TemplateService {
     return await new this.templateModel(template).save();
   }
 
-  // FUTURE TODO: Change to only find and return documents where author === req.user._id
-  // FUTURE TODO: Change to also return any documents marked as public (e.g. isPublic === true)
   async getAllTemplates(): Promise<Template[]> {
     return await this.templateModel.find().exec();
   }
@@ -45,5 +44,14 @@ export class TemplateService {
     const deleteRes = await this.templateModel.deleteOne({ _id: id }).exec();
     if (!deleteRes.deletedCount) throw new NotFoundException('No template matching the id exists');
     return deleteRes.acknowledged;
+  }
+
+  // HELPER METHODS ========================================================================
+
+  async verifyAuthor(id: string, user: User): Promise<boolean> {
+    // Checks if template with given id has given user as author
+    const data = await this.templateModel.findOne({ _id: id, author: user['_id'] });
+    if (!data) return false;
+    return true;
   }
 }
