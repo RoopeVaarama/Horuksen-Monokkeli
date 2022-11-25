@@ -208,5 +208,32 @@ describe('TemplateController', () => {
       const verify = await templateService.verifyAuthor(created._id, user2._id);
       expect(verify).toBeFalsy();
     });
+
+    it('verifyAuthor should throw NotFound for no matching template', async () => {
+      const user = {
+        _id: new Types.ObjectId('6380c7d7ca85580f1d5b69eb'),
+      } as any;
+      const errMsg = 'No template matching the id exists';
+      const created = (await templateService.createTemplate(TemplateStub())) as TemplateDocument;
+      await templateService.deleteTemplate(created._id);
+      await expect(templateService.verifyAuthor(created._id, user._id)).rejects.toThrow(
+        NotFoundException,
+      );
+      await expect(templateService.verifyAuthor(created._id, user._id)).rejects.toThrow(errMsg);
+    });
+
+    it('verifyAuthor should throw BadRequest for bad id', async () => {
+      const uid = new Types.ObjectId('6380c7d7ca85580f1d5b69eb');
+      const errMsg = 'Invalid id';
+      await expect(templateService.verifyAuthor(null, uid)).rejects.toThrow(BadRequestException);
+      await expect(templateService.verifyAuthor(null, uid)).rejects.toThrow(errMsg);
+    });
+
+    it('verifyAuthor should throw BadRequest for bad user id', async () => {
+      const id = new Types.ObjectId('6280c7d7ca85580f1d5b69eb');
+      const errMsg = 'Invalid user id';
+      await expect(templateService.verifyAuthor(id, null)).rejects.toThrow(BadRequestException);
+      await expect(templateService.verifyAuthor(id, null)).rejects.toThrow(errMsg);
+    });
   });
 });

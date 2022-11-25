@@ -175,7 +175,7 @@ describe('TemplateController', () => {
       expect(spy.mock.calls[0][1]).toStrictEqual(TemplateStub());
       expect(spy2).toHaveBeenCalled();
       expect(spy2.mock.calls[0][0]).toBe(mockId);
-      expect(spy2.mock.calls[0][1]).toStrictEqual(mockReq.user);
+      expect(spy2.mock.calls[0][1]).toStrictEqual(mockReq.user._id);
       expect(spy2.mock.results[0].value).toBeTruthy();
       expect(updatedTemplate).toStrictEqual(TemplateStub());
     });
@@ -218,7 +218,7 @@ describe('TemplateController', () => {
       expect(spy).toHaveBeenCalledWith(mockId);
       expect(spy2).toHaveBeenCalled();
       expect(spy2.mock.calls[0][0]).toBe(mockId);
-      expect(spy2.mock.calls[0][1]).toStrictEqual(mockReq.user);
+      expect(spy2.mock.calls[0][1]).toStrictEqual(mockReq.user._id);
       expect(deletedTemplate).toBeTruthy();
     });
 

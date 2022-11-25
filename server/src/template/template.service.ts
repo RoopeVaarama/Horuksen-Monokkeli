@@ -48,10 +48,13 @@ export class TemplateService {
 
   // HELPER METHODS ========================================================================
 
-  async verifyAuthor(id: string, user: User): Promise<boolean> {
+  async verifyAuthor(id: Types.ObjectId, userId: Types.ObjectId): Promise<boolean> {
     // Checks if template with given id has given user as author
-    const data = await this.templateModel.findOne({ _id: id, author: user['_id'] });
-    if (!data) return false;
-    return true;
+    if (!Types.ObjectId.isValid(id)) throw new BadRequestException('Invalid id');
+    if (!Types.ObjectId.isValid(userId)) throw new BadRequestException('Invalid user id');
+    const data = await this.templateModel.findById(id);
+    if (!data) throw new NotFoundException('No template matching the id exists');
+    if (data.author.toString() === userId.toString()) return true;
+    return false;
   }
 }

@@ -26,7 +26,6 @@ import {
 } from '@nestjs/swagger';
 import { Template } from './schemas/template.schema';
 import { TemplateService } from './template.service';
-import { UserDocument } from '../user/user.schema';
 
 @ApiTags('templates')
 @Controller('/template')
@@ -105,7 +104,7 @@ export class TemplateController {
     if (!req.user) throw new UnauthorizedException('User is not logged in');
     if (!template) throw new BadRequestException('Template is not defined');
     if (!id) throw new BadRequestException('ID is not defined');
-    if (!(await this.templateService.verifyAuthor(id, req.user as UserDocument))) {
+    if (!(await this.templateService.verifyAuthor(id as any, req.user['_id']))) {
       throw new ForbiddenException('Access forbidden');
     }
     return await this.templateService.updateTemplate(id, template);
@@ -121,7 +120,7 @@ export class TemplateController {
   async deleteTemplate(@Param('id') id: string, @Req() req: Request): Promise<boolean> {
     if (!req.user) throw new UnauthorizedException('User is not logged in');
     if (!id) throw new BadRequestException('ID is not defined');
-    if (!(await this.templateService.verifyAuthor(id, req.user as UserDocument))) {
+    if (!(await this.templateService.verifyAuthor(id as any, req.user['_id']))) {
       throw new ForbiddenException('Access forbidden');
     }
     return await this.templateService.deleteTemplate(id);
