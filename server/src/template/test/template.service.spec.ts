@@ -146,7 +146,7 @@ describe('TemplateController', () => {
       await expect(templateService.deleteTemplate(created._id)).rejects.toThrow(errMsg);
     });
 
-    it('', async () => {
+    it('Should find and return documents by userID', async () => {
       const user = {
         _id: new Types.ObjectId('6380c7d7ca85580f1d5b69eb'),
       } as any;
@@ -163,7 +163,7 @@ describe('TemplateController', () => {
       expect(getByUid[0]).toHaveProperty('updatedAt');
     });
 
-    it('getTemplateById Should throw BadRequest for Invalid ID', async () => {
+    it('getTemplateByUserId Should throw BadRequest for Invalid userID', async () => {
       const errMsg = 'Invalid user id';
       await expect(templateService.getTemplatesByUserId('abc')).rejects.toThrow(
         BadRequestException,
@@ -171,7 +171,7 @@ describe('TemplateController', () => {
       await expect(templateService.getTemplatesByUserId('abc')).rejects.toThrow(errMsg);
     });
 
-    it('getTemplateById Should throw NotFound for no matches', async () => {
+    it('getTemplateByUserId Should throw NotFound for no matches', async () => {
       const user = {
         _id: new Types.ObjectId('6380c7d7ca85580f1d5b69eb'),
       } as any;
@@ -183,6 +183,30 @@ describe('TemplateController', () => {
       );
       await expect(templateService.getTemplatesByUserId(user._id)).rejects.toThrow(errMsg);
     });
-    // TODO: Get by UID, unless method is retired
+
+    it('verifyAuthor should return true', async () => {
+      const user = {
+        _id: new Types.ObjectId('6380c7d7ca85580f1d5b69eb'),
+      } as any;
+      const stubWithUser = TemplateStub();
+      stubWithUser.author = user._id;
+      const created = (await templateService.createTemplate(stubWithUser)) as TemplateDocument;
+      const verify = await templateService.verifyAuthor(created._id, user._id);
+      expect(verify).toBeTruthy();
+    });
+
+    it('verifyAuthor should return false', async () => {
+      const user = {
+        _id: new Types.ObjectId('6380c7d7ca85580f1d5b69eb'),
+      } as any;
+      const user2 = {
+        _id: new Types.ObjectId('6280c7d7ca85580f1d5b69eb'),
+      } as any;
+      const stubWithUser = TemplateStub();
+      stubWithUser.author = user._id;
+      const created = (await templateService.createTemplate(stubWithUser)) as TemplateDocument;
+      const verify = await templateService.verifyAuthor(created._id, user2._id);
+      expect(verify).toBeFalsy();
+    });
   });
 });
