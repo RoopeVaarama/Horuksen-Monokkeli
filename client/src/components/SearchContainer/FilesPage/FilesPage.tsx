@@ -1,19 +1,27 @@
 import { useEffect, useState } from 'react'
-import { Grid, InputAdornment, Stack, styled, TextField, Typography } from '@mui/material'
+import {
+  Grid,
+  IconButton,
+  InputAdornment,
+  Stack,
+  styled,
+  TextField,
+  Typography
+} from '@mui/material'
 import { SearchRounded } from '@mui/icons-material'
+import CloseIcon from '@mui/icons-material/Close'
 import StyledPaper from '../../common/StyledPaper/StyledPaper'
 import FileGroup from './FileGroup'
 import FileUploader from './FileUploader'
 import { useSearchStore } from '../../../store/searchStore'
-//import { fetcher } from '../../../tools/fetcher'
 import { getToken } from '../../../tools/auth'
 import { useFilesearchStore } from '../../../store/filesearchStore'
 import { FormattedMessage } from 'react-intl'
+import { FileList } from '../../../types'
 
 const SearchField = styled(TextField)(() => ({
   variant: 'outlined',
-  width: '100%',
-  label: 'Etsi tiedostoja..'
+  width: '100%'
 }))
 const UtilityBar = styled(Grid)(() => ({
   padding: '15px'
@@ -45,18 +53,16 @@ const FilesPage = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        const fileLists = []
+        const fileLists: {
+          key: string
+          groupName: string
+          selected: boolean
+        }[] = []
         if (data.length > 0) {
-          data.map((filelist: any) => {
+          data.map((filelist: FileList) => {
             fileLists.push({ key: filelist._id, groupName: filelist.title, selected: false })
           })
         }
-        // Always add one filegroup containing all files as the first one on the list
-        /*fileLists.unshift({
-          key: 'Kaikki tiedostot',
-          groupName: 'Kaikki tiedostot',
-          selected: false
-        })*/
         setChildren(fileLists)
       })
       .catch((e) => console.log(e))
@@ -73,7 +79,7 @@ const FilesPage = () => {
       }
     })
       .then((response) => response.json())
-      .then((data) => {
+      .then(() => {
         setUpload(true)
       })
       .catch((error) => console.log(error))
@@ -87,8 +93,6 @@ const FilesPage = () => {
       uploadFile(formData)
     })
   }
-
-  //TODO kokeile tätä
 
   const updateSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setKeyword(event.target.value)
@@ -104,6 +108,11 @@ const FilesPage = () => {
     }
   }
 
+  const resetSearch = () => {
+    setKeyword('')
+    setSearchInactive()
+  }
+
   return (
     <StyledPaper sx={{ width: 'calc(100% - 48px)' }}>
       <StyledDiv>
@@ -112,16 +121,23 @@ const FilesPage = () => {
             <SearchField
               id='filepage-searchbar'
               size='small'
-              placeholder='Etsi tiedostoja' // TODO intl
               InputProps={{
                 startAdornment: (
                   <InputAdornment position='start'>
                     <SearchRounded />
                   </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position='end'>
+                    <IconButton onClick={resetSearch}>
+                      <CloseIcon />
+                    </IconButton>
+                  </InputAdornment>
                 )
               }}
               onChange={updateSearch}
               onKeyDown={handleKeyPress}
+              value={keyword}
             />
           </Grid>
         </UtilityBar>

@@ -17,47 +17,53 @@ enum Direction {
   Above,
 }
 
+// strings to be ignored in the pdf when looking for values
 const ignoredValues: string[] = ['', ' '];
 
 @Injectable()
 export class SearchService {
+  // takes an array of search terms and a file id, returns all found results in a single array
   async search(contents: PDFExtractResult, terms: Term[], fileId: string): Promise<Result[]> {
     const pageArray = contents.pages;
-    let pageIndex: number;
-    let i: number;
     const results: Result[] = [];
 
-    for (i = 0; i < terms.length; ++i) {
-      for (pageIndex = 0; pageIndex < pageArray.length; ++pageIndex) {
+    // for each object of terms, iterate through every page
+    for (let i = 0; i < terms.length; ++i) {
+      for (let pageIndex = 0; pageIndex < pageArray.length; ++pageIndex) {
         const page = pageArray[pageIndex];
         const contentArray = page.content;
         let ignore = terms[i].ignoreFirst;
         let max = terms[i].maxPerPage;
         if (terms[i].maxPerPage == 0) max = -1;
         if (ignore > 0) contentArray.sort((a: PDFExtractText, b: PDFExtractText) => a.y - b.y);
-        let entryIndex: number;
 
-        for (entryIndex = 0; entryIndex < contentArray.length; ++entryIndex) {
+        // iterate through every entry on the page
+        for (let entryIndex = 0; entryIndex < contentArray.length; ++entryIndex) {
           const entry = contentArray[entryIndex];
+          const key = terms[i].key;
+
+          // search for a key only
+          if (terms[i].keyOnly) {
+            if (this.containsKey(key, entry.str)) {
+              results.push(this.createResult(entry, key, pageIndex, fileId, i));
+            }
+            continue;
+          }
+
+          // search for a key-value pair
           if (max == 0) break;
-          if (this.keyMatch(terms[i].key, entry.str, terms[i].levenDistance)) {
+          if (this.keyMatch(key, entry.str, terms[i].levenDistance)) {
             if (ignore > 0) {
               --ignore;
               continue;
             }
-            const result = new Result();
-            result.file = fileId;
-            result.page = pageIndex + 1;
-            result.termIndex = i;
-            result.key_x = entry.x;
-            result.key_y = entry.y;
-            result.key = entry.str;
-            let res: PDFExtractText = null;
-            if (!terms[i].keyOnly) res = this.findValue(terms[i], page, entry.x, entry.y);
-            if (res != null) {
-              result.value = this.pruneValue(res.str, terms[i].valuePrune);
-              result.val_x = res.x;
-              result.val_y = res.y;
+            const result = this.createResult(entry, key, pageIndex, fileId, i);
+            let value: PDFExtractText = null;
+            value = this.findValue(terms[i], page, entry.x, entry.y);
+            if (value != null) {
+              result.value = this.pruneValue(value.str, terms[i].valuePrune);
+              result.val_x = value.x;
+              result.val_y = value.y;
             }
             --max;
             results.push(result);
@@ -68,7 +74,7 @@ export class SearchService {
     return results;
   }
 
-  // Returns the closest matching value in the desired direction within allowed offset
+  // returns the closest matching value in the desired direction within allowed offset
   findValue(terms: Term, page: PDFExtractPage, key_x: number, key_y: number) {
     const contentArray = page.content;
     const candidates: PDFExtractText[] = [];
@@ -116,11 +122,13 @@ export class SearchService {
     return null;
   }
 
-  inMargin(val: number, key: number, margin: number) {
+  // checks if a number is in given margin from another number
+  inMargin(val: number, key: number, margin: number): boolean {
     return val >= key - margin && val <= key + margin;
   }
 
-  closestOnX(x: number, values: PDFExtractText[], terms: Term) {
+  // returns the closest match of given values on the x-axis
+  closestOnX(x: number, values: PDFExtractText[], terms: Term): PDFExtractText {
     let i: number;
     let match: boolean = false;
     match = this.valueMatch(values[0].str, terms.valueMatch);
@@ -138,7 +146,8 @@ export class SearchService {
     return null;
   }
 
-  closestOnY(y: number, values: PDFExtractText[], terms: Term) {
+  // returns the closest match of given values on the y-axis
+  closestOnY(y: number, values: PDFExtractText[], terms: Term): PDFExtractText {
     let i: number;
     let match: boolean = false;
     match = this.valueMatch(values[0].str, terms.valueMatch);
@@ -156,7 +165,7 @@ export class SearchService {
     return null;
   }
 
-  // Levenshtein key matching
+  // levenshtein key matching
   keyMatch(key: string, entry: string, leven: number) {
     if (leven == 0) return key == entry;
     if (Math.abs(key.length - entry.length) > leven) return false;
@@ -164,13 +173,32 @@ export class SearchService {
     return true;
   }
 
+  // checks if value matches regex
   valueMatch(value: string, regex: string): boolean {
     const reg = new RegExp(regex);
     return reg.test(value);
   }
 
+  // check if entry contains key (case insensitive)
+  containsKey(key: string, entry: string): boolean {
+    return entry.toLowerCase().includes(key.toLowerCase());
+  }
+
+  // removes instances of prune-string from value-string
   pruneValue(value: string, prune: string): string {
     if (prune == '') return value;
     return value.replace(prune, '');
+  }
+
+  // returns a new Result-object with the given values
+  createResult(entry: PDFExtractText, key: string, p: number, fid: string, i: number): Result {
+    const result = new Result();
+    result.file = fid;
+    result.page = p + 1;
+    result.termIndex = i;
+    result.key_x = entry.x;
+    result.key_y = entry.y;
+    result.key = key;
+    return result;
   }
 }

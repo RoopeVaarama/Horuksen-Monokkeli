@@ -1,7 +1,7 @@
 import create from 'zustand'
 import { fetcher } from '../tools/fetcher'
 //import { templatesArrayToSearch } from '../tools/temporaryConverters'
-import { FileMeta, SearchResult, Template } from '../types'
+import { FileInfo, SearchResult, Template } from '../types'
 
 interface SearchState {
   searchTemplates: Template[]
@@ -15,8 +15,8 @@ interface SearchState {
   removeTemplateFromSearch: (id: string) => void
   resetSearchParamaters: () => void
   search: () => void
-  addFileToSearch: (file: FileMeta) => void
-  removeFileFromSearch: (fileToRemove: FileMeta) => void
+  addFileToSearch: (file: FileInfo) => void
+  removeFileFromSearch: (fileToRemove: FileInfo) => void
   setGroupAsOpen: (groupName: string) => void
   setGroupAsClosed: (groupName: string) => void
   setUpload: (status: boolean) => void
@@ -77,13 +77,13 @@ export const useSearchStore = create<SearchState>((set, get) => ({
       }
     }
   },
-  addFileToSearch(file: FileMeta) {
+  addFileToSearch(file: FileInfo) {
     set((state) => ({
       fileIDs: [...state.fileIDs, file._id],
       refreshSearch: true
     }))
   },
-  removeFileFromSearch(fileToRemove: FileMeta) {
+  removeFileFromSearch(fileToRemove: FileInfo) {
     set((state) => ({
       fileIDs: state.fileIDs.filter((fileID) => fileID !== fileToRemove._id),
       refreshSearch: true
