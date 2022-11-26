@@ -56,7 +56,7 @@ export class FileController {
     @Res({ passthrough: true }) res: Response,
     @Req() request: Request,
   ): Promise<StreamableFile> {
-    const userId = request.user['_id'].toString();
+    const userId = await request.user['_id'].toString();
     const meta = await this.fileService.getFileMeta(id, userId);
     const file = createReadStream(join(process.cwd(), meta.filepath));
     res.set({
@@ -91,7 +91,7 @@ export class FileController {
     file: Express.Multer.File,
     @Req() request: Request,
   ): Promise<FileMeta> {
-    const userId = request.user['_id'].toString();
+    const userId = await request.user['_id'].toString();
     const fileMetaToReturn = await this.fileService.createFileMeta(file, userId);
     try {
       await this.parseService.parsePdf(fileMetaToReturn.filepath);
@@ -108,7 +108,7 @@ export class FileController {
   @ApiOperation({ summary: 'Returns all FileMetas.' })
   @ApiResponse({ status: 200, description: 'All files returned', type: [FileMeta] })
   async getFiles(@Req() request: Request): Promise<FileMeta[]> {
-    const userId = request.user['_id'].toString();
+    const userId = await request.user['_id'].toString();
     return await this.fileService.getFiles(userId);
   }
 
@@ -120,7 +120,7 @@ export class FileController {
     description: 'File not found. No file with given ID could be found.',
   })
   async deleteFile(@Param('id') id: string, @Req() request: Request) {
-    const userId = request.user['_id'].toString();
+    const userId = await request.user['_id'].toString();
     if (!(await this.fileService.doesUserOwnFile(userId, id))) throw new UnauthorizedException();
     return await this.fileService.deleteFile(id);
   }
@@ -141,10 +141,10 @@ export class FileController {
     type: FileList,
   })
   async createFileList(@Body() list: FileList, @Req() request: Request): Promise<FileList> {
+    const userId = await request.user['_id'].toString();
     for (let i = 0; i < list.files.length; ++i) {
-      await this.fileService.canFileBeFound(list.files.at(i).toString());
+      await this.fileService.doesUserOwnFile(userId, list.files.at(i).toString());
     }
-    const userId = request.user['_id'].toString();
     list.author = userId;
     return await this.listService.createFileList(list);
   }
@@ -153,7 +153,7 @@ export class FileController {
   @ApiOperation({ summary: 'Returns all FileLists' })
   @ApiResponse({ status: 200, description: 'Lists retrieved succesfully', type: [FileList] })
   async getAllLists(@Req() request: Request): Promise<FileList[]> {
-    const userId = request.user['_id'].toString();
+    const userId = await request.user['_id'].toString();
     return await this.listService.getAll(userId);
   }
 
@@ -161,7 +161,7 @@ export class FileController {
   @ApiOperation({ summary: 'Returns FileList matching given ID.' })
   @ApiResponse({ status: 200, description: 'List retrieved succesfully', type: FileList })
   async getOneList(@Param('id') id: string, @Req() request: Request): Promise<FileList> {
-    const userId = request.user['_id'].toString();
+    const userId = await request.user['_id'].toString();
     return await this.listService.getOne(id, userId);
   }
 
@@ -176,7 +176,7 @@ export class FileController {
     type: FileList,
   })
   async updateFileList(@Param('id') id: string, @Body() list: FileList, @Req() request: Request) {
-    const userId = request.user['_id'].toString();
+    const userId = await request.user['_id'].toString();
     for (let i = 0; i < list.files.length; ++i) {
       //Also checks if file exists at the same time
       if (!(await this.fileService.doesUserOwnFile(userId, list.files.at(i).toString()))) {
@@ -197,7 +197,7 @@ export class FileController {
     type: Boolean,
   })
   async deleteFileList(@Param('id') listId: string, @Req() request: Request) {
-    const userId = request.user['_id'].toString();
+    const userId = await request.user['_id'].toString();
     return await this.listService.deleteFileList(listId, userId);
   }
 
@@ -209,7 +209,7 @@ export class FileController {
     @Body() fileIds: string[],
     @Req() request: Request,
   ): Promise<FileList> {
-    const userId = request.user['_id'].toString();
+    const userId = await request.user['_id'].toString();
     if (!(await this.listService.doesUserOwnFileList(userId, listId))) {
       throw new UnauthorizedException();
     }
@@ -225,7 +225,7 @@ export class FileController {
     @Body() fileIds: string[],
     @Req() request: Request,
   ): Promise<FileList> {
-    const userId = request.user['_id'].toString();
+    const userId = await request.user['_id'].toString();
     await this.listService.canListBeFound(listId);
     const metas: FileMeta[] = await this.fileService.getFilesByIds(fileIds, userId);
     return await this.listService.removeFilesFromFileList(listId, metas);
