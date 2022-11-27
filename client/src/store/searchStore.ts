@@ -1,6 +1,5 @@
 import create from 'zustand'
 import { fetcher } from '../tools/fetcher'
-//import { templatesArrayToSearch } from '../tools/temporaryConverters'
 import { FileInfo, SearchResult, Template } from '../types'
 
 interface SearchState {

@@ -116,6 +116,9 @@ const RegisterContainer = () => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault()
     showPossibleErrors()
+    if (error.errorPresent) {
+      return
+    }
     const success = await register(registerData)
     if (success) {
       setRegisterData(DEFAULT_USER_DTO)

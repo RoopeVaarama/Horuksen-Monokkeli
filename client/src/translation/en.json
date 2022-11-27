@@ -60,5 +60,18 @@
   "unsavedChanges": "You have unchanged changes.",
   "uploadFiles": "Upload files",
   "noAuthedUser": "Login information was not found from local storage. Log out and back in again.",
-  "usersLists": "User's lists"
+  "usersLists": "User's lists",
+  "file": "File",
+  "page": "Page",
+  "termIndex": "Term index",
+  "key_x": "x (key)",
+  "key_y": "y (key)",
+  "key": "Key",
+  "value": "Value",
+  "val_x": "x (value)",
+  "val_y": "y (value)",
+  "allResults": "All results",
+  "keyOnlySearchResults": "Key only search",
+  "valueSearchResults": "Value search",
+  "count": "Count"
 }
