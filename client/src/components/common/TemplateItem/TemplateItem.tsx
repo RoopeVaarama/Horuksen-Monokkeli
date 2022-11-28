@@ -154,6 +154,7 @@ const TemplateItem = ({ template, variant }: { template: Template; variant: Temp
             }}
           >
             <TextField
+              id='templateTitleInput'
               color='secondary'
               size='small'
               defaultValue={template.title}
