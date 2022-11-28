@@ -4,7 +4,7 @@ import { TermStub } from './term.schema.stub';
 export const TemplateStub = (): Template => {
   return {
     title: 'Test Template',
-    author: null,
+    author: undefined,
     terms: [TermStub()],
   };
 };
@@ -12,7 +12,7 @@ export const TemplateStub = (): Template => {
 export const UpdatedTemplateStub = (): Template => {
   return {
     title: 'Updated test template',
-    author: null,
+    author: undefined,
     terms: [TermStub()],
   };
 };
