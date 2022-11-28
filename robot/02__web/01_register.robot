@@ -13,7 +13,7 @@ ${EMAIL}=    testi@testi.fi
 *** Test Cases ***
 Set Variables
     [Documentation]    Set global variables to be used by browser FW tests
-    ${epoch}    Get Time    
+    ${epoch}    Get Time    epoch
     Set Global Variable    ${USERNAME}    user_${epoch}
     Set Global Variable    ${PASSWORD}
     Set Global Variable    ${FIRST_NAME}
