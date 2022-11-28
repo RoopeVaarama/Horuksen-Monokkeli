@@ -22,4 +22,29 @@ Navigate to templates page
     Get Text    xpath=(//a[@id='nav-route-templates'])[1]    ==    TEMPLATET
     Click    xpath=(//a[@id='nav-route-templates'])[1]
 
-    
+Click new template button and give title
+    Click    css=#newTemplateBtn
+
+    Fill Text    //input[@id='templateTitleInput']    TemplateNimi
+    Get Text    //input[@id='templateTitleInput']    ==    TemplateNimi
+
+
+Add first keyword (total)
+    Fill Text    css=#templateRowCollapse1 .templateRowKeyInput input    Total
+    Get Text    css=#templateRowCollapse1 .templateRowKeyInput input    ==    Total
+
+Add new row    
+    Click    "Lisää rivi"
+
+Add second keyword (Web Design)
+    Fill Text    css=#templateRowCollapse2 .templateRowKeyInput input    Web Design
+    Get Text    css=#templateRowCollapse2 .templateRowKeyInput input    ==    Web Design
+
+Change direction to down
+    Click    css=#templateRowCollapse2 .relativePositionSelect
+    Click    css=#direction-below
+
+Save template
+    Click    css=button.saveBtn
+
+## Todo: Edit template
