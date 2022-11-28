@@ -1,5 +1,5 @@
 *** Settings ***
-Documentation    Login, autologin and profile page tests
+Documentation    Template creation
 Library    Browser    auto_closing_level=Suite
 Resource    ../resources.robot
 
