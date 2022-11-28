@@ -1,5 +1,5 @@
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
-import { Controller, Get, Post, Body, Param, ValidationPipe, UsePipes } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, ValidationPipe, UsePipes, Req } from '@nestjs/common';
 import { ParseService } from './parse.service';
 import { SearchService } from './search.service';
 import { PDFExtractResult } from 'pdf.js-extract';
@@ -11,6 +11,7 @@ import { SearchRequest } from './schemas/search-request.schema';
 import { FileService } from '../file/file.service';
 import { TemplateSearchRequest } from './schemas/template-search-request';
 import { Term } from '../template/schemas/term.schema';
+import { Request } from 'express';
 
 @ApiTags('search')
 @Controller('search')
@@ -32,19 +33,22 @@ export class SearchController {
   // Performs a search with the received TemplateSearchRequest-object
   @Post('/template_search')
   @ApiCreatedResponse({ status: 200, description: 'Search completed', type: TemplateSearchRequest })
-  async multifileSearchWithId(@Body() request: TemplateSearchRequest): Promise<Search> {
+  async multifileSearchWithId(
+    @Body() searchRequest: TemplateSearchRequest,
+    @Req() request: Request,
+  ): Promise<Search> {
     let results: Result[] = [];
     let terms: Term[] = [];
     const templates: Template[] = [];
 
-    for (let i = 0; i < request.templates.length; ++i) {
-      templates.push(await this.templateService.getTemplateById(request.templates[i]));
+    for (let i = 0; i < searchRequest.templates.length; ++i) {
+      templates.push(await this.templateService.getTemplateById(searchRequest.templates[i]));
       terms = [...terms, ...templates[i].terms];
     }
-
-    for (let i = 0; i < request.files.length; ++i) {
-      const fileId = request.files[i];
-      const file = await this.fileService.getFileMeta(fileId);
+    const userId = request.user['_id'].toString();
+    for (let i = 0; i < searchRequest.files.length; ++i) {
+      const fileId = searchRequest.files[i];
+      const file = await this.fileService.getFileMeta(fileId, userId);
       const contents = await this.parseService.parsePdf(file.filepath);
       if (contents == null) break;
       const fileResults = await this.service.search(contents, terms, fileId);
@@ -52,7 +56,7 @@ export class SearchController {
     }
 
     const search = new Search();
-    search.files = request.files;
+    search.files = searchRequest.files;
     search.terms = terms;
     search.results = results;
     return search;
@@ -62,15 +66,18 @@ export class SearchController {
   @Post('/search')
   @ApiCreatedResponse({ status: 200, description: 'Search completed', type: SearchRequest })
   @UsePipes(new ValidationPipe({ transform: true }))
-  async valueSearch(@Body() searchRequest: SearchRequest): Promise<Search> {
+  async valueSearch(
+    @Body() searchRequest: SearchRequest,
+    @Req() request: Request,
+  ): Promise<Search> {
     const search = new Search();
     search.files = searchRequest.files;
     search.terms = searchRequest.terms;
     search.results = [];
-
+    const userId = request.user['_id'].toString();
     for (let i = 0; i < searchRequest.files.length; ++i) {
       const fileId = searchRequest.files[i];
-      const file = await this.fileService.getFileMeta(fileId);
+      const file = await this.fileService.getFileMeta(fileId, userId);
       const contents = await this.parseService.parsePdf(file.filepath);
       if (contents == null) break;
       const results = await this.service.search(contents, search.terms, fileId);
