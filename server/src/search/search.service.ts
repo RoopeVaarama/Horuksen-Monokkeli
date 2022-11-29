@@ -64,6 +64,8 @@ export class SearchService {
               result.value = this.pruneValue(value.str, terms[i].valuePrune);
               result.val_x = value.x;
               result.val_y = value.y;
+              result.value_height = value.height;
+              result.value_width = value.width;
             }
             --max;
             results.push(result);
@@ -199,6 +201,8 @@ export class SearchService {
     result.key_x = entry.x;
     result.key_y = entry.y;
     result.key = key;
+    result.key_height = entry.height;
+    result.key_width = entry.width;
     return result;
   }
 }
