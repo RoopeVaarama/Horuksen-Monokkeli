@@ -14,6 +14,11 @@ const PdfView = ({
 }: {
   fileId: string
   results?: SearchResult[]
+  /**
+   * Max width should come from parent. PDF Viewer doesn't seem to respect boundaries at all,
+   * and will just use PDF page width. Has to be exact number I guess, so maybe get container
+   * element ref in parent and clientWidth from that? Before rendering this PdfView ofc.
+   */
   width?: number
 }) => {
   const url = `${process.env.REACT_APP_BACKEND_URL}/files/read/${fileId}`
