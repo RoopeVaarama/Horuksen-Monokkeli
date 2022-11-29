@@ -24,8 +24,13 @@ const PdfView = ({
     }
   }
 
+  /**
+   * PDF elements' coordinates seem to differ from what is returned from backend.
+   * There is a slight offset, which seems to be also slightly resolution dependent.
+   * These values work ok with 1080p to 1440p atleast
+   */
   const svgMargin = 10
-  const svgYOffset = 25
+  const svgYOffset = -15
   const svgXOffset = -5
 
   const [numPages, setNumPages] = useState<number>(0)
@@ -43,15 +48,23 @@ const PdfView = ({
 
   return (
     <div className='pdfViewContainer' style={{ position: 'relative', margin: 0 }}>
-      <div className='buttonContainer'>
-        <IconButton onClick={() => (pageNumber > 1 ? setPageNumber(pageNumber - 1) : null)}>
-          <SkipPrevious></SkipPrevious>
-        </IconButton>
-        <IconButton onClick={() => (pageNumber < numPages ? setPageNumber(pageNumber + 1) : null)}>
-          <SkipNext></SkipNext>
-        </IconButton>
-      </div>
-      <div className='pdfDocumentContainer'>
+      {numPages > 1 && (
+        <div className='buttonContainer' style={{ display: 'flex', justifyContent: 'center' }}>
+          <IconButton
+            disabled={pageNumber <= 1}
+            onClick={() => (pageNumber > 1 ? setPageNumber(pageNumber - 1) : null)}
+          >
+            <SkipPrevious></SkipPrevious>
+          </IconButton>
+          <IconButton
+            disabled={pageNumber >= numPages}
+            onClick={() => (pageNumber < numPages ? setPageNumber(pageNumber + 1) : null)}
+          >
+            <SkipNext></SkipNext>
+          </IconButton>
+        </div>
+      )}
+      <div className='pdfDocumentContainer' style={{ position: 'relative', margin: 0 }}>
         <Document file={docRequestObject} onLoadSuccess={onDocumentLoadSuccess}>
           <Page
             width={width}
@@ -61,46 +74,48 @@ const PdfView = ({
             onLoadSuccess={onPageLoadSuccess}
           />
         </Document>
-        {results?.map((result) => (
-          <svg
-            key={result.key}
-            width={svgMargin + scale * result.key_width}
-            height={svgMargin + scale * result.key_height}
-            style={{
-              position: 'absolute',
-              zIndex: 1,
-              top: svgYOffset + scale * (result.key_y ?? 0),
-              left: svgXOffset + scale * (result.key_x ?? 0)
-            }}
-          >
-            <rect
-              width={svgMargin + scale * result.key_width}
-              height={svgMargin + scale * result.key_height}
-              style={{ fillOpacity: 0, strokeWidth: 3, stroke: 'rgb(0,0,255)' }}
-            />
-          </svg>
-        ))}
-        {results
-          ?.filter((result) => result.val_x && result.val_y)
-          .map((result) => (
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
+          {results?.map((result) => (
             <svg
               key={result.key}
-              width={svgMargin + scale * (result.value_width ?? 0)}
-              height={svgMargin + scale * (result.value_height ?? 0)}
+              width={svgMargin + scale * result.key_width}
+              height={svgMargin + scale * result.key_height}
               style={{
                 position: 'absolute',
                 zIndex: 1,
-                top: svgYOffset + scale * (result.val_y ?? 0),
-                left: svgXOffset + scale * (result.val_x ?? 0)
+                top: svgYOffset + scale * (result.key_y ?? 0),
+                left: svgXOffset + scale * (result.key_x ?? 0)
               }}
             >
               <rect
-                width={svgMargin + scale * (result.value_width ?? 0)}
-                height={svgMargin + scale * (result.value_height ?? 0)}
-                style={{ fillOpacity: 0, strokeWidth: 3, stroke: 'rgb(255,0,0)' }}
+                width={svgMargin + scale * result.key_width}
+                height={svgMargin + scale * result.key_height}
+                style={{ fillOpacity: 0, strokeWidth: 3, stroke: 'rgb(0,0,255)' }}
               />
             </svg>
           ))}
+          {results
+            ?.filter((result) => result.val_x && result.val_y)
+            .map((result) => (
+              <svg
+                key={result.key}
+                width={svgMargin + scale * (result.value_width ?? 0)}
+                height={svgMargin + scale * (result.value_height ?? 0)}
+                style={{
+                  position: 'absolute',
+                  zIndex: 1,
+                  top: svgYOffset + scale * (result.val_y ?? 0),
+                  left: svgXOffset + scale * (result.val_x ?? 0)
+                }}
+              >
+                <rect
+                  width={svgMargin + scale * (result.value_width ?? 0)}
+                  height={svgMargin + scale * (result.value_height ?? 0)}
+                  style={{ fillOpacity: 0, strokeWidth: 3, stroke: 'rgb(255,0,0)' }}
+                />
+              </svg>
+            ))}
+        </div>
       </div>
     </div>
   )
