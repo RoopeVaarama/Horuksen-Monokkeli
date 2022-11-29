@@ -30,7 +30,7 @@ const PdfView = ({
    * These values work ok with 1080p to 1440p atleast
    */
   const svgMargin = 10
-  const svgYOffset = -15
+  const svgYOffset = -2
   const svgXOffset = -5
 
   const [numPages, setNumPages] = useState<number>(0)
@@ -83,7 +83,7 @@ const PdfView = ({
               style={{
                 position: 'absolute',
                 zIndex: 1,
-                top: svgYOffset + scale * (result.key_y ?? 0),
+                top: svgYOffset + scale * ((result.key_y ?? 0) - (result.key_height ?? 0)),
                 left: svgXOffset + scale * (result.key_x ?? 0)
               }}
             >
@@ -104,7 +104,7 @@ const PdfView = ({
                 style={{
                   position: 'absolute',
                   zIndex: 1,
-                  top: svgYOffset + scale * (result.val_y ?? 0),
+                  top: svgYOffset + scale * ((result.val_y ?? 0) - (result.value_height ?? 0)),
                   left: svgXOffset + scale * (result.val_x ?? 0)
                 }}
               >
