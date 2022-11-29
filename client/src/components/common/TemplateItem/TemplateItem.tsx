@@ -167,6 +167,7 @@ const TemplateItem = ({ template, variant }: { template: Template; variant: Temp
         )}
         <IconButton
           onClick={handleAction}
+          className='actionButton'
           sx={{
             position: 'absolute',
             top: '8px',
@@ -202,6 +203,7 @@ const TemplateItem = ({ template, variant }: { template: Template; variant: Temp
         </IconButton>
         {variant === 'noEdit' && (
           <IconButton
+            className='editButton'
             onClick={handleEdit}
             sx={{
               position: 'absolute',
