@@ -30,8 +30,19 @@ Click new template button and give title
 
 
 Add first keyword (total)
-    Fill Text    css=#templateRowCollapse1 .templateRowKeyInput input    Total
-    Get Text    css=#templateRowCollapse1 .templateRowKeyInput input    ==    Total
+    Fill Text    css=#templateRowCollapse1 .templateRowKeyInput input    Total1
+    Get Text    css=#templateRowCollapse1 .templateRowKeyInput input    ==    Total1
+
+Save template
+    Click    css=button.saveBtn
+
+Edit created row
+    Click    css=#templatesContainer .templateItem .editButton
+
+Click on keyword
+    Mouse Move Relative To    css=#templateRowCollapse1 .templateRowKeyInput
+    Mouse Button    click
+    Keyboard Key    press    Backspace
 
 Add new row    
     Click    "Lisää rivi"
@@ -44,7 +55,8 @@ Change direction to down
     Click    css=#templateRowCollapse2 .relativePositionSelect
     Click    css=#direction-below
 
-Save template
+Save modified template
     Click    css=button.saveBtn
 
-## Todo: Edit template
+Screenshot of complete template
+    Take Screenshot
