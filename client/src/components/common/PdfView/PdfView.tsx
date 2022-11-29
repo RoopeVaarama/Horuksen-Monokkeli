@@ -24,11 +24,6 @@ const PdfView = ({
     }
   }
 
-  /**
-   * PDF elements' coordinates seem to differ from what is returned from backend.
-   * There is a slight offset, which seems to be also slightly resolution dependent.
-   * These values work ok with 1080p to 1440p atleast
-   */
   const svgMargin = 10
   const svgYOffset = -2
   const svgXOffset = -5
