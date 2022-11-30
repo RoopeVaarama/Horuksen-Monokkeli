@@ -12,7 +12,7 @@ export type SearchDocument = Search & Document;
 export class Search {
   @Prop({ type: String }) // Should this be a relation to User?
   @ApiProperty()
-  userId = 'Kikki Hiiri';
+  userId = '';
 
   @Prop({ type: [TermSchema], required: true })
   @ApiProperty({ type: [Term] })
@@ -22,11 +22,11 @@ export class Search {
   @ValidateNested({ each: true })
   terms: Term[];
 
-  @Prop({ type: [] }) // Either string array, or array of relations to database file objects
+  @Prop({ type: [] })
   @ApiProperty()
   files: any[];
 
-  @Prop({ type: [ResultSchema], default: [] }) // Needs to use Schema within type. Unsure if this applies to non-array schema model types.
+  @Prop({ type: [ResultSchema], default: [] })
   @ApiProperty()
   results: Result[];
 }
