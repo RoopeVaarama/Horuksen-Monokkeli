@@ -1,8 +1,31 @@
-import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
-import { Controller, Get, Post, Body, Param, ValidationPipe, UsePipes, Req } from '@nestjs/common';
+import {
+  ApiBadRequestResponse,
+  ApiCreatedResponse,
+  ApiForbiddenResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
+import {
+  Req,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UsePipes,
+  ValidationPipe,
+  UnauthorizedException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { ParseService } from './parse.service';
 import { SearchService } from './search.service';
-import { PDFExtractResult } from 'pdf.js-extract';
 import { Result } from './schemas/result.schema';
 import { TemplateService } from '../template//template.service';
 import { Template } from '../template/schemas/template.schema';
@@ -23,16 +46,13 @@ export class SearchController {
     private readonly fileService: FileService,
   ) {}
 
-  //This should not be needed as front-end doesn't need to parse files. --Juhana
-  // extract the contents of a pdf
-  /*@Get('/parse/:file')
-  async parse(@Param('file') file: string): Promise<PDFExtractResult> {
-    return await this.parseService.parsePdf(`test_pdfs/${file}`);
-  }*/
-
   // Performs a search with the received TemplateSearchRequest-object
   @Post('/template_search')
-  @ApiCreatedResponse({ status: 200, description: 'Search completed', type: TemplateSearchRequest })
+  @ApiOperation({ summary: 'Searches given file ids using terms in given template ids' })
+  @ApiCreatedResponse({ description: 'Search completed', type: Search })
+  @ApiBadRequestResponse({ description: 'Invalid or missing request parameters' })
+  @ApiNotFoundResponse({ description: 'Resource not found' })
+  @ApiUnauthorizedResponse({ description: 'User is not authenticated' })
   async multifileSearchWithId(
     @Body() searchRequest: TemplateSearchRequest,
     @Req() request: Request,
@@ -59,12 +79,15 @@ export class SearchController {
     search.files = searchRequest.files;
     search.terms = terms;
     search.results = results;
-    return search;
+    search.userId = userId;
+    return await this.service.saveSearch(search);
   }
 
   // Performs a search with the received SearchRequest-object
+  // Not used anymore? Remove? --Tuomo
   @Post('/search')
-  @ApiCreatedResponse({ status: 200, description: 'Search completed', type: SearchRequest })
+  @ApiOperation({ summary: 'Performs a search with the SearchRequest-object given in the body' })
+  @ApiOkResponse({ status: 200, description: 'Search completed', type: SearchRequest })
   @UsePipes(new ValidationPipe({ transform: true }))
   async valueSearch(
     @Body() searchRequest: SearchRequest,
@@ -85,5 +108,29 @@ export class SearchController {
     }
 
     return search;
+  }
+
+  @Get('/')
+  @ApiOperation({ summary: 'Returns an array of all searches performed by current user' })
+  @ApiOkResponse({ description: 'Searches retrieved successfully', type: [Search] })
+  @ApiBadRequestResponse({ description: 'Invalid or missing request parameters' })
+  @ApiNotFoundResponse({ description: 'Resource not found' })
+  @ApiUnauthorizedResponse({ description: 'User is not authenticated' })
+  async getSearches(@Req() req: Request) {
+    if (!req.user) throw new UnauthorizedException('User is not logged in');
+    return await this.service.getSearchesByUserId(req.user['_id']);
+  }
+
+  @Delete('/:id')
+  @ApiOperation({ summary: 'Deletes a search record with given id' })
+  @ApiOkResponse({ description: 'Search record deleted succesfully', type: Boolean })
+  @ApiBadRequestResponse({ description: 'Invalid request parameters' })
+  @ApiNotFoundResponse({ description: 'Resource not found' })
+  @ApiUnauthorizedResponse({ description: 'User is not authenticated' })
+  @ApiForbiddenResponse({ description: 'Access to resource is forbidden (user is not author)' })
+  async deleteTemplate(@Param('id') id: string, @Req() req: Request): Promise<boolean> {
+    if (!req.user) throw new UnauthorizedException('User is not logged in');
+    if (!id) throw new BadRequestException('ID is not defined');
+    return await this.service.deleteSearch(id, req.user['_id']);
   }
 }
