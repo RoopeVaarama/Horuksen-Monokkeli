@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import {
   PDFExtract,
   PDFExtractOptions,
@@ -9,6 +9,9 @@ import {
 import { Result } from './schemas/result.schema';
 import { Term } from '../template/schemas/term.schema';
 import { distance } from 'fastest-levenshtein';
+import { Search, SearchDocument } from './schemas/search.schema';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, Types } from 'mongoose';
 
 enum Direction {
   Right,
@@ -22,6 +25,8 @@ const ignoredValues: string[] = ['', ' '];
 
 @Injectable()
 export class SearchService {
+  constructor(@InjectModel(Search.name) private searchModel: Model<SearchDocument>) {}
+
   // takes an array of search terms and a file id, returns all found results in a single array
   async search(contents: PDFExtractResult, terms: Term[], fileId: string): Promise<Result[]> {
     const pageArray = contents.pages;
@@ -64,6 +69,8 @@ export class SearchService {
               result.value = this.pruneValue(value.str, terms[i].valuePrune);
               result.val_x = value.x;
               result.val_y = value.y;
+              result.value_height = value.height;
+              result.value_width = value.width;
             }
             --max;
             results.push(result);
@@ -199,6 +206,31 @@ export class SearchService {
     result.key_x = entry.x;
     result.key_y = entry.y;
     result.key = key;
+    result.key_height = entry.height;
+    result.key_width = entry.width;
     return result;
+  }
+
+  // DATABASE METHODS
+
+  async saveSearch(search: Search): Promise<Search> {
+    return await new this.searchModel(search).save();
+  }
+
+  async deleteSearch(id: string, uid: string): Promise<boolean> {
+    if (!Types.ObjectId.isValid(id)) throw new BadRequestException('Invalid id');
+    if (!Types.ObjectId.isValid(uid)) throw new BadRequestException('Invalid user id');
+    const search = await this.searchModel.findById(id);
+    if (!search) throw new NotFoundException('No template matching the id exists');
+    if (search.userId != uid) throw new ForbiddenException('Access forbidden');
+    const deleteRes = await this.searchModel.deleteOne({ _id: id }).exec();
+    return deleteRes.acknowledged;
+  }
+
+  async getSearchesByUserId(uid: string): Promise<Search[]> {
+    if (!Types.ObjectId.isValid(uid)) throw new BadRequestException('Invalid user id');
+    const searches = await this.searchModel.find({ userId: uid }).exec();
+    if (!searches.length) throw new NotFoundException('No searches done by the user found');
+    return searches;
   }
 }

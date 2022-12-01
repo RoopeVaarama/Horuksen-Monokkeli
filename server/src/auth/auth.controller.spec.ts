@@ -1,5 +1,10 @@
+import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
+import { UserService } from '../user/user.service';
+import { User } from '../user/user.schema';
 import { AuthController } from './auth.controller';
+import { AuthService } from './auth.service';
+import { JwtService } from '@nestjs/jwt';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -7,6 +12,12 @@ describe('AuthController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
+      providers: [
+        AuthService,
+        JwtService,
+        UserService,
+        { provide: getModelToken(User.name), useValue: jest.fn() },
+      ],
     }).compile();
 
     controller = module.get<AuthController>(AuthController);
