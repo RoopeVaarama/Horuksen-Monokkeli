@@ -41,7 +41,7 @@ const TemplateItem = ({ template, variant }: { template: Template; variant: Temp
     createTemplateDraft
   } = useTemplateStore()
   const { addTemplateToSearch, removeTemplateFromSearch } = useSearchStore()
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState(variant !== 'searchOption')
   const [textFieldError, setTextFieldError] = useState(false)
 
   const handleAction = () => {

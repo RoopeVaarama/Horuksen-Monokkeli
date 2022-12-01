@@ -73,5 +73,6 @@
   "allResults": "All results",
   "keyOnlySearchResults": "Key only search",
   "valueSearchResults": "Value search",
-  "count": "Count"
+  "count": "Count",
+  "fileName": "File"
 }

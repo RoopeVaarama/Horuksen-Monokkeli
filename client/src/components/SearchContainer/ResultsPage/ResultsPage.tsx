@@ -2,42 +2,43 @@ import { Box, CircularProgress, Stack, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { FormattedMessage } from 'react-intl'
 import { useSearchStore } from '../../../store/searchStore'
+import { fetcher } from '../../../tools/fetcher'
+import { FileInfo } from '../../../types'
 import { Alert, Table } from '../../common'
 
-const ALL_COLUMNS: string[] = [
-  'file',
-  'page',
-  'termIndex',
-  'key',
-  'value',
-  'key_x',
-  'key_y',
-  'val_x',
-  'val_y'
-]
-const KEY_ONLY_COLUMNS: string[] = ['key', 'count']
-const VALUE_COLUMNS: string[] = ['file', 'page', 'key', 'value']
+const KEY_ONLY_COLUMNS: string[] = ['fileName', 'key', 'count']
+const VALUE_COLUMNS: string[] = ['fileName', 'page', 'key', 'value']
 
-const getResults = (objects: Record<string, any>[]) => {
+const getResults = (objects: Record<string, any>[], files?: FileInfo[]) => {
   const valueTableRows: Record<string, any>[] = []
   const keyOnlyTableRows: Record<string, any>[] = []
-  const keyCounts: Record<string, number> = {}
+  const fileCounts: Record<string, Record<string, number>> = {}
+  let fileName: string | undefined = undefined
   objects.forEach((obj) => {
-    if (obj.key !== undefined && obj.value === undefined) {
-      if (keyCounts[obj.key] === undefined) {
-        keyCounts[obj.key] = 1
-      } else {
-        keyCounts[obj.key] += 1
+    if (Array.isArray(files) && files.length !== 0) {
+      fileName = files.find((file) => file._id === obj.file)?.filename
+    }
+    if (obj.key !== undefined && obj.value === undefined && fileName !== undefined) {
+      if (fileCounts[fileName] === undefined) {
+        fileCounts[fileName] = {}
       }
-    } else if (obj.key !== undefined) {
-      valueTableRows.push(obj)
+      if (fileCounts[fileName][obj.key] === undefined) {
+        fileCounts[fileName][obj.key] = 1
+      } else {
+        fileCounts[fileName][obj.key] += 1
+      }
+    } else if (obj.key !== undefined && fileName !== undefined) {
+      valueTableRows.push({ ...obj, fileName })
     }
   })
-  for (const [key, value] of Object.entries(keyCounts)) {
-    keyOnlyTableRows.push({
-      key,
-      count: value
-    })
+  for (const [fileName, keyCounts] of Object.entries(fileCounts)) {
+    for (const [key, value] of Object.entries(keyCounts)) {
+      keyOnlyTableRows.push({
+        fileName,
+        key,
+        count: value
+      })
+    }
   }
   return { keyOnlyTableRows, valueTableRows }
 }
@@ -59,17 +60,27 @@ const ResultsPage = () => {
   const { search, searching, results } = useSearchStore()
   const [keyOnlyRows, setKeyOnlyRows] = useState<Record<string, any>[]>([])
   const [valueRows, setValueRows] = useState<Record<string, any>[]>([])
+  const [files, setFiles] = useState<FileInfo[]>([])
+
+  const getFiles = async () => {
+    const data = await fetcher({
+      method: 'GET',
+      path: 'files'
+    })
+    setFiles(data)
+  }
 
   useEffect(() => {
     if (Array.isArray(results)) {
-      const { keyOnlyTableRows, valueTableRows } = getResults(results)
+      const { keyOnlyTableRows, valueTableRows } = getResults(results, files)
       setKeyOnlyRows(keyOnlyTableRows)
       setValueRows(valueTableRows)
     }
-  }, [results])
+  }, [results, files])
 
   useEffect(() => {
     if (!searching) search()
+    getFiles()
   }, [])
 
   return (
@@ -106,12 +117,6 @@ const ResultsPage = () => {
                   />
                 </Box>
               )}
-              <Box>
-                <Typography variant='h6' sx={{ py: 1 }}>
-                  <FormattedMessage id='allResults' defaultMessage='Kaikki tulokset' />
-                </Typography>
-                <Table rows={results} columns={ALL_COLUMNS} defaultColumnMessages={translations} />
-              </Box>
             </Stack>
           )}
         </>
