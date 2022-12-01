@@ -1,6 +1,6 @@
 import { Checkbox, Stack, Typography, styled, Button, IconButton } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FormattedMessage } from 'react-intl'
 import { StyledPaper } from '../common'
 import { useFileStore } from '../../store/fileStore'
@@ -17,7 +17,7 @@ const Sidetext = styled('div')(() => ({
 
 const FilesContainer = (props: { id: string; filename: string; date: string }) => {
   const { id, filename, date } = props
-  const { openFile } = useFileStore()
+  const { selectedFileIDs, addFileID, deleteFile, removeFileID, openFile } = useFileStore()
 
   const [selected, setSelected] = useState(false)
   const toggle = () => {
@@ -27,6 +27,18 @@ const FilesContainer = (props: { id: string; filename: string; date: string }) =
   const open = () => {
     openFile(id)
   }
+
+  const deleteSelf = () => {
+    deleteFile(id)
+  }
+
+  useEffect(() => {
+    selected ? addFileID(id) : removeFileID(id)
+  }, [selected])
+
+  useEffect(() => {
+    selectedFileIDs.length === 0 && setSelected(false)
+  }, [selectedFileIDs])
 
   return (
     <Stack direction='row' alignItems='center'>
@@ -47,7 +59,7 @@ const FilesContainer = (props: { id: string; filename: string; date: string }) =
           </Sidetext>
         </ItemRow>
       </StyledPaper>
-      <IconButton>
+      <IconButton onClick={deleteSelf}>
         <DeleteIcon color='primary' />
       </IconButton>
     </Stack>

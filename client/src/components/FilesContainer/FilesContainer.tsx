@@ -8,7 +8,8 @@ import FileItem from './FileItem'
 import ClearIcon from '@mui/icons-material/Clear'
 
 const FilesContainer = () => {
-  const { files, fileLists, selectedFileIDs, resetFiles, uploadFiles } = useFileStore()
+  const { files, fileLists, selectedFileIDs, update, resetFileIDs, resetFiles, uploadFiles } =
+    useFileStore()
 
   const handleUpload = (files: File[] | null) => {
     // Convert into FormData and upload
@@ -22,7 +23,7 @@ const FilesContainer = () => {
 
   useEffect(() => {
     resetFiles()
-  }, [])
+  }, [update])
 
   return (
     <Stack spacing={3} id='filepage-container'>
@@ -31,9 +32,13 @@ const FilesContainer = () => {
         <Typography variant='h6'>
           <FormattedMessage id='files' defaultMessage='Tiedostot' />
         </Typography>
-        <Stack>
+        <Stack spacing={1}>
           {Array.isArray(selectedFileIDs) && selectedFileIDs.length > 0 && (
-            <Button startIcon={<ClearIcon />}>
+            <Button
+              startIcon={<ClearIcon />}
+              onClick={resetFileIDs}
+              sx={{ width: '20%', fontSize: '12px' }}
+            >
               <FormattedMessage id='clearSelection' defaultMessage='Tyhjennä valinnat' />
             </Button>
           )}

@@ -9,11 +9,14 @@ interface FileState {
   files: FileMeta[]
   fileLists: FileList[]
   selectedFileIDs: string[]
+  update: boolean
   uploadSuccess: IntlMsg | null
   uploadError: IntlMsg | null
   addFileID: (id: string) => void
+  deleteFile: (id: string) => void
   openFile: (id: string) => void
   removeFileID: (id: string) => void
+  resetFileIDs: () => void
   resetFiles: () => void
   uploadFiles: (formData: FormData) => void
 }
@@ -25,12 +28,27 @@ export const useFileStore = create<FileState>((set, get) => ({
   files: [],
   fileLists: [],
   selectedFileIDs: [],
+  update: false,
   uploadSuccess: null,
   uploadError: null,
   addFileID: (id: string) => {
     set((state) => ({
       selectedFileIDs: [...state.selectedFileIDs, id]
     }))
+  },
+  deleteFile: async (id: string) => {
+    try {
+      await fetcher({
+        method: 'DELETE',
+        path: BASE_PATH,
+        id: id
+      })
+      set({
+        update: !get().update
+      })
+    } catch (error) {
+      console.log(error)
+    }
   },
   openFile: (id: string) => {
     fetch(`${process.env.REACT_APP_BACKEND_URL}/files/read/${id}`, {
@@ -49,6 +67,9 @@ export const useFileStore = create<FileState>((set, get) => ({
     set((state) => ({
       selectedFileIDs: state.selectedFileIDs.filter((fileID) => fileID !== id)
     }))
+  },
+  resetFileIDs: () => {
+    set({ selectedFileIDs: [] })
   },
   resetFiles: async () => {
     if (!get().fetching) {
@@ -80,6 +101,7 @@ export const useFileStore = create<FileState>((set, get) => ({
     try {
       await axios(options)
       set({
+        update: !get().update,
         uploadSuccess: { intlKey: 'uploadSuccess', defaultMessage: 'Tiedostojen lataus onnistui' }
       })
     } catch (error) {
