@@ -5,4 +5,7 @@ export interface FileList {
   title: string
   author: string
   files: FileMeta[]
+  createdAt: string
+  updatedAt: string
+  __v: number
 }
