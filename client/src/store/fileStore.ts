@@ -5,11 +5,12 @@ import { fetcher } from '../tools/fetcher'
 import { getToken } from '../tools/auth'
 
 interface FileState {
-  fetching: boolean
+  creatingNewList: boolean
   files: FileMeta[]
   fileLists: FileList[]
   selectedFileIDs: string[]
-  update: boolean
+  fileUpdate: boolean
+  fileListUpdate: boolean
   uploadSuccess: IntlMsg | null
   uploadError: IntlMsg | null
   addFileID: (id: string) => void
@@ -19,16 +20,23 @@ interface FileState {
   resetFileIDs: () => void
   resetFiles: () => void
   uploadFiles: (formData: FormData) => void
+  addFileList: (title: string) => void
+  addEmptyFilelist: (title: string) => void
+  resetFileLists: () => void
+  deleteFileList: (id: string) => void
+  startCreating: () => void
+  stopCreating: () => void
 }
 
 const BASE_PATH = 'files'
 
 export const useFileStore = create<FileState>((set, get) => ({
-  fetching: false,
+  creatingNewList: false,
   files: [],
   fileLists: [],
   selectedFileIDs: [],
-  update: false,
+  fileUpdate: false,
+  fileListUpdate: false,
   uploadSuccess: null,
   uploadError: null,
   addFileID: (id: string) => {
@@ -44,7 +52,7 @@ export const useFileStore = create<FileState>((set, get) => ({
         id: id
       })
       set({
-        update: !get().update
+        fileUpdate: !get().fileUpdate
       })
     } catch (error) {
       console.log(error)
@@ -72,20 +80,16 @@ export const useFileStore = create<FileState>((set, get) => ({
     set({ selectedFileIDs: [] })
   },
   resetFiles: async () => {
-    if (!get().fetching) {
-      set({ fetching: true })
-      try {
-        const fetchedData = await fetcher({
-          method: 'GET',
-          path: BASE_PATH
-        })
-        set({
-          fetching: false,
-          files: Array.isArray(fetchedData) ? fetchedData : []
-        })
-      } catch (error) {
-        set({ fetching: false })
-      }
+    try {
+      const fetchedData = await fetcher({
+        method: 'GET',
+        path: BASE_PATH
+      })
+      set({
+        files: Array.isArray(fetchedData) ? fetchedData : []
+      })
+    } catch (error) {
+      console.log(error)
     }
   },
   uploadFiles: async (formData: FormData) => {
@@ -101,7 +105,7 @@ export const useFileStore = create<FileState>((set, get) => ({
     try {
       await axios(options)
       set({
-        update: !get().update,
+        fileUpdate: !get().fileUpdate,
         uploadSuccess: { intlKey: 'uploadSuccess', defaultMessage: 'Tiedostojen lataus onnistui' }
       })
     } catch (error) {
@@ -109,5 +113,54 @@ export const useFileStore = create<FileState>((set, get) => ({
         uploadError: { intlKey: 'uploadError', defaultMessage: 'Lataus epäonnistui' }
       })
     }
+  },
+  addFileList: async (title: string) => {
+    console.log('add')
+  },
+  addEmptyFilelist: async (title: string) => {
+    try {
+      await fetcher({
+        method: 'POST',
+        path: `${BASE_PATH}/list`,
+        body: {
+          title: title,
+          files: []
+        }
+      })
+      set({ fileListUpdate: !get().fileListUpdate, creatingNewList: false })
+    } catch (error) {
+      console.log(error)
+    }
+  },
+  deleteFileList: async (id: string) => {
+    try {
+      await fetcher({
+        method: 'DELETE',
+        path: `${BASE_PATH}/list`,
+        id: id
+      })
+      set({ fileListUpdate: !get().fileListUpdate })
+    } catch (error) {
+      console.log(error)
+    }
+  },
+  resetFileLists: async () => {
+    try {
+      const fetchedData = await fetcher({
+        method: 'GET',
+        path: `${BASE_PATH}/list`
+      })
+      set({
+        fileLists: Array.isArray(fetchedData) ? fetchedData : []
+      })
+    } catch (error) {
+      console.log(error)
+    }
+  },
+  startCreating: () => {
+    set({ creatingNewList: true })
+  },
+  stopCreating: () => {
+    set({ creatingNewList: false })
   }
 }))

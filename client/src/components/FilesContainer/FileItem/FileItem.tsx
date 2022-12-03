@@ -2,8 +2,8 @@ import { Checkbox, Stack, Typography, styled, Button, IconButton } from '@mui/ma
 import DeleteIcon from '@mui/icons-material/Delete'
 import { useEffect, useState } from 'react'
 import { FormattedMessage } from 'react-intl'
-import { StyledPaper } from '../common'
-import { useFileStore } from '../../store/fileStore'
+import { StyledPaper } from '../../common'
+import { useFileStore } from '../../../store/fileStore'
 
 const ItemRow = styled(Stack)(() => ({
   justifyContent: 'space-between',
