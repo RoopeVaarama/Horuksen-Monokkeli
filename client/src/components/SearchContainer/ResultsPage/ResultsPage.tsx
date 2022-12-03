@@ -5,6 +5,7 @@ import { useSearchStore } from '../../../store/searchStore'
 import { fetcher } from '../../../tools/fetcher'
 import { FileInfo } from '../../../types'
 import { Alert, Table } from '../../common'
+import PdfView from '../../common/PdfView'
 
 const KEY_ONLY_COLUMNS: string[] = ['fileName', 'key', 'count']
 const VALUE_COLUMNS: string[] = ['fileName', 'page', 'key', 'value']
@@ -57,7 +58,7 @@ const translations: Record<string, string> = {
 }
 
 const ResultsPage = () => {
-  const { search, searching, results } = useSearchStore()
+  const { search, searching, results, fileIDs } = useSearchStore()
   const [keyOnlyRows, setKeyOnlyRows] = useState<Record<string, any>[]>([])
   const [valueRows, setValueRows] = useState<Record<string, any>[]>([])
   const [files, setFiles] = useState<FileInfo[]>([])
@@ -84,7 +85,7 @@ const ResultsPage = () => {
   }, [])
 
   return (
-    <Stack width='100%' alignItems='center'>
+    <Stack width='100%' alignItems='center' spacing={2}>
       {searching ? (
         <CircularProgress color='secondary' />
       ) : (
@@ -119,6 +120,26 @@ const ResultsPage = () => {
               )}
             </Stack>
           )}
+          <Stack width='100%'>
+            <Typography variant='h6' sx={{ pt: 1 }}>
+              <FormattedMessage id='results' defaultMessage='Tulokset' />
+            </Typography>
+            {fileIDs.map((fileID) => {
+              const fileName = files.find((file) => file._id === fileID)?.filename
+              return (
+                <Stack key={fileID}>
+                  <Typography variant='body1' sx={{ py: 1 }}>
+                    {fileName}
+                  </Typography>
+                  <PdfView
+                    fileId={fileID}
+                    width={852}
+                    results={results.filter((res) => res.file === fileID)}
+                  ></PdfView>
+                </Stack>
+              )
+            })}
+          </Stack>
         </>
       )}
     </Stack>
