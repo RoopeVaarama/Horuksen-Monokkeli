@@ -20,10 +20,12 @@ interface FileState {
   resetFileIDs: () => void
   resetFiles: () => void
   uploadFiles: (formData: FormData) => void
-  addFileList: (title: string) => void
   addEmptyFilelist: (title: string) => void
+  addListWithFiles: (title: string) => void
+  addFilesToList: (id: string) => void
   resetFileLists: () => void
   deleteFileList: (id: string) => void
+  deleteSingleFileFromList: (listID: string, fileID: string) => void
   startCreating: () => void
   stopCreating: () => void
 }
@@ -114,10 +116,64 @@ export const useFileStore = create<FileState>((set, get) => ({
       })
     }
   },
-  addFileList: async (title: string) => {
-    console.log('add')
+  addListWithFiles: async (title: string) => {
+    console.log('Add list with files, title: ' + title)
+    try {
+      await fetcher({
+        method: 'POST',
+        path: `${BASE_PATH}/list`,
+        body: {
+          title: title,
+          files: get().selectedFileIDs
+        }
+      })
+      set({
+        selectedFileIDs: [],
+        fileListUpdate: !get().fileListUpdate,
+        fileUpdate: !get().fileUpdate,
+        uploadSuccess: {
+          intlKey: 'listWithFilesAdded',
+          defaultMessage: 'Lista ja tiedostot lisätty onnistuneesti'
+        }
+      })
+    } catch (error) {
+      console.log(error)
+    }
+  },
+  addFilesToList: async (id: string) => {
+    try {
+      await fetcher({
+        method: 'PATCH',
+        path: `${BASE_PATH}/list/files`,
+        id: id,
+        body: get().selectedFileIDs
+      })
+      set({
+        fileListUpdate: !get().fileListUpdate,
+        selectedFileIDs: [],
+        uploadSuccess: { intlKey: 'fileAddSuccess', defaultMessage: 'Tiedostojen lisäys onnistui' }
+      })
+    } catch (error) {
+      set({
+        uploadError: { intlKey: 'fileAddError', defaultMessage: 'Lataus epäonnistui' }
+      })
+    }
+  },
+  deleteSingleFileFromList: async (listID: string, fileID: string) => {
+    try {
+      await fetcher({
+        method: 'DELETE',
+        path: `${BASE_PATH}/list/files`,
+        id: listID,
+        body: [fileID]
+      })
+      set({ fileListUpdate: !get().fileListUpdate })
+    } catch (error) {
+      console.log(error)
+    }
   },
   addEmptyFilelist: async (title: string) => {
+    console.log('Add empty filelist')
     try {
       await fetcher({
         method: 'POST',

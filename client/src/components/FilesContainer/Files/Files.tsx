@@ -1,6 +1,7 @@
 import { Box, Stack, Typography, Button } from '@mui/material'
 import { useEffect, useState } from 'react'
 import FileItem from '../FileItem'
+import ListSelectionDialog from '../Dialogs/ListSelectionDialog'
 import Alert from '../../common/Alert'
 import { FormattedMessage } from 'react-intl'
 import { useFileStore } from '../../../store/fileStore'
@@ -8,9 +9,22 @@ import ClearIcon from '@mui/icons-material/Clear'
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd'
 
 const Files = () => {
-  const { files, selectedFileIDs, fileUpdate, resetFileIDs, resetFiles } = useFileStore()
+  const { files, selectedFileIDs, fileUpdate, addFilesToList, resetFileIDs, resetFiles } =
+    useFileStore()
+  const [open, setOpen] = useState(true) // todo koko filen togglaus?
 
-  const [open, setOpen] = useState(true)
+  const [dialogOpen, setDialogOpen] = useState(false)
+
+  const handleAddButtonClick = () => {
+    setDialogOpen(true)
+  }
+
+  const handleDialogClose = (id: string | null) => {
+    setDialogOpen(false)
+    if (id !== null) {
+      addFilesToList(id)
+    }
+  }
 
   useEffect(() => {
     resetFiles()
@@ -31,7 +45,11 @@ const Files = () => {
           >
             <FormattedMessage id='clearSelection' defaultMessage='Tyhjennä valinnat' />
           </Button>
-          <Button startIcon={<PlaylistAddIcon />} sx={{ width: '20%', fontSize: '12px' }}>
+          <Button
+            startIcon={<PlaylistAddIcon />}
+            sx={{ width: '20%', fontSize: '12px' }}
+            onClick={handleAddButtonClick}
+          >
             <FormattedMessage
               id='addSelectedToExistingList'
               defaultMessage='Lisää tiedostot listaan'
@@ -39,6 +57,7 @@ const Files = () => {
           </Button>
         </Stack>
       )}
+      <ListSelectionDialog open={dialogOpen} onClose={handleDialogClose}></ListSelectionDialog>
 
       <Box id='files-container'>
         {Array.isArray(files) &&

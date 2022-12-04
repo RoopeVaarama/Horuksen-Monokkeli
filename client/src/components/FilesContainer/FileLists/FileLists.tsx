@@ -13,9 +13,9 @@ const FileLists = () => {
     creatingNewList,
     fileLists,
     fileListUpdate,
+    addEmptyFilelist,
     startCreating,
     stopCreating,
-    addEmptyFilelist,
     resetFileLists
   } = useFileStore()
 
@@ -50,7 +50,7 @@ const FileLists = () => {
         </Button>
       )}
       <Box id='filelists-container'>
-        {creatingNewList && <NewFileList />}
+        {creatingNewList && <NewFileList variant='normal' onSave={addEmptyFilelist} />}
         {Array.isArray(fileLists) &&
           fileLists.length > 0 &&
           fileLists.map((filelist) => (

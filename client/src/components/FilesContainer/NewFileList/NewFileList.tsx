@@ -1,43 +1,47 @@
-import { Stack, Button, TextField } from '@mui/material'
+import { Stack, Button, TextField, styled } from '@mui/material'
 import { useState } from 'react'
 import { FormattedMessage } from 'react-intl'
-import { useFileStore } from '../../../store/fileStore'
+import { NewFileVariant } from '../../../types/NewFileVariant'
 
-const NewFileList = () => {
-  const { addEmptyFilelist } = useFileStore()
-
+const NewFileList = ({
+  variant,
+  onSave
+}: {
+  variant: NewFileVariant
+  onSave: (title: string) => void
+}) => {
+  const variantWidth = variant === 'popup' ? '100%' : '50%'
   const [title, setTitle] = useState('')
 
-  const handleUpdateTitle = (
-    event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement, Element>
-  ) => {
+  const StyledStack = styled(Stack)(() => ({
+    width: `${variantWidth}`
+  }))
+
+  const handleUpdateTitle = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     if (event.target.value !== null) {
       setTitle(event.target.value)
     }
   }
 
-  // TODO error handling
-
-  const createList = () => {
-    addEmptyFilelist(title)
-  }
   return (
-    <Stack direction='row' spacing='15px' sx={{ width: '50%' }} alignItems='center'>
+    <StyledStack direction='row' spacing={2} alignItems='center'>
       <TextField
+        autoFocus
         color='secondary'
         size='small'
-        onBlur={handleUpdateTitle}
+        value={title}
+        onChange={handleUpdateTitle}
         sx={{ marginTop: '2px', marginBottom: '2px' }}
         label={<FormattedMessage id='listTitle' defaultMessage='Listan nimi' />}
-      ></TextField>
+      />
       <Button
         variant='outlined'
-        onClick={createList}
+        onClick={() => onSave(title)}
         sx={{ marginTop: '2px', marginBottom: '2px', height: '90%' }}
       >
         <FormattedMessage id='createNewList' defaultMessage='Luo lista' />
       </Button>
-    </Stack>
+    </StyledStack>
   )
 }
 

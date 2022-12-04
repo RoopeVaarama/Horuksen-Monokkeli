@@ -59,7 +59,7 @@ const FilesContainer = (props: { id: string; filename: string; date: string }) =
           </Sidetext>
         </ItemRow>
       </StyledPaper>
-      <IconButton onClick={deleteSelf}>
+      <IconButton onClick={deleteSelf} size='small'>
         <DeleteIcon color='primary' />
       </IconButton>
     </Stack>

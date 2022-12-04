@@ -1,4 +1,5 @@
-import { Stack, Typography, Button, styled } from '@mui/material'
+import { Stack, Typography, Button, styled, IconButton } from '@mui/material'
+import DeleteIcon from '@mui/icons-material/Delete'
 import { FormattedMessage } from 'react-intl'
 import { StyledPaper } from '../../common'
 import { useFileStore } from '../../../store/fileStore'
@@ -15,12 +16,22 @@ const Sidetext = styled('div')(() => ({
   marginLeft: '10px'
 }))
 
-const FileInList = (props: { filename: string; id: string; date: string }) => {
-  const { id, filename, date } = props
+const FileInList = (props: {
+  filename: string
+  id: string
+  date: string
+  editable: boolean
+  onDelete: (id: string) => void
+}) => {
+  const { id, filename, date, editable, onDelete } = props
   const { openFile } = useFileStore()
 
   const open = () => {
     openFile(id)
+  }
+
+  const deleteSelf = () => {
+    onDelete(id)
   }
 
   return (
@@ -41,6 +52,11 @@ const FileInList = (props: { filename: string; id: string; date: string }) => {
           </Sidetext>
         </ItemRow>
       </StyledPaper>
+      {editable && (
+        <IconButton onClick={deleteSelf} size='small'>
+          <DeleteIcon color='primary' />
+        </IconButton>
+      )}
     </Stack>
   )
 }

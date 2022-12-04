@@ -10,11 +10,11 @@ import FileInList from '../FileInList'
 
 const FileListItem = (props: { id: string; title: string }) => {
   const { id, title } = props
-  const { fileUpdate, deleteFileList } = useFileStore()
+  const { fileUpdate, fileListUpdate, deleteFileList, deleteSingleFileFromList } = useFileStore()
 
   const [open, setOpen] = useState(false)
   const [files, setFiles] = useState<FileMeta[]>([])
-  const [editing, setEditing] = useState(false)
+  const [editing, setEditing] = useState(true)
 
   const getFilesInList = async () => {
     const listData = await fetcher({
@@ -33,9 +33,13 @@ const FileListItem = (props: { id: string; title: string }) => {
     deleteFileList(id)
   }
 
+  const deleteFile = (fileid: string) => {
+    deleteSingleFileFromList(id, fileid)
+  }
+
   useEffect(() => {
     getFilesInList()
-  }, [fileUpdate])
+  }, [fileUpdate, fileListUpdate])
 
   return (
     <Stack>
@@ -50,13 +54,20 @@ const FileListItem = (props: { id: string; title: string }) => {
             {open ? <ExpandLess /> : <ExpandMore />}
           </ListItemButton>
         </StyledPaper>
-        <IconButton onClick={deleteSelf}>
+        <IconButton onClick={deleteSelf} size='small'>
           <DeleteIcon color='primary' />
         </IconButton>
       </Stack>
       <Collapse in={open}>
         {files.map((file) => (
-          <FileInList key={file._id} id={file._id} filename={file.filename} date={file.createdAt} />
+          <FileInList
+            key={file._id}
+            id={file._id}
+            filename={file.filename}
+            date={file.createdAt}
+            editable={editing}
+            onDelete={deleteFile}
+          />
         ))}
       </Collapse>
     </Stack>
