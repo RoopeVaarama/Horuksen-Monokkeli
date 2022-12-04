@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import CancelIcon from '@mui/icons-material/Cancel'
 import EditIcon from '@mui/icons-material/Edit'
@@ -30,7 +30,15 @@ import { getUid } from '../../../tools/auth'
 const BUTTON_WIDTH = '48px'
 const DB_BUTTON_WIDTH = '88px'
 
-const TemplateItem = ({ template, variant }: { template: Template; variant: TemplateVariant }) => {
+const TemplateItem = ({
+  template,
+  variant,
+  toggleOpen
+}: {
+  template: Template
+  variant: TemplateVariant
+  toggleOpen: boolean
+}) => {
   const theme = useTheme()
   const {
     templates,
@@ -41,7 +49,7 @@ const TemplateItem = ({ template, variant }: { template: Template; variant: Temp
     createTemplateDraft
   } = useTemplateStore()
   const { addTemplateToSearch, removeTemplateFromSearch } = useSearchStore()
-  const [open, setOpen] = useState(variant !== 'searchSelected')
+  const [open, setOpen] = useState(toggleOpen)
   const [textFieldError, setTextFieldError] = useState(false)
 
   const handleAction = () => {
@@ -75,6 +83,12 @@ const TemplateItem = ({ template, variant }: { template: Template; variant: Temp
   const handleAddRow = () => {
     addTemplateDraftRow()
   }
+
+  useEffect(() => {
+    if (toggleOpen !== open && variant !== 'draft') {
+      setOpen(toggleOpen)
+    }
+  }, [toggleOpen])
 
   return (
     <StyledPaper
