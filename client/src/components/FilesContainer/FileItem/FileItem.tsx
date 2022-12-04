@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { FormattedMessage } from 'react-intl'
 import { StyledPaper } from '../../common'
 import { useFileStore } from '../../../store/fileStore'
+import { DeleteConfirmationDialog } from '../Dialogs'
 
 const ItemRow = styled(Stack)(() => ({
   justifyContent: 'space-between',
@@ -15,11 +16,13 @@ const Sidetext = styled('div')(() => ({
   marginLeft: '10px'
 }))
 
-const FilesContainer = (props: { id: string; filename: string; date: string }) => {
-  const { id, filename, date } = props
+const FilesContainer = ({ id, filename, date }: { id: string; filename: string; date: string }) => {
+  const formattedDate = new Date(date).toLocaleDateString()
   const { selectedFileIDs, addFileID, deleteFile, removeFileID, openFile } = useFileStore()
 
   const [selected, setSelected] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+
   const toggle = () => {
     setSelected((currState) => !currState)
   }
@@ -29,7 +32,12 @@ const FilesContainer = (props: { id: string; filename: string; date: string }) =
   }
 
   const deleteSelf = () => {
-    deleteFile(id)
+    setDeleting(true)
+  }
+
+  const handleDeletion = (deleteConfirmation: boolean) => {
+    deleteConfirmation && deleteFile(id)
+    setDeleting(false)
   }
 
   useEffect(() => {
@@ -51,7 +59,7 @@ const FilesContainer = (props: { id: string; filename: string; date: string }) =
           <Sidetext>
             <Typography id='fileitem-date' variant='caption'>
               <FormattedMessage id='added' defaultMessage='Lisätty '></FormattedMessage>
-              {date}
+              {formattedDate}
             </Typography>
             <Button id='fileitem-open-button' onClick={open}>
               <FormattedMessage id='open' defaultMessage='Avaa' />
@@ -62,6 +70,15 @@ const FilesContainer = (props: { id: string; filename: string; date: string }) =
       <IconButton onClick={deleteSelf} size='small'>
         <DeleteIcon color='primary' />
       </IconButton>
+      <DeleteConfirmationDialog
+        open={deleting}
+        itemname={filename}
+        onClose={handleDeletion}
+        additionalInfo={{
+          intlKey: 'fileDeleteWarning',
+          defaultMessage: 'Tiedosto poistetaan myös kaikista listoista.'
+        }}
+      />
     </Stack>
   )
 }

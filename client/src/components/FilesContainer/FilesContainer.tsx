@@ -7,13 +7,14 @@ import { useFileStore } from '../../store/fileStore'
 const FilesContainer = () => {
   const { uploadFiles } = useFileStore()
 
-  const handleUpload = (files: File[] | null) => {
+  const handleUpload = async (files: File[] | null) => {
     // Convert into FormData and upload
     files !== null &&
-      files.forEach((file) => {
+      files.forEach(async (file) => {
+        console.log(file)
         const formData = new FormData()
         formData.append('file', file)
-        uploadFiles(formData)
+        await uploadFiles(formData)
       })
   }
 

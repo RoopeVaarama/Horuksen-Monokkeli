@@ -11,7 +11,6 @@ import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd'
 const Files = () => {
   const { files, selectedFileIDs, fileUpdate, addFilesToList, resetFileIDs, resetFiles } =
     useFileStore()
-  const [open, setOpen] = useState(true) // todo koko filen togglaus?
 
   const [dialogOpen, setDialogOpen] = useState(false)
 
@@ -29,6 +28,8 @@ const Files = () => {
   useEffect(() => {
     resetFiles()
   }, [fileUpdate])
+
+  console.log(Array.isArray(selectedFileIDs) + ' && ' + selectedFileIDs.length)
 
   return (
     <Stack spacing={1}>
