@@ -21,7 +21,7 @@ const FilesContainer = () => {
   return (
     <Stack spacing={3} id='filepage-container'>
       <FileUploader handleUpload={handleUpload} />
-      <Stack spacing={2}>
+      <Stack spacing={4}>
         <Files />
         <FileLists />
       </Stack>

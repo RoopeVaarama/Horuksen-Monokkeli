@@ -16,6 +16,7 @@ const Sidetext = styled('div')(() => ({
 }))
 
 const FileInList = ({ filename, id, date }: { filename: string; id: string; date: string }) => {
+  const formattedDate = new Date(date).toLocaleDateString()
   const { openFile } = useFileStore()
 
   return (
@@ -28,7 +29,7 @@ const FileInList = ({ filename, id, date }: { filename: string; id: string; date
           <Sidetext>
             <Typography id='fileitem-date' variant='caption'>
               <FormattedMessage id='added' defaultMessage='Lisätty '></FormattedMessage>
-              {date}
+              {formattedDate}
             </Typography>
             <Button id='fileitem-open-button' onClick={() => openFile(id)}>
               <FormattedMessage id='open' defaultMessage='Avaa' />

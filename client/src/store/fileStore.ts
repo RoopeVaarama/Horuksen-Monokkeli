@@ -4,10 +4,14 @@ import { FileMeta, FileList, IntlMsg, SortVariant } from '../types'
 import { fetcher } from '../tools/fetcher'
 import { getToken } from '../tools/auth'
 import {
-  sortByDate,
-  sortByDateReverse,
-  sortByAlphabets,
-  sortByAlphabetsReverse
+  sortFilesByDate,
+  sortFilesByDateReverse,
+  sortFilesByAlphabets,
+  sortFilesByAlphabetsReverse,
+  sortListsByAlphabets,
+  sortListsByAlphabetsReverse,
+  sortListsByDate,
+  sortListsByDateReverse
 } from '../tools/sortPredicates'
 
 interface FileState {
@@ -19,7 +23,10 @@ interface FileState {
   fileListUpdate: boolean
   uploadSuccess: IntlMsg | null
   uploadError: IntlMsg | null
-  sortVariant: SortVariant
+  fileSortVariant: SortVariant
+  listSortVariant: SortVariant
+  fileKeyword: string
+  listKeyword: string
   addFileID: (id: string) => void
   deleteFile: (id: string) => void
   openFile: (id: string) => void
@@ -36,8 +43,16 @@ interface FileState {
   deleteSingleFileFromList: (listID: string, fileID: string) => void
   startCreating: () => void
   stopCreating: () => void
-  setSortVariant: (variant: SortVariant) => void
+  setFileSortVariant: (variant: SortVariant) => void
+  setListSortVariant: (variant: SortVariant) => void
   sortFiles: () => void
+  sortFilelists: () => void
+  setFileKeyword: (keyword: string) => void
+  fileSearch: () => void
+  stopFileSearch: () => void
+  setListKeyword: (keyword: string) => void
+  fileListSearch: () => void
+  stopFileListSearch: () => void
 }
 
 const BASE_PATH = 'files'
@@ -51,7 +66,10 @@ export const useFileStore = create<FileState>((set, get) => ({
   fileListUpdate: false,
   uploadSuccess: null,
   uploadError: null,
-  sortVariant: 'date',
+  fileSortVariant: 'date',
+  listSortVariant: 'date',
+  fileKeyword: '',
+  listKeyword: '',
   addFileID: (id: string) => {
     set((state) => ({
       selectedFileIDs: [...state.selectedFileIDs, id]
@@ -65,6 +83,7 @@ export const useFileStore = create<FileState>((set, get) => ({
         id: id
       })
       set((state) => ({
+        files: get().files.filter((file) => file._id !== id),
         selectedFileIDs: state.selectedFileIDs.filter((fileid) => fileid !== id),
         fileUpdate: !get().fileUpdate
       }))
@@ -108,7 +127,6 @@ export const useFileStore = create<FileState>((set, get) => ({
     }
   },
   uploadFiles: async (formData: FormData) => {
-    console.log('upload')
     const options = {
       url: `${process.env.REACT_APP_BACKEND_URL}/${BASE_PATH}/upload`,
       method: 'POST',
@@ -124,7 +142,6 @@ export const useFileStore = create<FileState>((set, get) => ({
         fileUpdate: !get().fileUpdate,
         uploadSuccess: { intlKey: 'uploadSuccess', defaultMessage: 'Tiedostojen lataus onnistui' }
       })
-      console.log('upload success')
     } catch (error) {
       set({
         uploadError: { intlKey: 'uploadError', defaultMessage: 'Lataus epäonnistui' }
@@ -132,7 +149,6 @@ export const useFileStore = create<FileState>((set, get) => ({
     }
   },
   addListWithFiles: async (title: string) => {
-    console.log('Add list with files, title: ' + title)
     try {
       await fetcher({
         method: 'POST',
@@ -238,6 +254,7 @@ export const useFileStore = create<FileState>((set, get) => ({
         id: id
       })
       set({
+        fileLists: get().fileLists.filter((list) => list._id !== id),
         fileListUpdate: !get().fileListUpdate,
         uploadSuccess: { intlKey: 'listDeleted', defaultMessage: 'Lista poistettu' }
       })
@@ -253,6 +270,7 @@ export const useFileStore = create<FileState>((set, get) => ({
         method: 'GET',
         path: `${BASE_PATH}/list`
       })
+      get().sortFilelists()
       set({
         fileLists: Array.isArray(fetchedData) ? fetchedData : []
       })
@@ -266,36 +284,102 @@ export const useFileStore = create<FileState>((set, get) => ({
   stopCreating: () => {
     set({ creatingNewList: false })
   },
-  setSortVariant: (variant: SortVariant) => {
-    set({ sortVariant: variant })
+  setFileSortVariant: (variant: SortVariant) => {
+    set({ fileSortVariant: variant })
+  },
+  setListSortVariant: (variant: SortVariant) => {
+    set({ listSortVariant: variant })
   },
   sortFiles: () => {
-    // TODO tää ei toimi..
-
-    console.log('sorting')
-    switch (get().sortVariant) {
+    switch (get().fileSortVariant) {
       case 'name':
         set((state) => ({
-          files: state.files.sort(sortByAlphabets)
+          files: state.files.sort(sortFilesByAlphabets)
         }))
         break
       case 'nameReverse':
         set((state) => ({
-          files: state.files.sort(sortByAlphabetsReverse)
+          files: state.files.sort(sortFilesByAlphabetsReverse)
         }))
         break
       case 'date':
         set((state) => ({
-          files: state.files.sort(sortByDate)
+          files: state.files.sort(sortFilesByDate)
         }))
         break
       case 'dateReverse':
         set((state) => ({
-          files: state.files.sort(sortByDateReverse)
+          files: state.files.sort(sortFilesByDateReverse)
         }))
         break
       default:
         break
     }
+  },
+  sortFilelists: () => {
+    switch (get().listSortVariant) {
+      case 'name':
+        set((state) => ({
+          fileLists: state.fileLists.sort(sortListsByAlphabets)
+        }))
+        break
+      case 'nameReverse':
+        set((state) => ({
+          fileLists: state.fileLists.sort(sortListsByAlphabetsReverse)
+        }))
+        break
+      case 'date':
+        set((state) => ({
+          fileLists: state.fileLists.sort(sortListsByDate)
+        }))
+        break
+      case 'dateReverse':
+        set((state) => ({
+          fileLists: state.fileLists.sort(sortListsByDateReverse)
+        }))
+        break
+      default:
+        break
+    }
+  },
+  setFileKeyword: (newKeyword: string) => {
+    set({
+      fileKeyword: newKeyword
+    })
+  },
+  fileSearch: () => {
+    if (get().fileKeyword !== '') {
+      set({
+        files: get().files.filter((file) =>
+          file.filename.toLowerCase().includes(get().fileKeyword.toLowerCase())
+        )
+      })
+    }
+  },
+  stopFileSearch: () => {
+    set({
+      fileKeyword: ''
+    })
+    get().resetFiles()
+  },
+  setListKeyword: (newKeyword: string) => {
+    set({
+      listKeyword: newKeyword
+    })
+  },
+  fileListSearch: () => {
+    if (get().listKeyword !== '') {
+      set({
+        fileLists: get().fileLists.filter((filelist) =>
+          filelist.title.toLowerCase().includes(get().listKeyword.toLowerCase())
+        )
+      })
+    }
+  },
+  stopFileListSearch: () => {
+    set({
+      listKeyword: ''
+    })
+    get().resetFileLists()
   }
 }))

@@ -2,18 +2,15 @@ import { IconButton, Menu, MenuItem, Stack, Typography } from '@mui/material'
 import SortIcon from '@mui/icons-material/Sort'
 import { useState } from 'react'
 import { FormattedMessage } from 'react-intl'
-import { useFileStore } from '../../../store/fileStore'
 import { SortVariant } from '../../../types'
 
-const options: { intlId: string; msg: string; sortId: SortVariant }[] = [
-  { intlId: 'nameAtoZ', msg: 'Nimi (A-Ö)', sortId: 'name' },
-  { intlId: 'nameZtoA', msg: 'Nimi (Ö-A)', sortId: 'nameReverse' },
-  { intlId: 'dateFromNewest', msg: 'Päivämäärä (uusin ensin)', sortId: 'dateReverse' },
-  { intlId: 'dateFromOldest', msg: 'Päivämäärä (vanhin ensin)', sortId: 'date' }
-]
-
-const SortingMenu = () => {
-  const { setSortVariant } = useFileStore()
+const SortingMenu = ({
+  options,
+  onSelection
+}: {
+  options: { intlId: string; msg: string; sortId: SortVariant }[]
+  onSelection: (id: SortVariant) => void
+}) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [open, setOpen] = useState(false)
 
@@ -28,7 +25,7 @@ const SortingMenu = () => {
 
   const setSorter = (id: SortVariant) => {
     setOpen(false)
-    setSortVariant(id)
+    onSelection(id)
   }
 
   return (
