@@ -1,8 +1,14 @@
 import create from 'zustand'
 import axios from 'axios'
-import { FileMeta, FileList, IntlMsg } from '../types'
+import { FileMeta, FileList, IntlMsg, SortVariant } from '../types'
 import { fetcher } from '../tools/fetcher'
 import { getToken } from '../tools/auth'
+import {
+  sortByDate,
+  sortByDateReverse,
+  sortByAlphabets,
+  sortByAlphabetsReverse
+} from '../tools/sortPredicates'
 
 interface FileState {
   creatingNewList: boolean
@@ -13,6 +19,7 @@ interface FileState {
   fileListUpdate: boolean
   uploadSuccess: IntlMsg | null
   uploadError: IntlMsg | null
+  sortVariant: SortVariant
   addFileID: (id: string) => void
   deleteFile: (id: string) => void
   openFile: (id: string) => void
@@ -29,6 +36,8 @@ interface FileState {
   deleteSingleFileFromList: (listID: string, fileID: string) => void
   startCreating: () => void
   stopCreating: () => void
+  setSortVariant: (variant: SortVariant) => void
+  sortFiles: () => void
 }
 
 const BASE_PATH = 'files'
@@ -42,6 +51,7 @@ export const useFileStore = create<FileState>((set, get) => ({
   fileListUpdate: false,
   uploadSuccess: null,
   uploadError: null,
+  sortVariant: 'date',
   addFileID: (id: string) => {
     set((state) => ({
       selectedFileIDs: [...state.selectedFileIDs, id]
@@ -89,6 +99,7 @@ export const useFileStore = create<FileState>((set, get) => ({
         method: 'GET',
         path: BASE_PATH
       })
+      get().sortFiles()
       set({
         files: Array.isArray(fetchedData) ? fetchedData : []
       })
@@ -254,5 +265,37 @@ export const useFileStore = create<FileState>((set, get) => ({
   },
   stopCreating: () => {
     set({ creatingNewList: false })
+  },
+  setSortVariant: (variant: SortVariant) => {
+    set({ sortVariant: variant })
+  },
+  sortFiles: () => {
+    // TODO tää ei toimi..
+
+    console.log('sorting')
+    switch (get().sortVariant) {
+      case 'name':
+        set((state) => ({
+          files: state.files.sort(sortByAlphabets)
+        }))
+        break
+      case 'nameReverse':
+        set((state) => ({
+          files: state.files.sort(sortByAlphabetsReverse)
+        }))
+        break
+      case 'date':
+        set((state) => ({
+          files: state.files.sort(sortByDate)
+        }))
+        break
+      case 'dateReverse':
+        set((state) => ({
+          files: state.files.sort(sortByDateReverse)
+        }))
+        break
+      default:
+        break
+    }
   }
 }))

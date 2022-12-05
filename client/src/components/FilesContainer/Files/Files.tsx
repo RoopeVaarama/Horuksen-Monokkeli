@@ -7,10 +7,19 @@ import { FormattedMessage } from 'react-intl'
 import { useFileStore } from '../../../store/fileStore'
 import ClearIcon from '@mui/icons-material/Clear'
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd'
+import SortingMenu from '../SortingMenu'
 
 const Files = () => {
-  const { files, selectedFileIDs, fileUpdate, addFilesToList, resetFileIDs, resetFiles } =
-    useFileStore()
+  const {
+    files,
+    selectedFileIDs,
+    fileUpdate,
+    sortVariant,
+    addFilesToList,
+    resetFileIDs,
+    resetFiles,
+    sortFiles
+  } = useFileStore()
 
   const [dialogOpen, setDialogOpen] = useState(false)
 
@@ -29,35 +38,39 @@ const Files = () => {
     resetFiles()
   }, [fileUpdate])
 
-  console.log(Array.isArray(selectedFileIDs) + ' && ' + selectedFileIDs.length)
+  useEffect(() => {
+    sortFiles()
+  }, [sortVariant])
 
   return (
     <Stack spacing={1}>
       <Typography variant='h6'>
         <FormattedMessage id='files' defaultMessage='Tiedostot' />
       </Typography>
-
-      {Array.isArray(selectedFileIDs) && selectedFileIDs.length > 0 && (
-        <Stack spacing={1} direction='row'>
-          <Button
-            startIcon={<ClearIcon />}
-            onClick={resetFileIDs}
-            sx={{ width: '20%', fontSize: '12px' }}
-          >
-            <FormattedMessage id='clearSelection' defaultMessage='Tyhjennä valinnat' />
-          </Button>
-          <Button
-            startIcon={<PlaylistAddIcon />}
-            sx={{ width: '20%', fontSize: '12px' }}
-            onClick={handleAddButtonClick}
-          >
-            <FormattedMessage
-              id='addSelectedToExistingList'
-              defaultMessage='Lisää tiedostot listaan'
-            />
-          </Button>
+      <Stack spacing={1} direction='row' justifyContent='space-between'>
+        <Stack direction='row'>
+          {Array.isArray(selectedFileIDs) && selectedFileIDs.length > 0 && (
+            <Stack direction='row'>
+              <Button startIcon={<ClearIcon />} onClick={resetFileIDs} sx={{ fontSize: '10px' }}>
+                <FormattedMessage id='clearSelection' defaultMessage='Tyhjennä valinnat' />
+              </Button>
+              <Button
+                startIcon={<PlaylistAddIcon />}
+                sx={{ fontSize: '10px' }}
+                onClick={handleAddButtonClick}
+              >
+                <FormattedMessage
+                  id='addSelectedToExistingList'
+                  defaultMessage='Lisää tiedostot listaan'
+                />
+              </Button>
+            </Stack>
+          )}
         </Stack>
-      )}
+
+        <SortingMenu />
+      </Stack>
+
       <ListSelectionDialog open={dialogOpen} onClose={handleDialogClose}></ListSelectionDialog>
 
       <Box id='files-container'>
