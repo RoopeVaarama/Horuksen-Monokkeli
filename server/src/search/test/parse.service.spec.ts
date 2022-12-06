@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { getModelToken } from '@nestjs/mongoose';
-import { BadRequestException, HttpException, NotFoundException } from '@nestjs/common';
+import { HttpException } from '@nestjs/common';
 import { ParseService } from '../parse.service';
 import { invoicePdfExpectedResult } from './json/invoice.pdf';
 

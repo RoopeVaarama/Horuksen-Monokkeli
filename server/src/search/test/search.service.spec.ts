@@ -1,12 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
-import { BadRequestException, HttpException, NotFoundException } from '@nestjs/common';
-import { ParseService } from '../parse.service';
-import { invoicePdfExpectedResult } from './json/invoice.pdf';
 import { Direction, SearchService } from '../search.service';
 import { Term } from 'src/template/schemas/term.schema';
 import { mockPage1 } from './json/mockPages';
-import { Search, SearchDocument, SearchSchema } from '../schemas/search.schema';
+import { Search, SearchSchema } from '../schemas/search.schema';
 import { connect, Connection, Model } from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 
