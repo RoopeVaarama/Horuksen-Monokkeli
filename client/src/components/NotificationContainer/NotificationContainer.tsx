@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useUserStore } from '../../store/userStore'
+import { useFileStore } from '../../store/fileStore'
 import { AlertColor, Snackbar, Alert } from '@mui/material'
 import { IntlMsg } from '../../types'
 import { useIntl } from 'react-intl'
@@ -12,6 +13,7 @@ const NotificationContainer = () => {
   const [message, setMessage] = useState<string | undefined>(undefined)
 
   const { successMsg: userSuccess, errorMsg: userError, resetMsg: userReset } = useUserStore()
+  const { uploadSuccess, uploadError } = useFileStore()
   const intl = useIntl()
 
   useEffect(() => {
@@ -52,6 +54,18 @@ const NotificationContainer = () => {
       handleNewMessage(userError, 'error')
     }
   }, [userError])
+
+  useEffect(() => {
+    if (uploadSuccess) {
+      handleNewMessage(uploadSuccess, 'success')
+    }
+  }, [uploadSuccess])
+
+  useEffect(() => {
+    if (uploadError) {
+      handleNewMessage(uploadError, 'error')
+    }
+  }, [uploadError])
 
   return (
     <Snackbar
