@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { SearchResult } from '../../../types'
 // eslint-disable-next-line prettier/prettier, unused-imports/no-unused-imports
-import { Document, Page } from 'react-pdf/dist/esm/entry.webpack5'
+import { Document, Page, pdfjs } from 'react-pdf/dist/esm/entry.webpack5'
 import { getToken } from '../../../tools/auth'
 import { IconButton } from '@mui/material'
 import { SkipNext, SkipPrevious } from '@mui/icons-material'
@@ -21,6 +21,8 @@ const PdfView = ({
    */
   width?: number
 }) => {
+  pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`
+
   const url = `${process.env.REACT_APP_BACKEND_URL}/files/read/${fileId}`
   const docRequestObject = {
     url,
