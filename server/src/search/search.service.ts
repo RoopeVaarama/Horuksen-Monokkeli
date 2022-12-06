@@ -13,7 +13,7 @@ import { Search, SearchDocument } from './schemas/search.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 
-enum Direction {
+export enum Direction {
   Right,
   Below,
   Left,
