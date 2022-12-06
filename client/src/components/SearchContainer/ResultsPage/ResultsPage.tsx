@@ -3,9 +3,10 @@ import { CircularProgress, Stack, Typography } from '@mui/material'
 import { FormattedMessage } from 'react-intl'
 import { useSearchStore } from '../../../store/searchStore'
 import { Alert } from '../../common'
+import PdfView from '../../common/PdfView'
 
 const ResultsPage = () => {
-  const { search, searching, results } = useSearchStore()
+  const { search, searching, results, fileIDs } = useSearchStore()
 
   useEffect(() => {
     search()
@@ -42,6 +43,14 @@ const ResultsPage = () => {
               </Stack>
             ))
           )}
+          {fileIDs.map((fileID) => (
+            <PdfView
+              key={fileID}
+              fileId={fileID}
+              width={1000}
+              results={results.filter((res) => res.file === fileID)}
+            ></PdfView>
+          ))}
         </>
       )}
     </Stack>
