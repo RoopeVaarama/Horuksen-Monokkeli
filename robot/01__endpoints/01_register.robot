@@ -14,10 +14,16 @@ Set Variables
     ${user_json}=    Load Json From File    ${CURDIR}/json/user.json
     Set Suite Variable    ${user_json}
 
+    ${epoch}    Get Time    epoch
+
     ${USERNAME}=    Get Value From Json    ${user_json}    $.username
-    ${USERNAME}=    Set Variable    ${USERNAME[0]}
+    ${USERNAME}=    Set Variable    ${USERNAME[0]}_${epoch}
     ${PASSWORD}=    Get Value From Json    ${user_json}    $.password
     ${PASSWORD}=    Set Variable    ${PASSWORD[0]}
+
+    ${user_json}=    Update Value To Json    ${user_json}    $..username    ${USERNAME}
+
+    Set Suite Variable    ${user_json}
 
     Set Global Variable    ${USERNAME}
     Set Global Variable    ${PASSWORD}

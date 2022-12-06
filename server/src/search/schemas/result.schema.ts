@@ -36,11 +36,27 @@ export class Result {
 
   @Prop({ type: Number })
   @ApiProperty()
+  key_width: number;
+
+  @Prop({ type: Number })
+  @ApiProperty()
+  key_height: number;
+
+  @Prop({ type: Number })
+  @ApiProperty()
   val_x: number;
 
   @Prop({ type: Number })
   @ApiProperty()
   val_y: number;
+
+  @Prop({ type: Number })
+  @ApiProperty()
+  value_width: number;
+
+  @Prop({ type: Number })
+  @ApiProperty()
+  value_height: number;
 }
 
 export const ResultSchema = SchemaFactory.createForClass(Result);

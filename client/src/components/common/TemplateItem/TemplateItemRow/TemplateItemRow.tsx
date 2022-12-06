@@ -77,7 +77,7 @@ const TemplateItemRow = ({
   }
 
   return (
-    <Box className='templateRow' position='relative'>
+    <Box id={'templateRowCollapse' + marker} className='templateRow' position='relative'>
       <ListItemButton
         onClick={() => setOpen(!open)}
         className='templateRowCollapse'
@@ -94,7 +94,7 @@ const TemplateItemRow = ({
         {open ? <ExpandLess color='primary' /> : <ExpandMore color='primary' />}
       </ListItemButton>
       <Collapse in={open} sx={{ backgroundColor: alpha(theme.palette.secondary.light, 0.1) }}>
-        <Grid container p={2} columnSpacing={4} rowSpacing={2}>
+        <Grid id={'templateRow' + marker} container p={2} columnSpacing={4} rowSpacing={2}>
           <Grid container item xs={12} sm={6} rowSpacing={2}>
             <Grid item xs={12}>
               <FormControl
@@ -138,6 +138,7 @@ const TemplateItemRow = ({
             <Grid item xs={12}>
               <TextField
                 fullWidth
+                className='allowedOffsetInput'
                 color='secondary'
                 size='small'
                 type='number'
@@ -157,6 +158,7 @@ const TemplateItemRow = ({
             <Grid item xs={12}>
               <TextField
                 fullWidth
+                className='regexValueInput'
                 color='secondary'
                 size='small'
                 defaultValue={templateRow.valueMatch}
@@ -249,6 +251,7 @@ const TemplateItemRow = ({
             <Grid item xs={12}>
               <TextField
                 fullWidth
+                className='levenshteinDistanceInput'
                 color='secondary'
                 size='small'
                 type='number'
@@ -271,6 +274,7 @@ const TemplateItemRow = ({
             <Grid item xs={12}>
               <TextField
                 fullWidth
+                className='skipFirstValuesInput'
                 color='secondary'
                 size='small'
                 type='number'
@@ -291,6 +295,7 @@ const TemplateItemRow = ({
             <Grid item xs={12}>
               <TextField
                 fullWidth
+                className='maximumValuesPerPageInput'
                 color='secondary'
                 size='small'
                 type='number'
@@ -354,6 +359,7 @@ const TemplateItemRow = ({
           >
             <TextField
               color='secondary'
+              className='templateRowKeyInput'
               size='small'
               defaultValue={templateRow.key}
               autoFocus={!templateRow.key}

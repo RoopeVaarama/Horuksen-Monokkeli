@@ -40,9 +40,17 @@ const Content = styled('div')(({ theme }) => ({
   }
 }))
 
+const Background = styled('div')(({ theme }) => ({
+  position: 'fixed',
+  width: '100vw',
+  height: '100vh',
+  backgroundColor: theme.palette.background.default
+}))
+
 const AppFrame = ({ children }: { children: JSX.Element | JSX.Element[] }) => {
   return (
     <Root>
+      <Background />
       <Wrapper>
         <Toolbar height={TOOLBAR_HEIGHT} />
         <NotificationContainer />
