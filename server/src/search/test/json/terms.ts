@@ -1,0 +1,40 @@
+const invoicePdfTerms = [
+  {
+    key: 'Total',
+    keyOnly: false,
+    levenDistance: 0,
+    direction: 0,
+    allowedOffset: 10,
+    valueMatch: '.*',
+    valuePrune: '.*',
+    ignoreFirst: 0,
+    maxPerPage: 0,
+    _id: '6384b4ea3820153100f5d301',
+  },
+  {
+    key: 'Web Design',
+    keyOnly: false,
+    levenDistance: 0,
+    direction: 1,
+    allowedOffset: 10,
+    valueMatch: '.*',
+    valuePrune: '.*',
+    ignoreFirst: 0,
+    maxPerPage: 0,
+    _id: '6384b4ea3820153100f5d302',
+  },
+  {
+    key: 'From:',
+    keyOnly: false,
+    levenDistance: 0,
+    direction: 1,
+    allowedOffset: 10,
+    valueMatch: '.*',
+    valuePrune: '.*',
+    ignoreFirst: 0,
+    maxPerPage: 0,
+    _id: '638603b9aa6f1edb582c3440',
+  },
+];
+
+export { invoicePdfTerms };

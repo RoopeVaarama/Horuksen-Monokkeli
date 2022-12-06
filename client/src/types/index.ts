@@ -10,6 +10,7 @@ import { RegisterDto } from './RegisterDto'
 import { LoginDto } from './LoginDto'
 import { User } from './User'
 import { IntlMsg } from './IntlMsg'
+import { SortVariant } from './SortVariant'
 
 export type {
   FileInfo,
@@ -23,5 +24,6 @@ export type {
   RegisterDto,
   LoginDto,
   User,
-  IntlMsg
+  IntlMsg,
+  SortVariant
 }
