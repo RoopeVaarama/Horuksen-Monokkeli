@@ -1,6 +1,5 @@
 import create from 'zustand'
 import { fetcher } from '../tools/fetcher'
-//import { templatesArrayToSearch } from '../tools/temporaryConverters'
 import { FileInfo, SearchResult, Template } from '../types'
 
 interface SearchState {
@@ -79,7 +78,9 @@ export const useSearchStore = create<SearchState>((set, get) => ({
   },
   addFileToSearch(file: FileInfo) {
     set((state) => ({
-      fileIDs: [...state.fileIDs, file._id],
+      fileIDs: state.fileIDs.find((id) => id === file._id)
+        ? state.fileIDs
+        : [...state.fileIDs, file._id],
       refreshSearch: true
     }))
   },

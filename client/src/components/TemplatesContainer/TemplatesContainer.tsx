@@ -1,9 +1,9 @@
 import AddIcon from '@mui/icons-material/Add'
 import { Button, Stack, Typography, CircularProgress, Box, useTheme } from '@mui/material'
-import { TemplateItem } from '../common'
+import { TemplateItem, ToggleButton } from '../common'
 import { FormattedMessage } from 'react-intl'
 import { useTemplateStore } from '../../store/templateStore'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Alert from '../common/Alert'
 import { Template } from '../../types'
 import { getUid } from '../../tools/auth'
@@ -24,6 +24,7 @@ const TemplatesContainer = () => {
     createTemplate,
     updateTemplate
   } = useTemplateStore()
+  const [openTabs, setOpenTabs] = useState<boolean>(true)
 
   const filteredTemplates = (oldTemplates: Template[]) => {
     if (templateDraft?._id) {
@@ -75,16 +76,29 @@ const TemplatesContainer = () => {
             />
           )}
           <Stack spacing={1} width='100%' display='flex'>
-            <Box display='flex' justifyContent='space-between' className='templatesListheader'>
-              <Typography variant='h6'>
-                <FormattedMessage id='templates' defaultMessage='Templatet' />
-              </Typography>
+            <Box
+              display='flex'
+              flexDirection={{ xs: 'column', sm: 'row' }}
+              justifyContent='space-between'
+              alignItems='start'
+              className='templatesListheader'
+            >
+              <Stack direction='row' spacing={2}>
+                <Typography variant='h6'>
+                  <FormattedMessage id='templates' defaultMessage='Templatet' />
+                </Typography>
+                <ToggleButton open={openTabs} setOpen={setOpenTabs} />
+              </Stack>
               {!templateDraft && (
                 <Button
                   id='newTemplateBtn'
                   onClick={handleCreateTemplateDraft}
                   startIcon={<AddIcon />}
-                  sx={{ maxWidth: 'max-content', alignSelf: 'center' }}
+                  sx={{
+                    maxWidth: 'max-content',
+                    alignSelf: { xs: 'start', sm: 'center' },
+                    mt: { xs: 1, sm: 0 }
+                  }}
                 >
                   <FormattedMessage id='createNewTemplate' defaultMessage='Luo uusi template' />
                 </Button>
@@ -93,14 +107,19 @@ const TemplatesContainer = () => {
             {templateDraft && (
               <Box
                 id='draftContainer'
-                sx={{ '&>div': { boxShadow: `0px 0px 0px 1px ${theme.palette.secondary.main}` } }}
+                sx={{ '&>div': { boxShadow: `0px 0px 0px 1px ${theme.palette.success.main}` } }}
               >
-                <TemplateItem template={templateDraft} variant='draft' />
+                <TemplateItem template={templateDraft} variant='draft' toggleOpen={openTabs} />
               </Box>
             )}
             {Array.isArray(templates) &&
               filteredTemplates(templates).map((template) => (
-                <TemplateItem key={template._id} template={template} variant='noEdit' />
+                <TemplateItem
+                  key={template._id}
+                  template={template}
+                  variant='noEdit'
+                  toggleOpen={openTabs}
+                />
               ))}
             {Array.isArray(templates) && templates.length === 0 && !templateDraft && (
               <Alert
