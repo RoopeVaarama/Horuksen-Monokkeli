@@ -13,7 +13,9 @@ import CloseIcon from '@mui/icons-material/Close'
 import StyledPaper from '../../common/StyledPaper/StyledPaper'
 import FileGroup from './FileGroup'
 import FileUploader from './FileUploader'
-import { useSearchStore } from '../../../store/searchStore'
+//import { useSearchStore } from '../../../store/searchStore'
+import { uploader } from '../../../tools/uploader'
+//import { fetcher } from '../../../tools/fetcher'
 import { getToken } from '../../../tools/auth'
 import { useFilesearchStore } from '../../../store/filesearchStore'
 import { FormattedMessage } from 'react-intl'
@@ -32,7 +34,6 @@ const StyledDiv = styled('div')(() => ({
 }))
 
 const FilesPage = () => {
-  const { setUpload } = useSearchStore()
   const { keyword, refresh, setKeyword, setSearchActive, setSearchInactive, searchActive } =
     useFilesearchStore()
 
@@ -70,19 +71,11 @@ const FilesPage = () => {
 
   // Upload file(s) to the database
   const uploadFile = async (formData: FormData) => {
-    // Use fetch instead of fetcher to enable FormData content
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/files/upload`, {
-      method: 'POST',
-      body: formData,
-      headers: {
-        Authorization: `Bearer ${getToken()}`
-      }
-    })
-      .then((response) => response.json())
-      .then(() => {
-        setUpload(true)
-      })
-      .catch((error) => console.log(error))
+    try {
+      await uploader(formData)
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   // Get the selected file(s) from FileUploader

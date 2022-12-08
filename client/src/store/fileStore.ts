@@ -1,7 +1,7 @@
 import create from 'zustand'
-import axios from 'axios'
 import { FileMeta, FileList, IntlMsg, SortVariant } from '../types'
 import { fetcher } from '../tools/fetcher'
+import { uploader } from '../tools/uploader'
 import { getToken } from '../tools/auth'
 import {
   sortFilesByDate,
@@ -127,17 +127,8 @@ export const useFileStore = create<FileState>((set, get) => ({
     }
   },
   uploadFiles: async (formData: FormData) => {
-    const options = {
-      url: `${process.env.REACT_APP_BACKEND_URL}/${BASE_PATH}/upload`,
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-        'Content-Type': 'multipart/form-data'
-      },
-      data: formData
-    }
     try {
-      await axios(options)
+      const res = await uploader(formData)
       set({
         fileUpdate: !get().fileUpdate,
         uploadSuccess: { intlKey: 'uploadSuccess', defaultMessage: 'Tiedostojen lataus onnistui' }

@@ -13,8 +13,8 @@ import FileItem from './FileItem'
 import { useSearchStore } from '../../../store/searchStore'
 import { useFilesearchStore } from '../../../store/filesearchStore'
 import { FormattedMessage } from 'react-intl'
-import { getToken } from '../../../tools/auth'
 import { FileMeta } from '../../../types'
+import { fetcher } from '../../../tools/fetcher'
 
 const Sidetext = styled('div')(() => ({
   display: 'flex',
@@ -58,59 +58,52 @@ const FileGroup = (props: { id: string; groupName: string }) => {
     }
   }, [])
 
-  const fetchAllFiles = () => {
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/files`, {
-      headers: {
-        Authorization: `Bearer ${getToken()}`
-      }
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        const newData = data.map((file: FileMeta) => {
-          const date = new Date(file.createdAt).toLocaleDateString()
-          return {
-            id: file._id,
-            author: file.author,
-            filename: file.filename,
-            date: date,
-            dateObj: file.createdAt,
-            checked: fileIDs.includes(file._id)
-          }
-        })
-        // Sort from newest to oldest
-        newData.sort(function compareFn(
-          a: { name: string; date: string; dateObj: Date; checked: boolean },
-          b: { name: string; date: string; dateObj: Date; checked: boolean }
-        ) {
-          return a.dateObj > b.dateObj ? -1 : 1
-        })
-        setAllFiles(newData)
-        setChildren(newData)
+  const fetchAllFiles = async () => {
+    try {
+      const data = await fetcher({ method: 'GET', path: 'files' })
+      const newData = data.map((file: FileMeta) => {
+        const date = new Date(file.createdAt).toLocaleDateString()
+        return {
+          id: file._id,
+          author: file.author,
+          filename: file.filename,
+          date: date,
+          dateObj: file.createdAt,
+          checked: fileIDs.includes(file._id)
+        }
       })
+      // Sort from newest to oldest
+      newData.sort(function compareFn(
+        a: { name: string; date: string; dateObj: Date; checked: boolean },
+        b: { name: string; date: string; dateObj: Date; checked: boolean }
+      ) {
+        return a.dateObj > b.dateObj ? -1 : 1
+      })
+      setAllFiles(newData)
+      setChildren(newData)
+    } catch (e) {
+      console.log(e)
+    }
   }
 
-  const fetchFilesInList = () => {
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/files/list/${id}`, {
-      headers: {
-        Authorization: `Bearer ${getToken()}`
-      }
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        const files = data.files.map((file: FileMeta) => {
-          const date = new Date(file.createdAt).toLocaleDateString()
-          return {
-            id: file._id,
-            author: file.author,
-            filename: file.filename,
-            date: date,
-            dateObj: file.createdAt,
-            checked: fileIDs.includes(file._id)
-          }
-        })
-        setChildren(files)
+  const fetchFilesInList = async () => {
+    try {
+      const data = await fetcher({ method: 'GET', path: 'files/list', id: id })
+      const files = data.files.map((file: FileMeta) => {
+        const date = new Date(file.createdAt).toLocaleDateString()
+        return {
+          id: file._id,
+          author: file.author,
+          filename: file.filename,
+          date: date,
+          dateObj: file.createdAt,
+          checked: fileIDs.includes(file._id)
+        }
       })
-      .catch((e) => console.log(e))
+      setChildren(files)
+    } catch (e) {
+      console.log(e)
+    }
   }
 
   const [override, setOverride] = useState(false)
