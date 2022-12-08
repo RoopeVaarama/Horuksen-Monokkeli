@@ -77,46 +77,48 @@ const PdfView = ({
           />
         </Document>
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
-          {results?.map((result) => (
-            <>
-              <svg
-                key={'key-' + result.key}
-                width={svgMargin + scale * result.key_width}
-                height={svgMargin + scale * result.key_height}
-                style={{
-                  position: 'absolute',
-                  zIndex: 1,
-                  top: svgYOffset + scale * ((result.key_y ?? 0) - (result.key_height ?? 0)),
-                  left: svgXOffset + scale * (result.key_x ?? 0)
-                }}
-              >
-                <rect
+          {results
+            ?.filter((result) => result.page === pageNumber)
+            .map((result) => (
+              <>
+                <svg
+                  key={'key-' + result.key}
                   width={svgMargin + scale * result.key_width}
                   height={svgMargin + scale * result.key_height}
-                  style={{ fillOpacity: 0, strokeWidth: 3, stroke: 'rgb(0,0,255)' }}
-                />
-              </svg>
-              {result.val_x && result.val_y && (
-                <svg
-                  key={result.key}
-                  width={svgMargin + scale * (result.value_width ?? 0)}
-                  height={svgMargin + scale * (result.value_height ?? 0)}
                   style={{
                     position: 'absolute',
                     zIndex: 1,
-                    top: svgYOffset + scale * ((result.val_y ?? 0) - (result.value_height ?? 0)),
-                    left: svgXOffset + scale * (result.val_x ?? 0)
+                    top: svgYOffset + scale * ((result.key_y ?? 0) - (result.key_height ?? 0)),
+                    left: svgXOffset + scale * (result.key_x ?? 0)
                   }}
                 >
                   <rect
-                    width={svgMargin + scale * (result.value_width ?? 0)}
-                    height={svgMargin + scale * (result.value_height ?? 0)}
-                    style={{ fillOpacity: 0, strokeWidth: 3, stroke: 'rgb(255,0,0)' }}
+                    width={svgMargin + scale * result.key_width}
+                    height={svgMargin + scale * result.key_height}
+                    style={{ fillOpacity: 0, strokeWidth: 3, stroke: 'rgb(0,0,255)' }}
                   />
                 </svg>
-              )}
-            </>
-          ))}
+                {result.val_x && result.val_y && (
+                  <svg
+                    key={result.key}
+                    width={svgMargin + scale * (result.value_width ?? 0)}
+                    height={svgMargin + scale * (result.value_height ?? 0)}
+                    style={{
+                      position: 'absolute',
+                      zIndex: 1,
+                      top: svgYOffset + scale * ((result.val_y ?? 0) - (result.value_height ?? 0)),
+                      left: svgXOffset + scale * (result.val_x ?? 0)
+                    }}
+                  >
+                    <rect
+                      width={svgMargin + scale * (result.value_width ?? 0)}
+                      height={svgMargin + scale * (result.value_height ?? 0)}
+                      style={{ fillOpacity: 0, strokeWidth: 3, stroke: 'rgb(255,0,0)' }}
+                    />
+                  </svg>
+                )}
+              </>
+            ))}
         </div>
       </div>
     </div>

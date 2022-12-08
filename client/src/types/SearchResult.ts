@@ -11,4 +11,5 @@ export interface SearchResult {
   val_y?: number
   value_width?: number
   value_height?: number
+  page: number
 }
