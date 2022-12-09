@@ -9,16 +9,15 @@ interface SearchState {
   refreshSearch: boolean
   searching: boolean
   fileIDs: string[]
-  upload: boolean
   addTemplateToSearch: (template: Template) => void
   removeTemplateFromSearch: (id: string) => void
   resetSearchParamaters: () => void
   search: () => void
   addFileToSearch: (file: FileInfo) => void
   removeFileFromSearch: (fileToRemove: FileInfo) => void
+  removeFileIDfromSearch: (idToRemove: string) => void
   setGroupAsOpen: (groupName: string) => void
   setGroupAsClosed: (groupName: string) => void
-  setUpload: (status: boolean) => void
 }
 
 export const useSearchStore = create<SearchState>((set, get) => ({
@@ -69,6 +68,7 @@ export const useSearchStore = create<SearchState>((set, get) => ({
             files: uniqueFileIDS
           })
         })
+        console.log(data.results)
         set({ searching: false, refreshSearch: false, results: data.results })
       } catch (e) {
         console.log(e)
@@ -90,6 +90,12 @@ export const useSearchStore = create<SearchState>((set, get) => ({
       refreshSearch: true
     }))
   },
+  removeFileIDfromSearch: (idToRemove: string) => {
+    set((state) => ({
+      fileIDs: state.fileIDs.filter((id) => id !== idToRemove),
+      refreshSearch: true
+    }))
+  },
   setGroupAsOpen(groupName: string) {
     set((state) => ({
       openFileGroups: [...state.openFileGroups, groupName]
@@ -99,8 +105,5 @@ export const useSearchStore = create<SearchState>((set, get) => ({
     set((state) => ({
       openFileGroups: state.openFileGroups.filter((groupname) => groupname !== groupName)
     }))
-  },
-  setUpload(status: boolean) {
-    set({ upload: status })
   }
 }))

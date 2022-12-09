@@ -15,6 +15,7 @@ import { useFilesearchStore } from '../../../store/filesearchStore'
 import { FormattedMessage } from 'react-intl'
 import { FileMeta } from '../../../types'
 import { fetcher } from '../../../tools/fetcher'
+import { useFileStore } from '../../../store/fileStore'
 
 const Sidetext = styled('div')(() => ({
   display: 'flex',
@@ -22,8 +23,10 @@ const Sidetext = styled('div')(() => ({
 }))
 
 const FileGroup = (props: { id: string; groupName: string }) => {
-  const { fileIDs, openFileGroups, setGroupAsOpen, setGroupAsClosed, upload, setUpload } =
-    useSearchStore()
+  const { fileIDs, openFileGroups, setGroupAsOpen, setGroupAsClosed } = useSearchStore()
+
+  const { files, fileUpdate, fileListUpdate } = useFileStore()
+
   const { keyword, refreshSearch, searchActive } = useFilesearchStore()
   const { id, groupName } = props
 
@@ -136,7 +139,7 @@ const FileGroup = (props: { id: string; groupName: string }) => {
   }
 
   const [chosenFiles, setChosenFiles] = useState(0)
-  const [totalFiles, setTotalFiles] = useState(0)
+  const [totalFiles, setTotalFiles] = useState(files.length)
 
   const onItemToggle = (id: string, selected: boolean) => {
     setChildren((current) => {
@@ -169,15 +172,12 @@ const FileGroup = (props: { id: string; groupName: string }) => {
   }, [chosenFiles, totalFiles])
 
   useEffect(() => {
-    if (upload) {
-      groupName === 'Kaikki tiedostot' ? fetchAllFiles() : fetchFilesInList()
-      setUpload(false)
-    }
-  }, [upload])
+    groupName === 'Kaikki tiedostot' ? fetchAllFiles() : fetchFilesInList()
+  }, [fileUpdate])
 
   useEffect(() => {
     updateGroup()
-  }, [children])
+  }, [fileUpdate, children])
 
   useEffect(() => {
     if (groupName === 'Kaikki tiedostot') {
