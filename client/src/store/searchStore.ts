@@ -43,6 +43,7 @@ export const useSearchStore = create<SearchState>((set, get) => ({
   resetSearchParamaters: () => {
     set({
       searchTemplates: [],
+      fileIDs: [],
       refreshSearch: false
     })
   },
@@ -68,7 +69,6 @@ export const useSearchStore = create<SearchState>((set, get) => ({
             files: uniqueFileIDS
           })
         })
-        console.log(data.results)
         set({ searching: false, refreshSearch: false, results: data.results })
       } catch (e) {
         console.log(e)

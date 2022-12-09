@@ -128,7 +128,7 @@ export const useFileStore = create<FileState>((set, get) => ({
   },
   uploadFiles: async (formData: FormData) => {
     try {
-      const res = await uploader(formData)
+      await uploader(formData)
       set({
         fileUpdate: !get().fileUpdate,
         uploadSuccess: { intlKey: 'uploadSuccess', defaultMessage: 'Tiedostojen lataus onnistui' }

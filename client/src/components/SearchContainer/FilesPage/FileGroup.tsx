@@ -25,7 +25,7 @@ const Sidetext = styled('div')(() => ({
 const FileGroup = (props: { id: string; groupName: string }) => {
   const { fileIDs, openFileGroups, setGroupAsOpen, setGroupAsClosed } = useSearchStore()
 
-  const { files, fileUpdate, fileListUpdate } = useFileStore()
+  const { files, fileUpdate } = useFileStore()
 
   const { keyword, refreshSearch, searchActive } = useFilesearchStore()
   const { id, groupName } = props
