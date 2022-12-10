@@ -3,19 +3,20 @@ import { useEffect, useState } from 'react'
 import { FormattedMessage } from 'react-intl'
 import { useSearchStore } from '../../../store/searchStore'
 import { fetcher } from '../../../tools/fetcher'
-import { FileInfo } from '../../../types'
+import { FileInfo, SearchResult } from '../../../types'
 import { Alert, Table } from '../../common'
 import PdfView from '../../common/PdfView'
 
 const KEY_ONLY_COLUMNS: string[] = ['fileName', 'key', 'count']
 const VALUE_COLUMNS: string[] = ['fileName', 'page', 'key', 'value']
 
-const getResults = (objects: Record<string, any>[], files?: FileInfo[]) => {
+const getResults = (results: SearchResult[], files?: FileInfo[]) => {
   const valueTableRows: Record<string, any>[] = []
   const keyOnlyTableRows: Record<string, any>[] = []
   const fileCounts: Record<string, Record<string, number>> = {}
   let fileName: string | undefined = undefined
-  objects.forEach((obj) => {
+  console.log(results)
+  results.forEach((obj) => {
     if (Array.isArray(files) && files.length !== 0) {
       fileName = files.find((file) => file._id === obj.file)?.filename
     }
@@ -28,7 +29,11 @@ const getResults = (objects: Record<string, any>[], files?: FileInfo[]) => {
       } else {
         fileCounts[fileName][obj.key] += 1
       }
-    } else if (obj.key !== undefined && fileName !== undefined) {
+    } else if (
+      obj.key !== undefined &&
+      fileName !== undefined &&
+      !valueTableRows.find((row) => row.key === obj.key && row.value === obj.value)
+    ) {
       valueTableRows.push({ ...obj, fileName })
     }
   })
@@ -124,10 +129,10 @@ const ResultsPage = () => {
             <Typography variant='h6' sx={{ pt: 1 }}>
               <FormattedMessage id='results' defaultMessage='Tulokset' />
             </Typography>
-            {fileIDs.map((fileID) => {
+            {fileIDs.map((fileID, i) => {
               const fileName = files.find((file) => file._id === fileID)?.filename
               return (
-                <Stack key={fileID}>
+                <Stack key={i}>
                   <Typography variant='body1' sx={{ py: 1 }}>
                     {fileName}
                   </Typography>
