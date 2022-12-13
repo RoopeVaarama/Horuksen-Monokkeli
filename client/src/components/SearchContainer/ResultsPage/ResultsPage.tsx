@@ -125,6 +125,7 @@ const ResultsPage = () => {
               <FormattedMessage id='results' defaultMessage='Tulokset' />
             </Typography>
             {fileIDs.map((fileID) => {
+              console.log(fileID)
               const fileName = files.find((file) => file._id === fileID)?.filename
               return (
                 <Stack key={fileID}>

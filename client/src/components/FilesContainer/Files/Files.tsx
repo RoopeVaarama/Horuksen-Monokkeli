@@ -70,7 +70,7 @@ const Files = () => {
         <Typography variant='h6'>
           <FormattedMessage id='files' defaultMessage='Tiedostot' />
         </Typography>
-        <IconButton onClick={() => setOpen(!open)}>
+        <IconButton onClick={() => setOpen(!open)} id='files-dropdown-button'>
           {open ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
         </IconButton>
       </Stack>

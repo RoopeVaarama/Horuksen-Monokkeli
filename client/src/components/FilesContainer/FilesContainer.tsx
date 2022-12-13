@@ -11,7 +11,6 @@ const FilesContainer = () => {
     // Convert into FormData and upload
     files !== null &&
       files.forEach(async (file) => {
-        console.log(file)
         const formData = new FormData()
         formData.append('file', file)
         await uploadFiles(formData)
