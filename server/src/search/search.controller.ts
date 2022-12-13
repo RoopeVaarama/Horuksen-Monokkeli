@@ -5,7 +5,6 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
-  ApiResponse,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -16,13 +15,11 @@ import {
   Delete,
   Get,
   Param,
-  Patch,
   Post,
   UsePipes,
   ValidationPipe,
   UnauthorizedException,
   BadRequestException,
-  ForbiddenException,
 } from '@nestjs/common';
 import { ParseService } from './parse.service';
 import { SearchService } from './search.service';
@@ -84,7 +81,8 @@ export class SearchController {
   }
 
   // Performs a search with the received SearchRequest-object
-  // Not used anymore? Remove? --Tuomo
+  // Currently not used but leaving this here for future possibility
+  // of templateless searches -Tuomo
   @Post('/search')
   @ApiOperation({ summary: 'Performs a search with the SearchRequest-object given in the body' })
   @ApiOkResponse({ status: 200, description: 'Search completed', type: SearchRequest })

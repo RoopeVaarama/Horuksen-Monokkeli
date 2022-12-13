@@ -12,7 +12,7 @@ import { ParseService } from 'src/search/parse.service';
   imports: [
     MongooseModule.forFeature([{ name: FileMeta.name, schema: FileMetaSchema }]),
     MongooseModule.forFeature([{ name: FileList.name, schema: FileListSchema }]),
-    MulterModule.register({ dest: './test_pdfs' }),
+    MulterModule.register({ dest: './files' }),
   ],
   providers: [FileService, ListService, ParseService],
   controllers: [FileController],

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import {
   Grid,
   IconButton,
@@ -14,10 +14,9 @@ import StyledPaper from '../../common/StyledPaper/StyledPaper'
 import FileGroup from './FileGroup'
 import FileUploader from './FileUploader'
 import { useSearchStore } from '../../../store/searchStore'
-import { getToken } from '../../../tools/auth'
+import { useFileStore } from '../../../store/fileStore'
 import { useFilesearchStore } from '../../../store/filesearchStore'
 import { FormattedMessage } from 'react-intl'
-import { FileList } from '../../../types'
 
 const SearchField = styled(TextField)(() => ({
   variant: 'outlined',
@@ -32,65 +31,22 @@ const StyledDiv = styled('div')(() => ({
 }))
 
 const FilesPage = () => {
-  const { setUpload } = useSearchStore()
   const { keyword, refresh, setKeyword, setSearchActive, setSearchInactive, searchActive } =
     useFilesearchStore()
+  const { files, fileUpdate, fileLists, fileListUpdate, resetFiles, resetFileLists, uploadFiles } =
+    useFileStore()
+  const { fileIDs, removeFileIDfromSearch } = useSearchStore()
 
-  const [children, setChildren] = useState<
-    {
-      key: string
-      groupName: string
-      selected: boolean
-    }[]
-  >([])
-
-  // Fetch the file groups
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/files/list`, {
-      headers: {
-        Authorization: `Bearer ${getToken()}`
-      }
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        const fileLists: {
-          key: string
-          groupName: string
-          selected: boolean
-        }[] = []
-        if (data.length > 0) {
-          data.map((filelist: FileList) => {
-            fileLists.push({ key: filelist._id, groupName: filelist.title, selected: false })
-          })
-        }
-        setChildren(fileLists)
-      })
-      .catch((e) => console.log(e))
-  }, [])
-
-  // Upload file(s) to the database
-  const uploadFile = async (formData: FormData) => {
-    // Use fetch instead of fetcher to enable FormData content
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/files/upload`, {
-      method: 'POST',
-      body: formData,
-      headers: {
-        Authorization: `Bearer ${getToken()}`
-      }
-    })
-      .then((response) => response.json())
-      .then(() => {
-        setUpload(true)
-      })
-      .catch((error) => console.log(error))
-  }
+    resetFileLists()
+  }, [fileUpdate, fileListUpdate])
 
   // Get the selected file(s) from FileUploader
-  const filesUploaded = (files: File[]) => {
+  const filesUploaded = async (files: File[]) => {
     files.forEach((file) => {
       const formData = new FormData()
       formData.append('file', file)
-      uploadFile(formData)
+      uploadFiles(formData)
     })
   }
 
@@ -112,6 +68,22 @@ const FilesPage = () => {
     setKeyword('')
     setSearchInactive()
   }
+
+  useEffect(() => {
+    resetFiles()
+  }, [])
+
+  const checkForDeletions = () => {
+    const allIDs = files.map((file) => file._id)
+    const extraIDs = fileIDs.filter((id) => !allIDs.includes(id))
+    extraIDs.forEach((id) => {
+      removeFileIDfromSearch(id)
+    })
+  }
+
+  useEffect(() => {
+    checkForDeletions()
+  }, [fileUpdate])
 
   return (
     <StyledPaper sx={{ width: 'calc(100% - 48px)' }}>
@@ -153,16 +125,17 @@ const FilesPage = () => {
           }}
         >
           <FileGroup id='Kaikki tiedostot' groupName='Kaikki tiedostot' />
-          {children.length > 0 && !searchActive && <hr />}
-          {children.length > 0 && !searchActive && (
+          {fileLists.length > 0 && !searchActive && <hr />}
+          {fileLists.length > 0 && !searchActive && (
             <Typography>
               <FormattedMessage id='usersLists' defaultMessage='Käyttäjän omat listat' />
             </Typography>
           )}
-
           {!searchActive &&
-            children.map((filegroup) => (
-              <FileGroup key={filegroup.key} id={filegroup.key} groupName={filegroup.groupName} />
+            Array.isArray(fileLists) &&
+            fileLists.length > 0 &&
+            fileLists.map((filelist) => (
+              <FileGroup key={filelist._id} id={filelist._id} groupName={filelist.title} />
             ))}
         </Stack>
         <hr />

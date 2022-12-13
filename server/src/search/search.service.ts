@@ -1,11 +1,10 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import {
-  PDFExtract,
-  PDFExtractOptions,
-  PDFExtractPage,
-  PDFExtractResult,
-  PDFExtractText,
-} from 'pdf.js-extract';
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
+import { PDFExtractPage, PDFExtractResult, PDFExtractText } from 'pdf.js-extract';
 import { Result } from './schemas/result.schema';
 import { Term } from '../template/schemas/term.schema';
 import { distance } from 'fastest-levenshtein';
@@ -40,7 +39,13 @@ export class SearchService {
         let ignore = terms[i].ignoreFirst;
         let max = terms[i].maxPerPage;
         if (terms[i].maxPerPage == 0) max = -1;
-        if (ignore > 0) contentArray.sort((a: PDFExtractText, b: PDFExtractText) => a.y - b.y);
+
+        // if we need to ignore some matches, sort the entries first by y, then by x
+        if (ignore > 0)
+          contentArray.sort((a: PDFExtractText, b: PDFExtractText) => {
+            if (a.y == b.y) return a.x - b.x;
+            return a.y - b.y;
+          });
 
         // iterate through every entry on the page
         for (let entryIndex = 0; entryIndex < contentArray.length; ++entryIndex) {
@@ -180,9 +185,14 @@ export class SearchService {
     return true;
   }
 
-  // checks if value matches regex
-  valueMatch(value: string, regex: string): boolean {
-    const reg = new RegExp(regex);
+  // checks if value matches regex, invalid regex just returns false (for now)
+  valueMatch(value: string, regexStr: string): boolean {
+    try {
+      new RegExp(regexStr);
+    } catch (e) {
+      return false;
+    }
+    const reg = new RegExp(regexStr);
     return reg.test(value);
   }
 
