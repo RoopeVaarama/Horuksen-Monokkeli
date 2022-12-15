@@ -40,7 +40,7 @@ See results
 
 Check result validity
     [Documentation]    Todo: Rework this
-    Get Element    "key: Total"
-    Get Element    "value: $93.50"
-    Get Element    "key: Web Design"
-    Get Element    "value: This is a sample description..."
+    Get Element    "Total"
+    Get Element    "$93.50"
+    Get Element    "Web Design"
+    Get Element    "This is a sample description..."
