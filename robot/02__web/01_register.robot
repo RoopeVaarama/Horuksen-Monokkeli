@@ -5,7 +5,8 @@ Resource    ../resources.robot
 
 *** Variables ***
 ${USERNAME}
-${PASSWORD}=    asdasd123123
+${PASSWORD_WEB}=    asdasd123123
+${PASSWORD}
 ${FIRST_NAME}=    Testi
 ${LAST_NAME}=    Testinen
 ${EMAIL}=    testi@testi.fi
@@ -15,7 +16,7 @@ Set Variables
     [Documentation]    Set global variables to be used by browser FW tests
     ${epoch}    Get Time    epoch
     Set Global Variable    ${USERNAME}    user_${epoch}
-    Set Global Variable    ${PASSWORD}
+    Set Global Variable    ${PASSWORD}    ${PASSWORD_WEB}
     Set Global Variable    ${FIRST_NAME}
     Set Global Variable    ${LAST_NAME}
     Set Global Variable    ${EMAIL}
