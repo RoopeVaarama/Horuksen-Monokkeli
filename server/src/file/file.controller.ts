@@ -32,7 +32,7 @@ import { ListService } from './list.service';
 import { FileMeta, FileMetaDocument } from './schemas/filemeta.schema';
 import { FileList } from './schemas/filelist.schema';
 import { Model } from 'mongoose';
-import { ParseService } from 'src/search/parse.service';
+import { ParseService } from '../search/parse.service';
 import { deprecate } from 'util';
 import { createReadStream } from 'fs';
 import { join } from 'path';

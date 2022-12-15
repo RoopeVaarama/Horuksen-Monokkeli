@@ -14,6 +14,8 @@ import { FileMeta, FileMetaDocument } from './schemas/filemeta.schema';
 export class FileService {
   constructor(@InjectModel(FileMeta.name) private fileMetaModel: Model<FileMetaDocument>) {}
 
+  // Note from code testing:
+  // NotFound is not triggered. findById returns null, instead of raising error
   async canFileBeFound(fileId: string): Promise<boolean> {
     try {
       await this.fileMetaModel.findById(fileId);
@@ -27,6 +29,9 @@ export class FileService {
     return await this.fileMetaModel.find({ filepath: filePath }).exec();
   }
 
+  // Note from code testing:
+  // NotFound is not triggered. findById returns null, instead of raising error
+  // Causes internal error when trying to read property from null
   async doesUserOwnFile(userId: string, fileId: string): Promise<boolean> {
     let fileMeta;
     try {
@@ -63,6 +68,9 @@ export class FileService {
     return files;
   }
 
+  // Note from code testing:
+  // Mongoose supports finding by array of IDs, and by multiple conditions
+  // e.g. find({ author: userId, _id: { $in: fileIds } })
   async getFilesByIds(fileIds: string[], userId: string): Promise<FileMeta[]> {
     const metasToReturn: FileMeta[] = [];
     for (let i = 0; i < fileIds.length; i++) {
@@ -79,6 +87,8 @@ export class FileService {
     return metasToReturn;
   }
 
+  // Note from code testing:
+  // Other CRUD methods include userId and check ownership. Why not here?
   async deleteFile(id: string): Promise<boolean> {
     await this.canFileBeFound(id);
     const fileToRemove = (await this.fileMetaModel.findById(id)).filepath;
